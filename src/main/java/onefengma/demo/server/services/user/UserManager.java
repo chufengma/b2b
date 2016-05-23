@@ -1,10 +1,11 @@
-package onefengma.demo.server.user;
+package onefengma.demo.server.services.user;
 
 import java.util.UUID;
 
 import onefengma.demo.model.SimpleStr;
 import onefengma.demo.model.User;
 import onefengma.demo.server.core.BaseManager;
+import onefengma.demo.server.services.apibeans.Register;
 
 /**
  * @author yfchu
@@ -14,7 +15,8 @@ public class UserManager extends BaseManager {
 
     @Override
     public void init() {
-        post("file", (req, rep) -> {
+        post("register", (req, rep) -> {
+            Register request = getRequest(req, Register.class);
             User user = new User();
             user.setId(UUID.randomUUID().toString());
             user.setName("fengma");
@@ -23,4 +25,6 @@ public class UserManager extends BaseManager {
             return success(new SimpleStr("好吧，这是嘴刁的"));
         });
     }
+
+
 }

@@ -3,6 +3,7 @@ package onefengma.demo.server.core;
 import com.alibaba.fastjson.JSON;
 
 import onefengma.demo.server.config.Config;
+import spark.Request;
 import spark.Response;
 import spark.Route;
 import spark.Spark;
@@ -24,11 +25,11 @@ public abstract class BaseManager {
 
     /*------------------------------ http methods start --------------------------- */
     // wrap http post
-    public static void post(String path, Route route) {
-        Spark.post(path, (request, response) -> {
-            jsonContentType(response);
-            return route.handle(request, response);
-        });
+    public static void post(String path, TypedRoute route) {
+//        Spark.post(path, (request, response, bean) -> {
+//            jsonContentType(response);
+//            return route.handle(request, response);
+//        });
     }
 
     // wrap http get
@@ -77,6 +78,10 @@ public abstract class BaseManager {
         return jsonResult;
     }
 
+
+    public <T> T getRequest(Request request, Class<T> tClass) {
+        return JSON.parseObject(request.body(), tClass);
+    }
 
     /*-------------------------------abstract methods------------------------------------*/
     public abstract void init();

@@ -1,4 +1,4 @@
-package onefengma.demo.server.user;
+package onefengma.demo.server.services.user;
 
 import org.sql2o.Connection;
 
