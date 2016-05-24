@@ -2,7 +2,6 @@ package onefengma.demo.server.services.user;
 
 import java.util.UUID;
 
-import onefengma.demo.model.SimpleStr;
 import onefengma.demo.model.User;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.services.apibeans.Register;
@@ -13,18 +12,35 @@ import onefengma.demo.server.services.apibeans.Register;
  */
 public class UserManager extends BaseManager {
 
+    private UserDataHelper userDataHelper;
+
     @Override
     public void init() {
-        post("register", (req, rep) -> {
-            Register request = getRequest(req, Register.class);
+        post("register", Register.class, (req, rep, register) -> {
+            if (register == null || register.isNotValid()) {
+                return error("miss params");
+            }
             User user = new User();
+            user.setName(register.userName);
+            user.setPassword(register.password);
             user.setId(UUID.randomUUID().toString());
-            user.setName("fengma");
-            user.setPassword("86868239");
-            new UserDataHelper().insertUser(user);
-            return success(new SimpleStr("好吧，这是嘴刁的"));
+            insertUser(user);
+            return success();
         });
+
+        get("userList", Void.class, (request, response, requestBean) -> success(getUserDataHelper().getUserList()));
     }
 
+
+    private UserDataHelper getUserDataHelper() {
+        if (userDataHelper == null) {
+            userDataHelper = new UserDataHelper();
+        }
+        return userDataHelper;
+    }
+
+    private void insertUser(User user) {
+        getUserDataHelper().insertUser(user);
+    }
 
 }

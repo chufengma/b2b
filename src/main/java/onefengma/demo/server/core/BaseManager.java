@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSON;
 import onefengma.demo.server.config.Config;
 import spark.Request;
 import spark.Response;
-import spark.Route;
 import spark.Spark;
 
 /**
@@ -25,18 +24,26 @@ public abstract class BaseManager {
 
     /*------------------------------ http methods start --------------------------- */
     // wrap http post
-    public static void post(String path, TypedRoute route) {
-//        Spark.post(path, (request, response, bean) -> {
-//            jsonContentType(response);
-//            return route.handle(request, response);
-//        });
+    public static <T> void post(String path, Class<T> tClass, TypedRoute<T> route) {
+        Spark.post(path, (request, response) -> {
+            try {
+                jsonContentType(response);
+                return route.handle(request, response, getRequest(request, tClass));
+            } catch (Exception e) {
+                return error(STATUS_ERROR, "innerError", e);
+            }
+        });
     }
 
     // wrap http get
-    public static void get(String path, Route route) {
+    public static void get(String path, Class tClass, TypedRoute route) {
         Spark.get(path, (request, response) -> {
-            jsonContentType(response);
-            return route.handle(request, response);
+            try {
+                jsonContentType(response);
+                return route.handle(request, response, getRequest(request, tClass));
+            } catch (Exception e) {
+                return error(STATUS_ERROR, "innerError", e);
+            }
         });
     }
 
@@ -50,8 +57,21 @@ public abstract class BaseManager {
         return toJson(new BaseResult(STATUS_SUCCESS, "", data));
     }
 
+    public static String success() {
+        return toJson(new BaseResult(STATUS_SUCCESS, "", "{}"));
+    }
+
     public static String error(int code, String errorMsg, Throwable exception) {
-        return toJson(new BaseResult(code, errorMsg, exception));
+        StringBuffer stringBuffer = new StringBuffer();
+        if (exception != null) {
+            stringBuffer.append(exception.toString());
+            StackTraceElement[] trace = exception.getStackTrace();
+            for (StackTraceElement traceElement : trace) {
+                stringBuffer.append("" + traceElement);
+                stringBuffer.append("\\r\\n");
+            }
+        }
+        return toJson(new BaseResult(code, errorMsg, stringBuffer.toString()));
     }
 
     public static String error() {
@@ -79,7 +99,7 @@ public abstract class BaseManager {
     }
 
 
-    public <T> T getRequest(Request request, Class<T> tClass) {
+    public static <T> T getRequest(Request request, Class<T> tClass) {
         return JSON.parseObject(request.body(), tClass);
     }
 

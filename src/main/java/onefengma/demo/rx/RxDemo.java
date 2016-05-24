@@ -1,5 +1,7 @@
 package onefengma.demo.rx;
 
+import com.alibaba.fastjson.JSON;
+
 import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.model.SimpleStr;
 import retrofit2.Call;
@@ -21,6 +23,15 @@ public class RxDemo {
                 LogUtils.i(integer + 12 + "");
             }
         });
+
+
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("asdfasfasdf");
+        stringBuffer.append("  \r\n  ");
+        stringBuffer.append("123123");
+        stringBuffer.append("\n");
+
+        System.out.println(JSON.toJSONString(stringBuffer.toString()));
     }
 
     public interface ServerService {

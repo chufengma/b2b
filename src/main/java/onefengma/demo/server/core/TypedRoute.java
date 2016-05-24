@@ -7,6 +7,6 @@ import spark.Response;
  * @author yfchu
  * @date 2016/5/23
  */
-public interface TypedRoute {
-    Object handle(Request request, Response response, Object requestBean) throws Exception;
+public interface TypedRoute<T> {
+    Object handle(Request request, Response response, T requestBean) throws Exception;
 }

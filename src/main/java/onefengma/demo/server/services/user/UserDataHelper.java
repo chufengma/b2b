@@ -2,6 +2,7 @@ package onefengma.demo.server.services.user;
 
 import org.sql2o.Connection;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import onefengma.demo.model.User;
@@ -23,13 +24,13 @@ public class UserDataHelper extends BaseDataHelper {
         }
     }
 
-    public void getUser() {
+    public List<User> getUserList() {
         String sql = "select * from user";
+        List<User> userList = new ArrayList<>();
         try (Connection con = getConn()) {
             List<User> users = con.createQuery(sql).executeAndFetch(User.class);
-            for (User user : users) {
-                System.out.println("user:" + user.getId());
-            }
+            userList.addAll(users);
         }
+        return userList;
     }
 }
