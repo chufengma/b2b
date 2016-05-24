@@ -14,6 +14,20 @@ import onefengma.demo.server.core.BaseDataHelper;
  */
 public class UserDataHelper extends BaseDataHelper {
 
+    public User findUserByName(String name) {
+        String sql = "select * from user where name=:name";
+        List<User> users;
+        try (Connection con = getConn()) {
+            users = con.createQuery(sql)
+                    .addParameter("name", name)
+                    .executeAndFetch(User.class);
+            if (users.isEmpty()) {
+                return null;
+            }
+        }
+        return users.get(0);
+    }
+
     public void insertUser(User user) {
         String sql = "insert into user(id, name, password) values (:id, :name, :pass)";
         try (Connection con = getConn()) {

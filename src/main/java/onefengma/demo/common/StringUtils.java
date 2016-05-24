@@ -10,4 +10,8 @@ public class StringUtils {
         return str == null || str.isEmpty();
     }
 
+    public static boolean equals(String str, String str2) {
+        return str == null ? false : str.equals(str2);
+    }
+
 }

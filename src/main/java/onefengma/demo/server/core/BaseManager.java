@@ -3,8 +3,11 @@ package onefengma.demo.server.core;
 import com.alibaba.fastjson.JSON;
 
 import onefengma.demo.server.config.Config;
+import onefengma.demo.server.services.apibeans.BaseBean;
+import onefengma.demo.server.services.apibeans.BaseLoginSession;
 import spark.Request;
 import spark.Response;
+import spark.Route;
 import spark.Spark;
 
 /**
@@ -25,26 +28,29 @@ public abstract class BaseManager {
     /*------------------------------ http methods start --------------------------- */
     // wrap http post
     public static <T> void post(String path, Class<T> tClass, TypedRoute<T> route) {
-        Spark.post(path, (request, response) -> {
-            try {
-                jsonContentType(response);
-                return route.handle(request, response, getRequest(request, tClass));
-            } catch (Exception e) {
-                return error(STATUS_ERROR, "innerError", e);
-            }
-        });
+        Spark.post(path, doRequest(route, tClass));
     }
 
     // wrap http get
     public static void get(String path, Class tClass, TypedRoute route) {
-        Spark.get(path, (request, response) -> {
+        Spark.get(path, doRequest(route, tClass));
+    }
+
+    // really request logic body
+    private static Route doRequest(TypedRoute route, Class tClass) {
+        return (request, response) -> {
             try {
                 jsonContentType(response);
-                return route.handle(request, response, getRequest(request, tClass));
+                Object reqBean = getRequest(request, tClass);
+                if (loginSessionCheck(reqBean)) {
+                    return route.handle(request, response, reqBean);
+                } else {
+                    return error(STATUS_NOT_LOGIN, "not login", null);
+                }
             } catch (Exception e) {
                 return error(STATUS_ERROR, "innerError", e);
             }
-        });
+        };
     }
 
     // most content type is JSON
@@ -99,8 +105,23 @@ public abstract class BaseManager {
     }
 
 
-    public static <T> T getRequest(Request request, Class<T> tClass) {
-        return JSON.parseObject(request.body(), tClass);
+    public static <T extends BaseBean> T getRequest(Request request, Class<T> tClass) throws IllegalAccessException, InstantiationException {
+        T baseBean = JSON.parseObject(request.body(), tClass);
+        if (baseBean == null) {
+            baseBean = tClass.newInstance();
+        }
+        baseBean.session.clear();
+        baseBean.session.putAll(request.cookies());
+
+        if (baseBean instanceof BaseLoginSession) {
+            ((BaseLoginSession) baseBean).setAuth(request.headers(BaseLoginSession.HEADER_TICKET));
+        }
+        return baseBean;
+    }
+
+    /*------------------------login handler-----------------------------------*/
+    private static boolean loginSessionCheck(Object object) {
+        return object instanceof BaseLoginSession ? !((BaseLoginSession) object).isNotValid() : true;
     }
 
     /*-------------------------------abstract methods------------------------------------*/

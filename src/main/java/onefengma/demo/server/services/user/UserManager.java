@@ -1,9 +1,11 @@
 package onefengma.demo.server.services.user;
 
-import java.util.UUID;
-
+import onefengma.demo.common.MD5Utils;
+import onefengma.demo.common.StringUtils;
 import onefengma.demo.model.User;
 import onefengma.demo.server.core.BaseManager;
+import onefengma.demo.server.services.apibeans.BaseLoginSession;
+import onefengma.demo.server.services.apibeans.Login;
 import onefengma.demo.server.services.apibeans.Register;
 
 /**
@@ -16,19 +18,38 @@ public class UserManager extends BaseManager {
 
     @Override
     public void init() {
+        // 注册
         post("register", Register.class, (req, rep, register) -> {
             if (register == null || register.isNotValid()) {
                 return error("miss params");
             }
-            User user = new User();
-            user.setName(register.userName);
-            user.setPassword(register.password);
-            user.setId(UUID.randomUUID().toString());
-            insertUser(user);
+
+            User user = getUserDataHelper().findUserByName(register.userName);
+            if (user != null) {
+                return error("用户名已注册!");
+            }
+            getUserDataHelper().insertUser(register.generateUser());
             return success();
         });
 
-        get("userList", Void.class, (request, response, requestBean) -> success(getUserDataHelper().getUserList()));
+        // 登陆
+        post("login", Login.class, (request, response, loginBean) -> {
+            if (loginBean == null || loginBean.isNotValid()) {
+                return error("miss params");
+            }
+            User user = getUserDataHelper().findUserByName(loginBean.userName);
+            if (user == null) {
+                return error("用户名不存在！");
+            }
+            if (StringUtils.equals(user.getPassword(), MD5Utils.md5(loginBean.password))) {
+                return success();
+            } else {
+                return error("密码错误！");
+            }
+        });
+
+        // 用户列表
+        get("userList", BaseLoginSession.class, (request, response, requestBean) -> success(getUserDataHelper().getUserList()));
     }
 
 
@@ -37,10 +58,6 @@ public class UserManager extends BaseManager {
             userDataHelper = new UserDataHelper();
         }
         return userDataHelper;
-    }
-
-    private void insertUser(User user) {
-        getUserDataHelper().insertUser(user);
     }
 
 }
