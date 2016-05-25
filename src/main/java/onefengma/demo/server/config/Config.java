@@ -24,9 +24,9 @@ public class Config {
     // environment
     private static final ENVI ENV = ENVI.DEV;
     // data
-    private static final String DATA_BASE_URL = "jdbc:mysql://localhost:3306/b2b?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+    private static final String DATA_BASE_URL = "jdbc:mysql://localhost:3306/b2b?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false";
     private static final String DATA_BASE_USER = "root";
-    private static final String DATA_BASE_PASS = "8686239";
+    private static final String DATA_BASE_PASS = "root";
 
     private static final String NOT_FOUND_PATH = "404.html";
     private static final String BASE_FILE_PATH = "./files/";

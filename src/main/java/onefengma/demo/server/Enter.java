@@ -1,5 +1,8 @@
 package onefengma.demo.server;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,6 +22,12 @@ public class Enter {
     );
 
     public static void main(String[] args) {
+        try {
+            Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/b2b?useUnicode=true&characterEncoding=utf-8&useSSL=false", "root", "root");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         // user modules
         for(BaseManager manager : managers) {
             manager.init();
