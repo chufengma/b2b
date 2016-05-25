@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Document</title>
+
+<script>
+        
+        function initHistoryParams() {
+            var bizType = document.getElementById("bizType").value;
+            var productId = document.getElementById("productId").value;
+            var params = {
+                "bizType" : bizType,
+                "productId" : productId,
+                "callback_tagname" : "callback",
+            }
+
+            CtripBusiness.app_do_business_job(1, "setupHistoryWidget", params, 1111111);
+            console.log("----------------初始化成功！");
+        }
+
+        function callback(historyInfo) {
+            console.log("-----------------详情被点击--historyInfo:" + historyInfo);
+            var info = JSON.parse(historyInfo);
+        }
+
+        function closePullHistory() {
+            History_a.closeHistoryWidget("");
+            console.log("----------------关闭下拉成功！");
+        }
+
+    </script>
+
+    <script  type="text/javascript" src="http://10.2.57.11/hapi/code/bridge.js" ></script>
+    
+
+    <style type="text/css">
+        body {
+        display: flex;
+        flex-direction: column;
+        }
+        .title {
+        display: flex;
+        align-self: stretch;
+        }
+        .params {
+        background-color: #ffffee;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 15px;
+        margin-top: 5px;
+        }
+
+        .params_name {
+        width: 100px;
+        }
+        .params_layout {
+        display: flex;
+        flex-direction: column;
+        align-self: center;
+        }
+        .input {
+        display: flex;
+        flex-direction: row;
+        flex: 1;
+        margin-bottom: 10px;
+        }
+
+        .close {
+        background-color: #ffffee;
+        padding: 30px;
+        margin-top: 5px;
+        display: flex;
+        }
+
+        .close input {
+
+        }
+    </style>
+
+</head>
+<body>
+<h3 id="title">浏览历史js demo</h3>
+
+<div class="params">
+
+    <div class="params_layout">
+        <div class="input">
+            <div class="params_name">bizType:</div><input id="bizType" type="text" value="HotelDomestic" />
+        </div>
+        <div class="input">
+            <div class="params_name">productId:</div><input id="productId" type="text" value="anyone" />
+        </div>
+        <input type="button" value="设置浏览历史参数" onclick="initHistoryParams()">
+    </div>
+
+</div>
+</body>
+</html>

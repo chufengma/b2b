@@ -1,10 +1,11 @@
-package onefengma.demo.server.services.apibeans;
+package onefengma.demo.server.services.apibeans.login;
 
 import java.util.UUID;
 
 import onefengma.demo.common.MD5Utils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.model.User;
+import onefengma.demo.server.services.apibeans.BaseBean;
 
 /**
  * @author yfchu

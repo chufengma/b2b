@@ -16,4 +16,9 @@ public class ProductManager extends BaseManager {
         });
 
     }
+
+    @Override
+    public String getParentRoutePath() {
+        return "products";
+    }
 }

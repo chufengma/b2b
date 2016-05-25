@@ -4,9 +4,10 @@ import onefengma.demo.common.MD5Utils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.model.User;
 import onefengma.demo.server.core.BaseManager;
+import onefengma.demo.server.services.apibeans.BaseBean;
 import onefengma.demo.server.services.apibeans.BaseLoginSession;
-import onefengma.demo.server.services.apibeans.Login;
-import onefengma.demo.server.services.apibeans.Register;
+import onefengma.demo.server.services.apibeans.login.Login;
+import onefengma.demo.server.services.apibeans.login.Register;
 
 /**
  * @author yfchu
@@ -18,6 +19,7 @@ public class UserManager extends BaseManager {
 
     @Override
     public void init() {
+        initPages();
         // 注册
         post("register", Register.class, (req, rep, register) -> {
             if (register == null || register.isNotValid()) {
@@ -53,11 +55,26 @@ public class UserManager extends BaseManager {
     }
 
 
+    private void initPages() {
+        getPage("page/login", BaseBean.class, "login.html", (request, response, requestBean) -> {
+            User user = new User();
+            user.setName("AAA");
+            user.setPassword("BBB");
+            return null;
+        });
+    }
+
+
     private UserDataHelper getUserDataHelper() {
         if (userDataHelper == null) {
             userDataHelper = new UserDataHelper();
         }
         return userDataHelper;
+    }
+
+    @Override
+    public String getParentRoutePath() {
+        return "";
     }
 
 }

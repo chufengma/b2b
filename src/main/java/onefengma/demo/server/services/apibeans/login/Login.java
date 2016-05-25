@@ -1,6 +1,7 @@
-package onefengma.demo.server.services.apibeans;
+package onefengma.demo.server.services.apibeans.login;
 
 import onefengma.demo.common.StringUtils;
+import onefengma.demo.server.services.apibeans.BaseBean;
 
 /**
  * @author yfchu

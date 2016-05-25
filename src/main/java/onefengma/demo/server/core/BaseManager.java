@@ -1,14 +1,18 @@
 package onefengma.demo.server.core;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 
+import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.config.Config;
 import onefengma.demo.server.services.apibeans.BaseBean;
 import onefengma.demo.server.services.apibeans.BaseLoginSession;
+import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 import spark.Spark;
+import spark.TemplateViewRoute;
 
 /**
  * @author yfchu
@@ -20,6 +24,8 @@ public abstract class BaseManager {
     public static final int STATUS_SUCCESS = 0;
     public static final int STATUS_NOT_LOGIN = 2;
 
+    public static String parentRoutePath;
+
     // config
     static {
         Config.instance().init();
@@ -27,20 +33,43 @@ public abstract class BaseManager {
 
     /*------------------------------ http methods start --------------------------- */
     // wrap http post
-    public static <T> void post(String path, Class<T> tClass, TypedRoute<T> route) {
-        Spark.post(path, doRequest(route, tClass));
+    public <T> void post(String path, Class<T> tClass, TypedRoute<T> route) {
+        Spark.post(generatePath(path), doRequest(route, tClass));
+
     }
 
     // wrap http get
-    public static void get(String path, Class tClass, TypedRoute route) {
-        Spark.get(path, doRequest(route, tClass));
+    public void get(String path, Class tClass, TypedRoute route) {
+        Spark.get(generatePath(path), doRequest(route, tClass));
+
+    }
+
+    // wrap http get pages
+    public void getPage(String path, Class tClass, String templeFile, TypedRoute route) {
+        Spark.get(path, doPageRequest(route, tClass, templeFile), Config.instance().getFreeMarkerEngine());
+    }
+
+    // get pages
+    private TemplateViewRoute doPageRequest(TypedRoute route, Class tClass, String templeFile) {
+        return (request, response) -> {
+            try {
+                Object reqBean = getRequest(request, tClass);
+                if (loginSessionCheck(reqBean)) {
+                    return new ModelAndView(route.handle(request, response, tClass), templeFile);
+                } else {
+                    // TODO goto login page
+                    return new ModelAndView(null, Config.instance().getNotFoundPath());
+                }
+            } catch (Exception e) {
+                return new ModelAndView(null, Config.instance().getNotFoundPath());
+            }
+        };
     }
 
     // really request logic body
-    private static Route doRequest(TypedRoute route, Class tClass) {
+    private Route doRequest(TypedRoute route, Class tClass) {
         return (request, response) -> {
             try {
-                jsonContentType(response);
                 Object reqBean = getRequest(request, tClass);
                 if (loginSessionCheck(reqBean)) {
                     return route.handle(request, response, reqBean);
@@ -48,9 +77,21 @@ public abstract class BaseManager {
                     return error(STATUS_NOT_LOGIN, "not login", null);
                 }
             } catch (Exception e) {
-                return error(STATUS_ERROR, "innerError", e);
+                return error("inner Error", e);
             }
         };
+    }
+
+    // generate total path
+    private String generatePath(String path) {
+        parentRoutePath = getParentRoutePath();
+        StringBuilder pathBuilder = new StringBuilder();
+        if (!StringUtils.isEmpty(parentRoutePath)) {
+            pathBuilder.append(parentRoutePath);
+            pathBuilder.append("/");
+        }
+        pathBuilder.append(path);
+        return pathBuilder.toString();
     }
 
     // most content type is JSON
@@ -106,10 +147,21 @@ public abstract class BaseManager {
 
 
     public static <T extends BaseBean> T getRequest(Request request, Class<T> tClass) throws IllegalAccessException, InstantiationException {
-        T baseBean = JSON.parseObject(request.body(), tClass);
+        T baseBean = null;
+        if (request.requestMethod() == "GET") {
+            JSONObject beanJson = new JSONObject();
+            for (String key : request.queryParams()) {
+                beanJson.put(key, request.queryMap(key).value());
+            }
+            baseBean = beanJson.toJavaObject(tClass);
+        } else {
+            baseBean = JSON.parseObject(request.body(), tClass);
+        }
+
         if (baseBean == null) {
             baseBean = tClass.newInstance();
         }
+
         baseBean.session.clear();
         baseBean.session.putAll(request.cookies());
 
@@ -126,5 +178,7 @@ public abstract class BaseManager {
 
     /*-------------------------------abstract methods------------------------------------*/
     public abstract void init();
+
+    public abstract String getParentRoutePath();
 
 }
