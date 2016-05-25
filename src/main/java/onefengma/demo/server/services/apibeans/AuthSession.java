@@ -8,7 +8,7 @@ import onefengma.demo.common.StringUtils;
  * @author yfchu
  * @date 2016/5/24
  */
-public class BaseLoginSession extends BaseBean {
+public class AuthSession extends BaseBean {
 
     public static final String HEADER_TICKET = "auth";
     private String auth;

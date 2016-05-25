@@ -10,11 +10,12 @@ import onefengma.demo.common.MD5Utils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.config.Config;
 import onefengma.demo.server.services.apibeans.BaseBean;
-import onefengma.demo.server.services.apibeans.BaseLoginSession;
+import onefengma.demo.server.services.apibeans.AuthSession;
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
 import spark.Route;
+import spark.Session;
 import spark.Spark;
 import spark.TemplateViewRoute;
 
@@ -156,6 +157,8 @@ public abstract class BaseManager {
 
 
     public static <T extends BaseBean> T getRequest(Request request, Class<T> tClass) throws IllegalAccessException, InstantiationException {
+
+
         T baseBean = null;
         if (request.requestMethod() == "GET") {
             JSONObject beanJson = new JSONObject();
@@ -171,18 +174,19 @@ public abstract class BaseManager {
             baseBean = tClass.newInstance();
         }
 
-        baseBean.session.clear();
-        baseBean.session.putAll(request.cookies());
+        baseBean.cookies.clear();
+        baseBean.cookies.putAll(request.cookies());
 
-        if (baseBean instanceof BaseLoginSession) {
-            ((BaseLoginSession) baseBean).setAuth(request.headers(BaseLoginSession.HEADER_TICKET));
+        if (baseBean instanceof AuthSession) {
+            Session session = request.session();
+            ((AuthSession) baseBean).setAuth(session.attribute("token"));
         }
         return baseBean;
     }
 
     /*------------------------login handler-----------------------------------*/
     private static boolean loginSessionCheck(Object object) {
-        return object instanceof BaseLoginSession ? !((BaseLoginSession) object).isNotValid() : true;
+        return object instanceof AuthSession ? !((AuthSession) object).isNotValid() : true;
     }
 
     /*-------------------------------abstract methods------------------------------------*/

@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.UUID;
 
 import javax.servlet.MultipartConfigElement;
 
@@ -13,9 +14,10 @@ import onefengma.demo.common.StringUtils;
 import onefengma.demo.model.User;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.services.apibeans.BaseBean;
-import onefengma.demo.server.services.apibeans.BaseLoginSession;
+import onefengma.demo.server.services.apibeans.AuthSession;
 import onefengma.demo.server.services.apibeans.login.Login;
 import onefengma.demo.server.services.apibeans.login.Register;
+import spark.Session;
 import spark.Spark;
 
 /**
@@ -28,6 +30,9 @@ public class UserManager extends BaseManager {
 
     @Override
     public void init() {
+
+
+
         initPages();
         // 注册
         post("register", Register.class, (req, rep, register) -> {
@@ -53,6 +58,10 @@ public class UserManager extends BaseManager {
                 return error("用户名不存在！");
             }
             if (StringUtils.equals(user.getPassword(), MD5Utils.md5(loginBean.password))) {
+                Session session = request.session();
+                session.attribute("userId", user.getId());
+                session.attribute("token", UUID.randomUUID().toString());
+                session.maxInactiveInterval(5);
                 return success();
             } else {
                 return error("密码错误！");
@@ -60,7 +69,7 @@ public class UserManager extends BaseManager {
         });
 
         // 用户列表
-        get("userList", BaseLoginSession.class, (request, response, requestBean) -> success(getUserDataHelper().getUserList()));
+        get("userList", AuthSession.class, (request, response, requestBean) -> success(getUserDataHelper().getUserList()));
 
 
         Spark.post("/member/pages/upload", (request, response) -> {
@@ -79,7 +88,7 @@ public class UserManager extends BaseManager {
             User user = new User();
             user.setName("AAA");
             user.setPassword("BBB");
-            return null;
+            return user;
         });
 
         getPage("upload", BaseBean.class, "upload.html", (request, response, requestBean) -> {
