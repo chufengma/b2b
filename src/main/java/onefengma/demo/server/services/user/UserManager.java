@@ -1,5 +1,13 @@
 package onefengma.demo.server.services.user;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.InputStream;
+
+import javax.servlet.MultipartConfigElement;
+
+import onefengma.demo.common.FileHelper;
 import onefengma.demo.common.MD5Utils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.model.User;
@@ -8,6 +16,7 @@ import onefengma.demo.server.services.apibeans.BaseBean;
 import onefengma.demo.server.services.apibeans.BaseLoginSession;
 import onefengma.demo.server.services.apibeans.login.Login;
 import onefengma.demo.server.services.apibeans.login.Register;
+import spark.Spark;
 
 /**
  * @author yfchu
@@ -52,14 +61,28 @@ public class UserManager extends BaseManager {
 
         // 用户列表
         get("userList", BaseLoginSession.class, (request, response, requestBean) -> success(getUserDataHelper().getUserList()));
+
+
+        Spark.post("/member/pages/upload", (request, response) -> {
+            request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
+            File file = generateFile(FileHelper.getFileSuffix(FileHelper.getFileName(request.raw().getPart("uploaded_file"))));
+            try (InputStream is = request.raw().getPart("uploaded_file").getInputStream()) {
+                FileUtils.copyInputStreamToFile(is, file);
+            }
+            return "File uploaded";
+        });
     }
 
 
     private void initPages() {
-        getPage("page/login", BaseBean.class, "login.html", (request, response, requestBean) -> {
+        getPage("login", BaseBean.class, "login.html", (request, response, requestBean) -> {
             User user = new User();
             user.setName("AAA");
             user.setPassword("BBB");
+            return null;
+        });
+
+        getPage("upload", BaseBean.class, "upload.html", (request, response, requestBean) -> {
             return null;
         });
     }
@@ -74,7 +97,7 @@ public class UserManager extends BaseManager {
 
     @Override
     public String getParentRoutePath() {
-        return "";
+        return "member";
     }
 
 }

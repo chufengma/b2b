@@ -3,6 +3,10 @@ package onefengma.demo.server.core;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
+import java.io.File;
+import java.util.UUID;
+
+import onefengma.demo.common.MD5Utils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.config.Config;
 import onefengma.demo.server.services.apibeans.BaseBean;
@@ -41,13 +45,14 @@ public abstract class BaseManager {
     // wrap http get
     public void get(String path, Class tClass, TypedRoute route) {
         Spark.get(generatePath(path), doRequest(route, tClass));
-
     }
 
     // wrap http get pages
     public void getPage(String path, Class tClass, String templeFile, TypedRoute route) {
-        Spark.get(path, doPageRequest(route, tClass, templeFile), Config.instance().getFreeMarkerEngine());
+        Spark.get(generatePath("pages/" + path), doPageRequest(route, tClass, templeFile), Config.instance().getFreeMarkerEngine());
     }
+
+
 
     // get pages
     private TemplateViewRoute doPageRequest(TypedRoute route, Class tClass, String templeFile) {
@@ -92,6 +97,10 @@ public abstract class BaseManager {
         }
         pathBuilder.append(path);
         return pathBuilder.toString();
+    }
+
+    public File generateFile(String suffix) {
+        return new File(Config.getBaseFilePath() + MD5Utils.md5(UUID.randomUUID().toString()) + (StringUtils.isEmpty(suffix) ? "" : ".") + suffix);
     }
 
     // most content type is JSON

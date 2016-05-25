@@ -1,5 +1,7 @@
 package onefengma.demo.common;
 
+import javax.servlet.http.Part;
+
 import retrofit2.Retrofit;
 
 /**

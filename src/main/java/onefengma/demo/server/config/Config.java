@@ -29,6 +29,7 @@ public class Config {
     private static final String DATA_BASE_PASS = "8686239";
 
     private static final String NOT_FOUND_PATH = "404.html";
+    private static final String BASE_FILE_PATH = "./files/";
 
     private static DataBaseModel dataBaseModel;
     private static FreeMarkerEngine freeMarkerEngine;
@@ -93,6 +94,10 @@ public class Config {
             dataBaseModel = new DataBaseModel(DATA_BASE_URL, DATA_BASE_USER, DATA_BASE_PASS);
         }
         return dataBaseModel;
+    }
+
+    public static String getBaseFilePath() {
+        return BASE_FILE_PATH;
     }
 
     public static class DataBaseModel {

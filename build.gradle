@@ -8,6 +8,9 @@ repositories {
 }
 
 dependencies {
+    // http://mvnrepository.com/artifact/commons-io/commons-io
+    compile group: 'commons-io', name: 'commons-io', version: '2.4'
+
     // http://mvnrepository.com/artifact/com.sparkjava/spark-template-freemarker
     compile group: 'com.sparkjava', name: 'spark-template-freemarker', version: '2.3'
 
