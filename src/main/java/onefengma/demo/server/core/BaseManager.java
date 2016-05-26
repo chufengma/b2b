@@ -2,20 +2,24 @@ package onefengma.demo.server.core;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.oreilly.servlet.MultipartRequest;
 
 import java.io.File;
-import java.util.UUID;
+import java.io.IOException;
+import java.util.Enumeration;
 
-import onefengma.demo.common.MD5Utils;
+import onefengma.demo.common.FileHelper;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.config.Config;
-import onefengma.demo.server.services.apibeans.BaseBean;
+import onefengma.demo.server.core.request.BaseResult;
+import onefengma.demo.server.core.request.ParamsMissException;
+import onefengma.demo.server.core.request.TypedRoute;
 import onefengma.demo.server.services.apibeans.AuthSession;
+import onefengma.demo.server.services.apibeans.BaseBean;
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
 import spark.Route;
-import spark.Session;
 import spark.Spark;
 import spark.TemplateViewRoute;
 
@@ -40,7 +44,6 @@ public abstract class BaseManager {
     // wrap http post
     public <T> void post(String path, Class<T> tClass, TypedRoute<T> route) {
         Spark.post(generatePath(path), doRequest(route, tClass));
-
     }
 
     // wrap http get
@@ -53,7 +56,10 @@ public abstract class BaseManager {
         Spark.get(generatePath("pages/" + path), doPageRequest(route, tClass, templeFile), Config.instance().getFreeMarkerEngine());
     }
 
-
+    // wrap http multipost pages
+    public <T> void multiPost(String path, Class<T> tClass, TypedRoute<T> route) {
+        Spark.post(generatePath(path), doMultiRequest(route, tClass));
+    }
 
     // get pages
     private TemplateViewRoute doPageRequest(TypedRoute route, Class tClass, String templeFile) {
@@ -73,6 +79,25 @@ public abstract class BaseManager {
     }
 
     // really request logic body
+    private Route doMultiRequest(TypedRoute route, Class tClass) {
+        return (request, response) -> {
+            try {
+                Object requestBean = getMultiBean(request, tClass);
+
+                setupAuth(request, request);
+
+                if (loginSessionCheck(requestBean)) {
+                    return route.handle(request, response, requestBean);
+                } else {
+                    return error(STATUS_NOT_LOGIN, "not login", null);
+                }
+            } catch (Exception e) {
+                return exception(e);
+            }
+        };
+    }
+
+    // really request logic body
     private Route doRequest(TypedRoute route, Class tClass) {
         return (request, response) -> {
             try {
@@ -83,7 +108,7 @@ public abstract class BaseManager {
                     return error(STATUS_NOT_LOGIN, "not login", null);
                 }
             } catch (Exception e) {
-                return error("inner Error", e);
+                return exception(e);
             }
         };
     }
@@ -100,13 +125,13 @@ public abstract class BaseManager {
         return pathBuilder.toString();
     }
 
-    public File generateFile(String suffix) {
-        return new File(Config.getBaseFilePath() + MD5Utils.md5(UUID.randomUUID().toString()) + (StringUtils.isEmpty(suffix) ? "" : ".") + suffix);
-    }
-
     // most content type is JSON
     private static void jsonContentType(Response response) {
         response.type("application/json;charset=utf-8");
+    }
+
+    private String exception(Exception exception) {
+        return error(exception.getMessage(), exception);
     }
 
     /*------------------------------ output start ---------------------------*/
@@ -155,33 +180,65 @@ public abstract class BaseManager {
         return jsonResult;
     }
 
+    private <T extends BaseBean> T getMultiBean(Request request, Class<T> tClass) throws IOException, IllegalAccessException, ParamsMissException {
+        String parentFilePath = FileHelper.getFileFolder();
+        File file = new File(parentFilePath);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        MultipartRequest multipartRequest = new MultipartRequest(request.raw(), FileHelper.getFileFolder(), 1048576, "utf-8", FileHelper.getFileRename());
+        JSONObject beanJson = new JSONObject();
 
-    public static <T extends BaseBean> T getRequest(Request request, Class<T> tClass) throws IllegalAccessException, InstantiationException {
+        // params
+        Enumeration paramsEnum = multipartRequest.getParameterNames();
+        while (paramsEnum.hasMoreElements()) {
+            String paramsName = (String) paramsEnum.nextElement();
+            String value = multipartRequest.getParameter(paramsName);
+            beanJson.put(paramsName, value);
+        }
 
+        // files
+        Enumeration filesEnum = multipartRequest.getFileNames();
+        while (filesEnum.hasMoreElements()) {
+            String paramsName = (String) filesEnum.nextElement();
+            File value = multipartRequest.getFile(paramsName);
+            beanJson.put(paramsName, value);
+        }
 
+        T requestBean = beanJson.toJavaObject(tClass);
+        requestBean.checkParams(beanJson);
+
+        return requestBean;
+    }
+
+    private static <T extends BaseBean> T getRequest(Request request, Class<T> tClass) throws IllegalAccessException, InstantiationException, ParamsMissException {
         T baseBean = null;
+        JSONObject beanJson;
+        // parse params
         if (request.requestMethod() == "GET") {
-            JSONObject beanJson = new JSONObject();
+            beanJson = new JSONObject();
             for (String key : request.queryParams()) {
                 beanJson.put(key, request.queryMap(key).value());
             }
-            baseBean = beanJson.toJavaObject(tClass);
         } else {
-            baseBean = JSON.parseObject(request.body(), tClass);
+            beanJson = JSON.parseObject(request.body());
         }
-
+        baseBean = beanJson.toJavaObject(tClass);
         if (baseBean == null) {
             baseBean = tClass.newInstance();
         }
+        // check params
+        baseBean.checkParams(beanJson);
 
-        baseBean.cookies.clear();
-        baseBean.cookies.putAll(request.cookies());
+        setupAuth(baseBean, request);
 
-        if (baseBean instanceof AuthSession) {
-            Session session = request.session();
-            ((AuthSession) baseBean).setAuth(session.attribute("token"));
-        }
         return baseBean;
+    }
+
+    private static void setupAuth(Object authSession, Request request) {
+        if (authSession instanceof AuthSession) {
+            ((AuthSession) authSession).setAuthData(request);
+        }
     }
 
     /*------------------------login handler-----------------------------------*/

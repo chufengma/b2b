@@ -1,12 +1,29 @@
 package onefengma.demo.common;
 
+import com.oreilly.servlet.multipart.FileRenamePolicy;
+
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.UUID;
+
 import javax.servlet.http.Part;
+
+import onefengma.demo.server.config.Config;
 
 /**
  * @author yfchu
  * @date 2016/5/25
  */
 public class FileHelper {
+
+    private static final FileRename fileRename = new FileRename();
+
+    public static FileRename getFileRename() {
+        return fileRename;
+    }
 
     public static String getFileName(Part part) {
         for (String cd : part.getHeader("content-disposition").split(";")) {
@@ -32,4 +49,27 @@ public class FileHelper {
         return stringBuilder.reverse().toString();
     }
 
+    public static File saveFile(InputStream inputStream, String subFolder, String suffix) throws IOException {
+        subFolder = StringUtils.isEmpty(subFolder) ? "" : subFolder + File.pathSeparator ;
+        String folder = Config.getBaseFilePath() + subFolder + DateHelper.getDataStr() + File.pathSeparator;
+        String fileName = folder + MD5Utils.md5(UUID.randomUUID().toString());
+        File file = new File(fileName);
+        FileUtils.copyInputStreamToFile(inputStream, file);
+        return file;
+    }
+
+    public static String getFileFolder() {
+        return Config.getBaseFilePath() + DateHelper.getDataStr();
+    }
+
+    public static class FileRename implements FileRenamePolicy {
+
+        @Override
+        public File rename(File file) {
+            File newFile = new File(file.getParent() + File.separator + MD5Utils.md5(UUID.randomUUID().toString()) + "." + FileHelper.getFileSuffix(file.getName()));
+            file.renameTo(newFile);
+            return newFile;
+        }
+
+    }
 }

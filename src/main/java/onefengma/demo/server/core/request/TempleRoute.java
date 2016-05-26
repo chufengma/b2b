@@ -1,4 +1,4 @@
-package onefengma.demo.server.core;
+package onefengma.demo.server.core.request;
 
 import spark.Request;
 import spark.Response;

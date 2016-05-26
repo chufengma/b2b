@@ -10,6 +10,7 @@ import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import onefengma.demo.server.core.LogUtils;
 import spark.Spark;
 import spark.template.freemarker.FreeMarkerEngine;
 
@@ -26,13 +27,15 @@ public class Config {
     // data
     private static final String DATA_BASE_URL = "jdbc:mysql://localhost:3306/b2b?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false";
     private static final String DATA_BASE_USER = "root";
-    private static final String DATA_BASE_PASS = "root";
+    private static final String DATA_BASE_PASS = "8686239";
 
     private static final String NOT_FOUND_PATH = "404.html";
-    private static final String BASE_FILE_PATH = "./files/";
+    private static final String BASE_FILE_PATH = "./res/files/";
 
     private static DataBaseModel dataBaseModel;
     private static FreeMarkerEngine freeMarkerEngine;
+
+    private static final int SESSION_DIE_TIME = 10;
 
     private static Config instance;
 
@@ -73,7 +76,8 @@ public class Config {
             });
             freeMarkerEngine.setConfiguration(freeMarkerConfiguration);
         } catch (IOException e) {
-            System.exit(-1);
+            Spark.stop();
+            LogUtils.i(e.toString());
         }
     }
 
@@ -136,4 +140,7 @@ public class Config {
         }
     }
 
+    public static int getSessionDieTime() {
+        return SESSION_DIE_TIME;
+    }
 }

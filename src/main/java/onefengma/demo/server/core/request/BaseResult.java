@@ -1,4 +1,4 @@
-package onefengma.demo.server.core;
+package onefengma.demo.server.core.request;
 
 /**
  * @author yfchu
@@ -17,4 +17,5 @@ public class BaseResult {
         this.errorMsg = errorMsg;
         this.data = data;
     }
+
 }

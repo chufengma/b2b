@@ -1,23 +1,18 @@
 package onefengma.demo.server.services.user;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.InputStream;
-import java.util.UUID;
-
-import javax.servlet.MultipartConfigElement;
-
-import onefengma.demo.common.FileHelper;
 import onefengma.demo.common.MD5Utils;
 import onefengma.demo.common.StringUtils;
+import onefengma.demo.model.UploadDemo2;
 import onefengma.demo.model.User;
 import onefengma.demo.server.core.BaseManager;
-import onefengma.demo.server.services.apibeans.BaseBean;
+import onefengma.demo.server.core.request.AuthHelper;
 import onefengma.demo.server.services.apibeans.AuthSession;
+import onefengma.demo.server.services.apibeans.BaseBean;
 import onefengma.demo.server.services.apibeans.login.Login;
 import onefengma.demo.server.services.apibeans.login.Register;
-import spark.Session;
+import spark.Request;
+import spark.Response;
+import spark.Route;
 import spark.Spark;
 
 /**
@@ -30,9 +25,6 @@ public class UserManager extends BaseManager {
 
     @Override
     public void init() {
-
-
-
         initPages();
         // 注册
         post("register", Register.class, (req, rep, register) -> {
@@ -58,10 +50,7 @@ public class UserManager extends BaseManager {
                 return error("用户名不存在！");
             }
             if (StringUtils.equals(user.getPassword(), MD5Utils.md5(loginBean.password))) {
-                Session session = request.session();
-                session.attribute("userId", user.getId());
-                session.attribute("token", UUID.randomUUID().toString());
-                session.maxInactiveInterval(5);
+                AuthHelper.setLoginSession(request, response, user);
                 return success();
             } else {
                 return error("密码错误！");
@@ -71,14 +60,9 @@ public class UserManager extends BaseManager {
         // 用户列表
         get("userList", AuthSession.class, (request, response, requestBean) -> success(getUserDataHelper().getUserList()));
 
-
-        Spark.post("/member/pages/upload", (request, response) -> {
-            request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
-            File file = generateFile(FileHelper.getFileSuffix(FileHelper.getFileName(request.raw().getPart("uploaded_file"))));
-            try (InputStream is = request.raw().getPart("uploaded_file").getInputStream()) {
-                FileUtils.copyInputStreamToFile(is, file);
-            }
-            return "File uploaded";
+        multiPost("pages/upload", UploadDemo2.class, (request, response, requestBean) -> {
+            System.out.println(requestBean.age + "," + requestBean.test + "," + requestBean.myFile);
+            return success(requestBean);
         });
     }
 

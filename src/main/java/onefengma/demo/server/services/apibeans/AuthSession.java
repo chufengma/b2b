@@ -1,8 +1,9 @@
 package onefengma.demo.server.services.apibeans;
 
-import java.util.UUID;
-
-import onefengma.demo.common.StringUtils;
+import onefengma.demo.annotation.NotRequired;
+import onefengma.demo.model.AuthData;
+import onefengma.demo.server.core.request.AuthHelper;
+import spark.Request;
 
 /**
  * @author yfchu
@@ -10,18 +11,17 @@ import onefengma.demo.common.StringUtils;
  */
 public class AuthSession extends BaseBean {
 
-    public static final String HEADER_TICKET = "auth";
-    private String auth;
+    @NotRequired
+    private AuthData serverData;
+    @NotRequired
+    private AuthData clientData;
 
-    public void setAuth(String auth) {
-        this.auth = auth;
-    }
-
-    public String getSessionTicket() {
-        return auth;
+    public void setAuthData(Request request) {
+        serverData = new AuthData(AuthHelper.getServerToken(request), AuthHelper.getServerUserId(request));
+        clientData = new AuthData(AuthHelper.getRequestToken(request), AuthHelper.getRequestUserId(request));
     }
 
     public boolean isNotValid() {
-        return StringUtils.isEmpty(getSessionTicket());
+        return !serverData.equals(clientData);
     }
 }
