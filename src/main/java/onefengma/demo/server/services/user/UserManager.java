@@ -1,7 +1,13 @@
 package onefengma.demo.server.services.user;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
+
 import onefengma.demo.common.MD5Utils;
 import onefengma.demo.common.StringUtils;
+import onefengma.demo.common.ValidateCode;
 import onefengma.demo.model.UploadDemo2;
 import onefengma.demo.model.User;
 import onefengma.demo.server.core.BaseManager;
@@ -69,14 +75,27 @@ public class UserManager extends BaseManager {
 
     private void initPages() {
         getPage("login", BaseBean.class, "login.html", (request, response, requestBean) -> {
-            User user = new User();
-            user.setName("AAA");
-            user.setPassword("BBB");
-            return user;
+            ValidateCode validateCode = ValidateCode.getDefaultValidateCode(request.session());
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("name", "Fengma");
+            params.put("password", "123456");
+            return params;
         });
 
         getPage("upload", BaseBean.class, "upload.html", (request, response, requestBean) -> {
             return null;
+        });
+
+        Spark.get("/vc", new Route() {
+            @Override
+            public Object handle(Request request, Response response) throws Exception {
+                ValidateCode validateCode = ValidateCode.getDefaultValidateCode(request.session());
+                // most content type is JSON
+                response.type("image/png");
+
+                validateCode.write(((HttpServletResponse)response.raw()).getOutputStream());
+                return "";
+            }
         });
     }
 

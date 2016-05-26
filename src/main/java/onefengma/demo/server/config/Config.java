@@ -31,6 +31,7 @@ public class Config {
 
     private static final String NOT_FOUND_PATH = "404.html";
     private static final String BASE_FILE_PATH = "./res/files/";
+    private static final String VALIDATE_PATH = "./res/validate/";
 
     private static DataBaseModel dataBaseModel;
     private static FreeMarkerEngine freeMarkerEngine;
@@ -142,5 +143,13 @@ public class Config {
 
     public static int getSessionDieTime() {
         return SESSION_DIE_TIME;
+    }
+
+    public static String getValidatePath() {
+        File file = new File(VALIDATE_PATH);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        return VALIDATE_PATH;
     }
 }
