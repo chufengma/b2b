@@ -102,6 +102,7 @@ public abstract class BaseManager {
         return (request, response) -> {
             try {
                 Object reqBean = getRequest(request, tClass);
+                jsonContentType(response);
                 if (loginSessionCheck(reqBean)) {
                     return route.handle(request, response, reqBean);
                 } else {

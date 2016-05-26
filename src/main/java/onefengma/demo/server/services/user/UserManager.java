@@ -11,9 +11,11 @@ import onefengma.demo.common.ValidateCode;
 import onefengma.demo.model.UploadDemo2;
 import onefengma.demo.model.User;
 import onefengma.demo.server.core.BaseManager;
+import onefengma.demo.server.core.ValidateHelper;
 import onefengma.demo.server.core.request.AuthHelper;
 import onefengma.demo.server.services.apibeans.AuthSession;
 import onefengma.demo.server.services.apibeans.BaseBean;
+import onefengma.demo.server.services.apibeans.ValidateCodeBean;
 import onefengma.demo.server.services.apibeans.login.Login;
 import onefengma.demo.server.services.apibeans.login.Register;
 import spark.Request;
@@ -70,6 +72,7 @@ public class UserManager extends BaseManager {
             System.out.println(requestBean.age + "," + requestBean.test + "," + requestBean.myFile);
             return success(requestBean);
         });
+
     }
 
 
@@ -84,18 +87,6 @@ public class UserManager extends BaseManager {
 
         getPage("upload", BaseBean.class, "upload.html", (request, response, requestBean) -> {
             return null;
-        });
-
-        Spark.get("/vc", new Route() {
-            @Override
-            public Object handle(Request request, Response response) throws Exception {
-                ValidateCode validateCode = ValidateCode.getDefaultValidateCode(request.session());
-                // most content type is JSON
-                response.type("image/png");
-
-                validateCode.write(((HttpServletResponse)response.raw()).getOutputStream());
-                return "";
-            }
         });
     }
 

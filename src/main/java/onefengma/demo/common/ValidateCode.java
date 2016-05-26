@@ -117,8 +117,6 @@ public class ValidateCode {
         }
         // 将四位数字的验证码保存到Session中。
         code = randomCode.toString();
-
-        write(new FileOutputStream(new File(Config.getValidatePath() + MD5Utils.md5(UUID.randomUUID().toString() + ".png"))));
     }
 
     public void write(String path) throws IOException {
@@ -140,7 +138,7 @@ public class ValidateCode {
         return vCode;
     }
 
-    public File getPicFile() {
-        return picFile;
+    public String getCode() {
+        return code;
     }
 }

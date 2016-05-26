@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import onefengma.demo.server.core.BaseManager;
+import onefengma.demo.server.services.funcs.FuncManager;
 import onefengma.demo.server.services.products.ProductManager;
 import onefengma.demo.server.services.user.UserManager;
 
@@ -15,7 +16,8 @@ public class Enter {
 
     private static List<BaseManager> managers = Arrays.asList(
             new UserManager(),
-            new ProductManager()
+            new ProductManager(),
+            new FuncManager()
     );
 
     public static void main(String[] args) {
