@@ -35,3 +35,5 @@ out/
 *.[ao]
 .vscode/
 files/
+/res/validate/
+/res/files/
