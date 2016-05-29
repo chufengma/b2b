@@ -1,5 +1,7 @@
 package onefengma.demo.server.services.user;
 
+import com.alibaba.fastjson.JSON;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -88,6 +90,7 @@ public class UserManager extends BaseManager {
         getPage("upload", BaseBean.class, "upload.html", (request, response, requestBean) -> {
             return null;
         });
+
     }
 
 

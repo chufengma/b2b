@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.oreilly.servlet.MultipartRequest;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Enumeration;
 
@@ -12,6 +14,7 @@ import onefengma.demo.common.FileHelper;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.config.Config;
 import onefengma.demo.server.core.request.BaseResult;
+import onefengma.demo.server.core.request.PageRoute;
 import onefengma.demo.server.core.request.ParamsMissException;
 import onefengma.demo.server.core.request.TypedRoute;
 import onefengma.demo.server.services.apibeans.AuthSession;
@@ -22,6 +25,7 @@ import spark.Response;
 import spark.Route;
 import spark.Spark;
 import spark.TemplateViewRoute;
+import spark.utils.IOUtils;
 
 /**
  * @author yfchu
@@ -38,6 +42,7 @@ public abstract class BaseManager {
     // config
     static {
         Config.instance().init();
+        addFilers();
     }
 
     /*------------------------------ http methods start --------------------------- */
@@ -53,7 +58,14 @@ public abstract class BaseManager {
 
     // wrap http get pages
     public void getPage(String path, Class tClass, String templeFile, TypedRoute route) {
-        Spark.get(generatePath("pages/" + path), doPageRequest(route, tClass, templeFile), Config.instance().getFreeMarkerEngine());
+        Spark.get(generatePath(path), doPageRequest(route, tClass, templeFile), Config.instance().getFreeMarkerEngine());
+    }
+
+    // wrap http get pages
+    public void page(String path, PageRoute route) {
+        Spark.get(generatePath(path), (request, response) -> {
+            return new ModelAndView(null, route.handle(request, response));
+        }, Config.instance().getFreeMarkerEngine());
     }
 
     // wrap http multipost pages
@@ -245,6 +257,44 @@ public abstract class BaseManager {
     /*------------------------login handler-----------------------------------*/
     private static boolean loginSessionCheck(Object object) {
         return object instanceof AuthSession ? !((AuthSession) object).isNotValid() : true;
+    }
+
+    private static void gotoPage(String page) {
+
+    }
+
+    private static void addFilers() {
+        Spark.before((request, response) -> {
+                    String pathInfo = request.pathInfo();
+                    File pageFile = null;
+                    if (pathInfo.endsWith("/")) {
+                        // goto main page
+                        pageFile = FileHelper.getFileFromPath(Config.getIndexPath());
+                    } else if (request.pathInfo().endsWith(".html")) {
+                        // other pages
+                        if (request.pathInfo().startsWith("/auth")) {
+                            pageFile = FileHelper.getFileFromPath("notLogin.html");
+                        } else {
+                            pageFile = FileHelper.getFileFromPath(pathInfo);
+                        }
+                    }
+                    // other request
+                    if (pageFile == null) {
+                        return;
+                    }
+                    outputFile(pageFile, response);
+                    Spark.halt(200);
+                }
+        );
+
+    }
+
+    public static void outputFile(File file, Response response) throws IOException {
+        // output
+        try (FileInputStream inputStream = new FileInputStream(file)) {
+            response.raw().setCharacterEncoding("utf-8");
+            IOUtils.copy(inputStream, response.raw().getOutputStream());
+        }
     }
 
     /*-------------------------------abstract methods------------------------------------*/

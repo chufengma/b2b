@@ -25,13 +25,18 @@ public class Config {
     // environment
     private static final ENVI ENV = ENVI.DEV;
     // data
-    private static final String DATA_BASE_URL = "jdbc:mysql://localhost:3306/b2b?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false";
+    private static final String DATA_BASE_URL = "jdbc:mysql://localhost:3306/b2b?useUnicode=true&characterEncoding=utf8&useSSL=false";
     private static final String DATA_BASE_USER = "root";
-    private static final String DATA_BASE_PASS = "8686239";
+    private static final String DATA_BASE_PASS = "root";
 
-    private static final String NOT_FOUND_PATH = "404.html";
+    private static final String NOT_FOUND_PATH = "/404.html";
+    private static final String INDEX_PATH = "/index.html";
+    private static final String INNER_ERROR_PATH = "/404.html";
+
     private static final String BASE_FILE_PATH = "./res/files/";
     private static final String VALIDATE_PATH = "./res/validate/";
+    private static final String BASE_PAGE_PATH = "./res/views/";
+
 
     private static DataBaseModel dataBaseModel;
     private static FreeMarkerEngine freeMarkerEngine;
@@ -57,13 +62,13 @@ public class Config {
         Spark.port(PORT);
 
         // static files
-        Spark.externalStaticFileLocation("./res");
+        Spark.externalStaticFileLocation("./res/views/");
 
         // free marker engine
         freeMarkerEngine = new FreeMarkerEngine();
         Configuration freeMarkerConfiguration = new Configuration();
         try {
-            freeMarkerConfiguration.setTemplateLoader(new FileTemplateLoader(new File("./res/temples")));
+            freeMarkerConfiguration.setTemplateLoader(new FileTemplateLoader(new File("./res/views")));
             freeMarkerConfiguration.setEncoding(new Locale("zh"), "utf8");
             freeMarkerConfiguration.setTemplateExceptionHandler(new TemplateExceptionHandler() {
                 @Override
@@ -90,7 +95,7 @@ public class Config {
         return freeMarkerEngine;
     }
 
-    public String getNotFoundPath() {
+    public static String getNotFoundPath() {
         return NOT_FOUND_PATH;
     }
 
@@ -152,4 +157,18 @@ public class Config {
         }
         return VALIDATE_PATH;
     }
+
+    public static String getBasePagePath() {
+        return BASE_PAGE_PATH;
+    }
+
+    public static String getIndexPath() {
+        return INDEX_PATH;
+    }
+
+    public static String getInnerErrorPath() {
+        return INNER_ERROR_PATH;
+    }
+
+
 }

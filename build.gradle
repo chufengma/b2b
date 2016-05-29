@@ -22,7 +22,7 @@ dependencies {
     compile group: 'org.freemarker', name: 'freemarker', version: '2.3.20'
 
     // http://mvnrepository.com/artifact/mysql/mysql-connector-java
-    compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.2'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.38'
     compile group: 'org.sql2o', name: 'sql2o', version: '1.4.0'
 
     // http://mvnrepository.com/artifact/com.alibaba/fastjson

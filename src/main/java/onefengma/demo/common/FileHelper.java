@@ -72,4 +72,13 @@ public class FileHelper {
         }
 
     }
+
+    public static File getFileFromPath(String path) {
+        File file = new File(Config.getBasePagePath() + path);
+        if (file.exists()) {
+            return file;
+        } else {
+            return null;
+        }
+    }
 }
