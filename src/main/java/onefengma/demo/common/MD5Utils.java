@@ -2,12 +2,17 @@ package onefengma.demo.common;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 
 /**
  * @author yfchu
  * @date 2016/5/24
  */
 public class MD5Utils {
+
+    public static String uuid() {
+        return UUID.randomUUID().toString().replaceAll("-", "");
+    }
 
     public static String md5(String str) {
         try {

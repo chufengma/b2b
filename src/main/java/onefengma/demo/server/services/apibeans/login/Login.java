@@ -8,10 +8,6 @@ import onefengma.demo.server.services.apibeans.BaseBean;
  * @date 2016/5/24
  */
 public class Login extends BaseBean {
-    public String userName;
+    public String mobile;
     public String password;
-
-    public boolean isNotValid() {
-        return StringUtils.isEmpty(userName) || StringUtils.isEmpty(password);
-    }
 }

@@ -48,7 +48,7 @@ public abstract class BaseManager {
     /*------------------------------ http methods start --------------------------- */
     // wrap http post
     public <T> void post(String path, Class<T> tClass, TypedRoute<T> route) {
-        Spark.post(generatePath(path), doRequest(route, tClass));
+        Spark.post(generatePath(path), doMultiRequest(route, tClass));
     }
 
     // wrap http get
@@ -95,9 +95,8 @@ public abstract class BaseManager {
         return (request, response) -> {
             try {
                 Object requestBean = getMultiBean(request, tClass);
-
+                jsonContentType(response);
                 setupAuth(request, request);
-
                 if (loginSessionCheck(requestBean)) {
                     return route.handle(request, response, requestBean);
                 } else {
@@ -236,6 +235,11 @@ public abstract class BaseManager {
         } else {
             beanJson = JSON.parseObject(request.body());
         }
+
+        if (beanJson == null) {
+            beanJson = new JSONObject();
+        }
+
         baseBean = beanJson.toJavaObject(tClass);
         if (baseBean == null) {
             baseBean = tClass.newInstance();

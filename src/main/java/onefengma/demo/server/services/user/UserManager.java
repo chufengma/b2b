@@ -38,11 +38,7 @@ public class UserManager extends BaseManager {
         initPages();
         // 注册
         post("register", Register.class, (req, rep, register) -> {
-            if (register == null || register.isNotValid()) {
-                return error("miss params");
-            }
-
-            User user = getUserDataHelper().findUserByName(register.userName);
+            User user = getUserDataHelper().findUserByMobile(register.mobile);
             if (user != null) {
                 return error("用户名已注册!");
             }
@@ -52,10 +48,7 @@ public class UserManager extends BaseManager {
 
         // 登陆
         post("login", Login.class, (request, response, loginBean) -> {
-            if (loginBean == null || loginBean.isNotValid()) {
-                return error("miss params");
-            }
-            User user = getUserDataHelper().findUserByName(loginBean.userName);
+            User user = getUserDataHelper().findUserByMobile(loginBean.mobile);
             if (user == null) {
                 return error("用户名不存在！");
             }

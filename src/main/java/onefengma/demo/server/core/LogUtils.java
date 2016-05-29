@@ -17,4 +17,11 @@ public class LogUtils {
             logger.info(log);
         }
     }
+
+    public static void e(Exception e, String log) {
+        if (Config.instance().isDev()) {
+            logger.info(log);
+            e.printStackTrace();
+        }
+    }
 }

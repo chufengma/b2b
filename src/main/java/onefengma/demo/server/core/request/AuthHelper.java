@@ -48,10 +48,10 @@ public class AuthHelper {
     public static void setLoginSession(Request request, Response response, User user) {
         Session session = request.session();
         String token = UUID.randomUUID().toString();
-        session.attribute(USER_ID, user.getId());
+        session.attribute(USER_ID, user.getUserId());
         session.attribute(TOKEN, token);
         session.maxInactiveInterval(Config.getSessionDieTime());
-        response.cookie(USER_ID, user.getId());
+        response.cookie(USER_ID, user.getUserId());
         response.cookie(TOKEN, token);
     }
 
