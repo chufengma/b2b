@@ -198,7 +198,7 @@ public abstract class BaseManager {
         if (!file.exists()) {
             file.mkdirs();
         }
-        MultipartRequest multipartRequest = new MultipartRequest(request.raw(), FileHelper.getFileFolder(), 1048576, "utf-8", FileHelper.getFileRename());
+        MultipartRequest multipartRequest = new MultipartRequest(request.raw(), FileHelper.getFileFolder(), 10048576, "utf-8", FileHelper.getFileRename());
         JSONObject beanJson = new JSONObject();
 
         // params

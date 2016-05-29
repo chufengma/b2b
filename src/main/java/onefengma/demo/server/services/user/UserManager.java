@@ -1,29 +1,20 @@
 package onefengma.demo.server.services.user;
 
-import com.alibaba.fastjson.JSON;
-
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
-import onefengma.demo.common.MD5Utils;
+import onefengma.demo.common.IdUtils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.ValidateCode;
+import onefengma.demo.model.UploadDemo;
 import onefengma.demo.model.UploadDemo2;
 import onefengma.demo.model.User;
 import onefengma.demo.server.core.BaseManager;
-import onefengma.demo.server.core.ValidateHelper;
 import onefengma.demo.server.core.request.AuthHelper;
 import onefengma.demo.server.services.apibeans.AuthSession;
 import onefengma.demo.server.services.apibeans.BaseBean;
-import onefengma.demo.server.services.apibeans.ValidateCodeBean;
 import onefengma.demo.server.services.apibeans.login.Login;
 import onefengma.demo.server.services.apibeans.login.Register;
-import spark.Request;
-import spark.Response;
-import spark.Route;
-import spark.Spark;
 
 /**
  * @author yfchu
@@ -52,7 +43,7 @@ public class UserManager extends BaseManager {
             if (user == null) {
                 return error("用户名不存在！");
             }
-            if (StringUtils.equals(user.getPassword(), MD5Utils.md5(loginBean.password))) {
+            if (StringUtils.equals(user.getPassword(), IdUtils.md5(loginBean.password))) {
                 AuthHelper.setLoginSession(request, response, user);
                 return success();
             } else {
@@ -63,8 +54,7 @@ public class UserManager extends BaseManager {
         // 用户列表
         get("userList", AuthSession.class, (request, response, requestBean) -> success(getUserDataHelper().getUserList()));
 
-        multiPost("pages/upload", UploadDemo2.class, (request, response, requestBean) -> {
-            System.out.println(requestBean.age + "," + requestBean.test + "," + requestBean.myFile);
+        multiPost("upload", UploadDemo.class, (request, response, requestBean) -> {
             return success(requestBean);
         });
 

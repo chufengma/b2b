@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.Part;
 
 import onefengma.demo.server.config.Config;
@@ -20,9 +21,15 @@ import onefengma.demo.server.config.Config;
 public class FileHelper {
 
     private static final FileRename fileRename = new FileRename();
+    private static final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
+
 
     public static FileRename getFileRename() {
         return fileRename;
+    }
+
+    public static String getContentType(String fileName) {
+        return mimetypesFileTypeMap.getContentType(new File(fileName));
     }
 
     public static String getFileName(Part part) {
@@ -52,7 +59,7 @@ public class FileHelper {
     public static File saveFile(InputStream inputStream, String subFolder, String suffix) throws IOException {
         subFolder = StringUtils.isEmpty(subFolder) ? "" : subFolder + File.pathSeparator ;
         String folder = Config.getBaseFilePath() + subFolder + DateHelper.getDataStr() + File.pathSeparator;
-        String fileName = folder + MD5Utils.md5(UUID.randomUUID().toString());
+        String fileName = folder + IdUtils.md5(UUID.randomUUID().toString());
         File file = new File(fileName);
         FileUtils.copyInputStreamToFile(inputStream, file);
         return file;
@@ -66,7 +73,7 @@ public class FileHelper {
 
         @Override
         public File rename(File file) {
-            File newFile = new File(file.getParent() + File.separator + MD5Utils.md5(UUID.randomUUID().toString()) + "." + FileHelper.getFileSuffix(file.getName()));
+            File newFile = new File(file.getParent() + File.separator + IdUtils.id() + "." + FileHelper.getFileSuffix(file.getName()));
             file.renameTo(newFile);
             return newFile;
         }

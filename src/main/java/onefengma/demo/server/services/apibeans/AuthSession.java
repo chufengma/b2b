@@ -22,6 +22,6 @@ public class AuthSession extends BaseBean {
     }
 
     public boolean isNotValid() {
-        return !serverData.equals(clientData);
+        return serverData == null || !serverData.equals(clientData);
     }
 }

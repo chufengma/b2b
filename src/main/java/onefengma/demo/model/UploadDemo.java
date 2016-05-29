@@ -10,6 +10,5 @@ import onefengma.demo.server.services.apibeans.BaseBean;
  */
 public class UploadDemo extends BaseBean {
     public String test;
-    public int age;
     public File myFile;
 }

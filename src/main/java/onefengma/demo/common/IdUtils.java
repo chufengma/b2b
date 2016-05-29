@@ -1,14 +1,28 @@
 package onefengma.demo.common;
 
+import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.UUID;
 
 /**
  * @author yfchu
  * @date 2016/5/24
  */
-public class MD5Utils {
+public class IdUtils {
+
+    public static String id() {
+        SecureRandom rand = new SecureRandom();
+        byte[] randomBytes = new byte[6];
+        String idStr = null;
+        do {
+            rand.nextBytes(randomBytes);
+            idStr = Base64.getEncoder().encodeToString(randomBytes);
+        } while (idStr.contains(File.separator));
+        return idStr;
+    }
 
     public static String uuid() {
         return UUID.randomUUID().toString().replaceAll("-", "");

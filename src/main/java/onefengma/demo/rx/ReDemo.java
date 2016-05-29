@@ -1,13 +1,10 @@
 package onefengma.demo.rx;
 
-import org.eclipse.jetty.http.MimeTypes;
-
+import java.io.File;
 import java.lang.reflect.Field;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.activation.MimeTypeParameterList;
 import javax.activation.MimetypesFileTypeMap;
 
 import onefengma.demo.common.StringUtils;
@@ -24,12 +21,24 @@ public class ReDemo {
     private String ccc = "fengma2";
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException {
-//        MimetypesFileTypeMap.setDefaultFileTypeMap();
-//        System.out.println(MimeTypeParameterList.);
+    }
 
-        String sql = "select (@aaa, @bbb, @ccc) from user (@ccc)";
-        ReDemo reDemo = new ReDemo();
-        System.out.println(reDemo.createSql(sql));
+
+    public static class AsciiID {
+        private static final String alphabet=
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+        private int currentId;
+
+        public String nextId() {
+            int id = currentId++;
+            StringBuilder b = new StringBuilder();
+            do {
+                b.append(alphabet.charAt(id % alphabet.length()));
+            } while((id /=alphabet.length()) != 0);
+
+            return b.toString();
+        }
     }
 
     public String createSql(String sql) {

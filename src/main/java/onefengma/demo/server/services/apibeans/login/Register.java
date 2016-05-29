@@ -1,10 +1,7 @@
 package onefengma.demo.server.services.apibeans.login;
 
-import java.util.UUID;
-
 import onefengma.demo.annotation.NotRequired;
-import onefengma.demo.common.MD5Utils;
-import onefengma.demo.common.StringUtils;
+import onefengma.demo.common.IdUtils;
 import onefengma.demo.model.User;
 import onefengma.demo.server.services.apibeans.BaseBean;
 
@@ -21,8 +18,8 @@ public class Register extends BaseBean {
     public User generateUser() {
         User user = new User();
         user.setName(userName);
-        user.setPassword(MD5Utils.md5(password));
-        user.setId(MD5Utils.uuid());
+        user.setPassword(IdUtils.md5(password));
+        user.setId(IdUtils.id());
         user.setMobile(mobile);
         return user;
     }

@@ -1,5 +1,7 @@
 package onefengma.demo.model;
 
+import onefengma.demo.common.StringUtils;
+
 /**
  * @author yfchu
  * @date 2016/5/26
@@ -31,6 +33,9 @@ public class AuthData {
 
     @Override
     public boolean equals(Object o) {
+        if (StringUtils.isEmpty(token) || StringUtils.isEmpty(userId)) {
+            return false;
+        }
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
