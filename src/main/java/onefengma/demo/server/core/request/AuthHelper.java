@@ -51,8 +51,16 @@ public class AuthHelper {
         session.attribute(USER_ID, user.getUserId());
         session.attribute(TOKEN, token);
         session.maxInactiveInterval(Config.getSessionDieTime());
-        response.cookie(USER_ID, user.getUserId());
-        response.cookie(TOKEN, token);
+
+        response.removeCookie(USER_ID);
+        response.removeCookie(TOKEN);
+
+        addCookie(response, USER_ID, user.getUserId());
+        addCookie(response, TOKEN, token);
+    }
+
+    public static void addCookie(Response response, String key, String value) {
+        response.cookie("/", key, value, -1, false);
     }
 
 }

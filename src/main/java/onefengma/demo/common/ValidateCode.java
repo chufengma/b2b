@@ -4,16 +4,13 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Random;
-import java.util.UUID;
 
 import javax.imageio.ImageIO;
 
-import onefengma.demo.server.config.Config;
 import spark.Session;
 
 /**
@@ -33,8 +30,6 @@ public class ValidateCode {
     private String code = null;
     // 验证码图片Buffer
     private BufferedImage buffImg = null;
-
-    private File picFile;
 
     private char[] codeSequence = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
             'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',

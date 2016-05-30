@@ -29,6 +29,9 @@ public class FileHelper {
     }
 
     public static String getContentType(String fileName) {
+        mimetypesFileTypeMap.addMimeTypes("image/png png");
+        mimetypesFileTypeMap.addMimeTypes("image/tif tif");
+        mimetypesFileTypeMap.addMimeTypes("image/bmp bmp");
         return mimetypesFileTypeMap.getContentType(new File(fileName));
     }
 

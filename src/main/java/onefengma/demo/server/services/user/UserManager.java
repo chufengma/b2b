@@ -7,9 +7,10 @@ import onefengma.demo.common.IdUtils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.ValidateCode;
 import onefengma.demo.model.UploadDemo;
-import onefengma.demo.model.UploadDemo2;
 import onefengma.demo.model.User;
 import onefengma.demo.server.core.BaseManager;
+import onefengma.demo.server.core.MsgCodeHelper;
+import onefengma.demo.server.core.ValidateHelper;
 import onefengma.demo.server.core.request.AuthHelper;
 import onefengma.demo.server.services.apibeans.AuthSession;
 import onefengma.demo.server.services.apibeans.BaseBean;
@@ -27,12 +28,28 @@ public class UserManager extends BaseManager {
     @Override
     public void init() {
         initPages();
-        // 注册
+        /* 注册 */
         post("register", Register.class, (req, rep, register) -> {
+            // 输入验证
+            if (!register.isPasswordComfirmed()) {
+                return error("俩次密码输入不一致");
+            }
+            if (!register.isPasswordRight()) {
+                return error("密码长度为 6~16");
+            }
+            if(!ValidateHelper.isCodeValid(register.validateCode, req.session())) {
+                return error("验证码不正确");
+            }
+            if (!MsgCodeHelper.isMsgCodeRight(register.msgCode, register.mobile)) {
+                return error("短信验证码不正确");
+            }
+
+            // 是否是重复用户
             User user = getUserDataHelper().findUserByMobile(register.mobile);
             if (user != null) {
                 return error("用户名已注册!");
             }
+
             getUserDataHelper().insertUser(register.generateUser());
             return success();
         });
@@ -73,7 +90,6 @@ public class UserManager extends BaseManager {
         getPage("upload", BaseBean.class, "upload.html", (request, response, requestBean) -> {
             return null;
         });
-
     }
 
 

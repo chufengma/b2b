@@ -1,12 +1,10 @@
 package onefengma.demo.rx;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.activation.MimetypesFileTypeMap;
-
+import onefengma.demo.common.FileHelper;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.LogUtils;
 
@@ -21,6 +19,7 @@ public class ReDemo {
     private String ccc = "fengma2";
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException {
+        System.out.println(FileHelper.getContentType("aaa.png"));
     }
 
 

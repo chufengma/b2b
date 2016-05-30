@@ -15,7 +15,7 @@ public class StringUtils {
     }
 
     public static boolean equalsIngcase(String str, String str2) {
-        return str == null ? false : str.toLowerCase().equals(str2.toLowerCase());
+        return (str == null || str2 == null) ? false : str.toLowerCase().equals(str2.toLowerCase());
     }
 
 }
