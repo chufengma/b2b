@@ -12,7 +12,6 @@ import onefengma.demo.server.services.apibeans.AuthSession;
 import onefengma.demo.server.services.apibeans.BaseBean;
 import onefengma.demo.server.services.apibeans.codes.MsgCode.MsgCodeResponse;
 import onefengma.demo.server.services.apibeans.codes.ValidateCodeBean;
-import spark.Spark;
 import spark.utils.IOUtils;
 
 /**
@@ -23,7 +22,7 @@ public class FuncManager extends BaseManager {
     @Override
     public void init() {
         //  获取验证码
-        get("validateCode", BaseBean.class, ((request, response, requestBean1) -> {
+        get("validateCode.png", BaseBean.class, ((request, response, requestBean1) -> {
             ValidateHelper.generateValidateCode(request, response);
             return "";
         }));
@@ -65,11 +64,6 @@ public class FuncManager extends BaseManager {
                 return null;
             }
             return "";
-        }));
-
-
-        Spark.before("files/*", ((request, response) -> {
-
         }));
     }
 
