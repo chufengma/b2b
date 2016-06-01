@@ -1,6 +1,5 @@
 package onefengma.demo.common;
 
-import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -20,7 +19,7 @@ public class IdUtils {
         do {
             rand.nextBytes(randomBytes);
             idStr = Base64.getEncoder().encodeToString(randomBytes);
-        } while (idStr.contains(File.separator));
+        } while (idStr.contains("/") || idStr.contains("\\"));
         return idStr;
     }
 

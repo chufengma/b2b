@@ -1,4 +1,4 @@
-package onefengma.demo.server.services.apibeans;
+package onefengma.demo.server.model.apibeans;
 
 import com.alibaba.fastjson.JSONObject;
 

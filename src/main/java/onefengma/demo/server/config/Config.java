@@ -3,6 +3,7 @@ package onefengma.demo.server.config;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.List;
 import java.util.Locale;
 
 import freemarker.cache.FileTemplateLoader;
@@ -10,6 +11,8 @@ import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import onefengma.demo.server.model.metaData.IconDataCategory;
+import onefengma.demo.server.model.metaData.City;
 import onefengma.demo.server.core.LogUtils;
 import spark.Spark;
 import spark.template.freemarker.FreeMarkerEngine;
@@ -33,10 +36,10 @@ public class Config {
     private static final String INDEX_PATH = "/index.html";
     private static final String INNER_ERROR_PATH = "/404.html";
 
-    private static final String BASE_FILE_PATH = "./res/files/";
+    private static final String BASE_DOWN_LOAD_FILE_PATH = "./res/files/";
     private static final String VALIDATE_PATH = "./res/validate/";
     private static final String BASE_PAGE_PATH = "./res/B2BPlatformFront/";
-
+    private static final String BASE_META_PATH = "./res/meta/";
 
     private static DataBaseModel dataBaseModel;
     private static FreeMarkerEngine freeMarkerEngine;
@@ -106,8 +109,8 @@ public class Config {
         return dataBaseModel;
     }
 
-    public static String getBaseFilePath() {
-        return BASE_FILE_PATH;
+    public static String getBaseDownLoadFilePath() {
+        return BASE_DOWN_LOAD_FILE_PATH;
     }
 
     public static class DataBaseModel {
@@ -170,5 +173,15 @@ public class Config {
         return INNER_ERROR_PATH;
     }
 
+    public static IconDataCategory getIconDataCategory() {
+        return MetaDataHelper.getIconDataCategory();
+    }
 
+    public static String getBaseMetaPath() {
+        return BASE_META_PATH;
+    }
+
+    public static List<City> getCities() {
+        return MetaDataHelper.getCities();
+    }
 }

@@ -5,7 +5,7 @@ import org.sql2o.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
-import onefengma.demo.model.User;
+import onefengma.demo.server.model.User;
 import onefengma.demo.server.core.BaseDataHelper;
 
 /**

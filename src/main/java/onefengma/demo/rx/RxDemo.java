@@ -3,9 +3,6 @@ package onefengma.demo.rx;
 import com.alibaba.fastjson.JSON;
 
 import onefengma.demo.server.core.LogUtils;
-import onefengma.demo.model.SimpleStr;
-import retrofit2.Call;
-import retrofit2.http.POST;
 import rx.Observable;
 import rx.functions.Action1;
 
@@ -32,11 +29,6 @@ public class RxDemo {
         stringBuffer.append("\n");
 
         System.out.println(JSON.toJSONString(stringBuffer.toString()));
-    }
-
-    public interface ServerService {
-        @POST("file")
-        public Call<SimpleStr> getDemoStr();
     }
 
 

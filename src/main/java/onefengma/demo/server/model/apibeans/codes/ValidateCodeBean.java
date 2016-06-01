@@ -1,6 +1,6 @@
-package onefengma.demo.server.services.apibeans.codes;
+package onefengma.demo.server.model.apibeans.codes;
 
-import onefengma.demo.server.services.apibeans.BaseBean;
+import onefengma.demo.server.model.apibeans.BaseBean;
 
 /**
  * Created by chufengma on 16/5/26.

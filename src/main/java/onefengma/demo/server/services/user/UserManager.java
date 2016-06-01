@@ -6,16 +6,16 @@ import java.util.Map;
 import onefengma.demo.common.IdUtils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.ValidateCode;
-import onefengma.demo.model.UploadDemo;
-import onefengma.demo.model.User;
+import onefengma.demo.server.model.UploadDemo;
+import onefengma.demo.server.model.User;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.MsgCodeHelper;
 import onefengma.demo.server.core.ValidateHelper;
 import onefengma.demo.server.core.request.AuthHelper;
-import onefengma.demo.server.services.apibeans.AuthSession;
-import onefengma.demo.server.services.apibeans.BaseBean;
-import onefengma.demo.server.services.apibeans.login.Login;
-import onefengma.demo.server.services.apibeans.login.Register;
+import onefengma.demo.server.model.apibeans.AuthSession;
+import onefengma.demo.server.model.apibeans.BaseBean;
+import onefengma.demo.server.model.apibeans.login.Login;
+import onefengma.demo.server.model.apibeans.login.Register;
 
 /**
  * @author yfchu

@@ -1,4 +1,4 @@
-package onefengma.demo.model;
+package onefengma.demo.server.model.apibeans;
 
 import onefengma.demo.common.StringUtils;
 

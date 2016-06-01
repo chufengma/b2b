@@ -8,10 +8,10 @@ import onefengma.demo.server.config.Config;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.MsgCodeHelper;
 import onefengma.demo.server.core.ValidateHelper;
-import onefengma.demo.server.services.apibeans.AuthSession;
-import onefengma.demo.server.services.apibeans.BaseBean;
-import onefengma.demo.server.services.apibeans.codes.MsgCode.MsgCodeResponse;
-import onefengma.demo.server.services.apibeans.codes.ValidateCodeBean;
+import onefengma.demo.server.model.apibeans.AuthSession;
+import onefengma.demo.server.model.apibeans.BaseBean;
+import onefengma.demo.server.model.apibeans.codes.MsgCode.MsgCodeResponse;
+import onefengma.demo.server.model.apibeans.codes.ValidateCodeBean;
 import spark.utils.IOUtils;
 
 /**
@@ -56,7 +56,7 @@ public class FuncManager extends BaseManager {
                 return null;
             }
             String fileName = request.splat()[0];
-            File file = new File(Config.getBaseFilePath() + fileName);
+            File file = new File(Config.getBaseDownLoadFilePath() + fileName);
             if (file.exists()) {
                 response.type(FileHelper.getContentType(fileName));
                 IOUtils.copy(new FileInputStream(file.getAbsoluteFile()), response.raw().getOutputStream());
@@ -65,6 +65,9 @@ public class FuncManager extends BaseManager {
             }
             return "";
         }));
+
+        // 获取城市列表
+        get("cities", BaseBean.class, ((request, response, requestBean) -> success(Config.getCities())));
     }
 
     @Override

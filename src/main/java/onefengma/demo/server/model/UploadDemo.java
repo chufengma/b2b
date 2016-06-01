@@ -1,8 +1,8 @@
-package onefengma.demo.model;
+package onefengma.demo.server.model;
 
 import java.io.File;
 
-import onefengma.demo.server.services.apibeans.AuthSession;
+import onefengma.demo.server.model.apibeans.AuthSession;
 
 /**
  * @author yfchu

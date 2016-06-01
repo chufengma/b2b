@@ -1,7 +1,6 @@
-package onefengma.demo.server.services.apibeans;
+package onefengma.demo.server.model.apibeans;
 
 import onefengma.demo.annotation.NotRequired;
-import onefengma.demo.model.AuthData;
 import onefengma.demo.server.core.request.AuthHelper;
 import spark.Request;
 

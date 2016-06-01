@@ -1,4 +1,4 @@
-package onefengma.demo.server.services.apibeans.codes;
+package onefengma.demo.server.model.apibeans.codes;
 
 /**
  * @author yfchu

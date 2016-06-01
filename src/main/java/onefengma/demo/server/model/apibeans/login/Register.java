@@ -1,10 +1,10 @@
-package onefengma.demo.server.services.apibeans.login;
+package onefengma.demo.server.model.apibeans.login;
 
 import onefengma.demo.annotation.NotRequired;
 import onefengma.demo.common.IdUtils;
 import onefengma.demo.common.StringUtils;
-import onefengma.demo.model.User;
-import onefengma.demo.server.services.apibeans.BaseBean;
+import onefengma.demo.server.model.User;
+import onefengma.demo.server.model.apibeans.BaseBean;
 
 /**
  * @author yfchu

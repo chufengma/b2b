@@ -4,8 +4,8 @@ import java.lang.reflect.Field;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import onefengma.demo.common.FileHelper;
 import onefengma.demo.common.StringUtils;
+import onefengma.demo.server.config.MetaDataHelper;
 import onefengma.demo.server.core.LogUtils;
 
 /**
@@ -19,7 +19,17 @@ public class ReDemo {
     private String ccc = "fengma2";
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException {
-        System.out.println(FileHelper.getContentType("aaa.png"));
+        MetaDataHelper.getCities();
+    }
+
+
+    public static class IronDatas {
+        private String aaa = "FFFFF";
+
+        @Override
+        public String toString() {
+            return aaa;
+        }
     }
 
 

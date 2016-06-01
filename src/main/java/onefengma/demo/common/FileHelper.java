@@ -61,7 +61,7 @@ public class FileHelper {
 
     public static File saveFile(InputStream inputStream, String subFolder, String suffix) throws IOException {
         subFolder = StringUtils.isEmpty(subFolder) ? "" : subFolder + File.pathSeparator ;
-        String folder = Config.getBaseFilePath() + subFolder + DateHelper.getDataStr() + File.pathSeparator;
+        String folder = Config.getBaseDownLoadFilePath() + subFolder + DateHelper.getDataStr() + File.pathSeparator;
         String fileName = folder + IdUtils.md5(UUID.randomUUID().toString());
         File file = new File(fileName);
         FileUtils.copyInputStreamToFile(inputStream, file);
@@ -69,7 +69,7 @@ public class FileHelper {
     }
 
     public static String getFileFolder() {
-        return Config.getBaseFilePath() + DateHelper.getDataStr();
+        return Config.getBaseDownLoadFilePath() + DateHelper.getDataStr();
     }
 
     public static class FileRename implements FileRenamePolicy {

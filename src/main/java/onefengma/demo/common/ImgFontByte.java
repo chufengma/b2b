@@ -48,7 +48,7 @@ public class ImgFontByte {
      * @return
      */
     private InputStream getFontStream() throws FileNotFoundException {
-        File file = FileUtils.getFile("./res/fonts/ITCKRIST.TTF");
+        File file = FileUtils.getFile("./res/meta/ITCKRIST.TTF");
         return new FileInputStream(file);
     }
 }

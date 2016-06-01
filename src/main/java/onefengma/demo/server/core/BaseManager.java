@@ -6,7 +6,6 @@ import com.oreilly.servlet.MultipartRequest;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Enumeration;
 
@@ -17,8 +16,8 @@ import onefengma.demo.server.core.request.BaseResult;
 import onefengma.demo.server.core.request.PageRoute;
 import onefengma.demo.server.core.request.ParamsMissException;
 import onefengma.demo.server.core.request.TypedRoute;
-import onefengma.demo.server.services.apibeans.AuthSession;
-import onefengma.demo.server.services.apibeans.BaseBean;
+import onefengma.demo.server.model.apibeans.AuthSession;
+import onefengma.demo.server.model.apibeans.BaseBean;
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;

@@ -2,7 +2,7 @@ package onefengma.demo.server.core.request;
 
 import java.util.UUID;
 
-import onefengma.demo.model.User;
+import onefengma.demo.server.model.User;
 import onefengma.demo.server.config.Config;
 import spark.Request;
 import spark.Response;
