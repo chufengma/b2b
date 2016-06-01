@@ -3,6 +3,8 @@ package onefengma.demo.server.config;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Locale;
 
@@ -23,8 +25,6 @@ import spark.template.freemarker.FreeMarkerEngine;
  */
 public class Config {
 
-    // port
-    private static final int PORT = 9090;
     // environment
     private static final ENVI ENV = ENVI.DEV;
     // data
@@ -36,10 +36,14 @@ public class Config {
     private static final String INDEX_PATH = "/index.html";
     private static final String INNER_ERROR_PATH = "/404.html";
 
-    private static final String BASE_DOWN_LOAD_FILE_PATH = "./res/files/";
+    private static final String DOWN_LOAD_FILE_PATH = "./res/files/";
+    private static final String DOWN_LOAD_FILE_REQUEST_PATH = "files/";
     private static final String VALIDATE_PATH = "./res/validate/";
     private static final String BASE_PAGE_PATH = "./res/B2BPlatformFront/";
     private static final String BASE_META_PATH = "./res/meta/";
+
+    private static final int PORT = 9090;
+    private static String HOST;
 
     private static DataBaseModel dataBaseModel;
     private static FreeMarkerEngine freeMarkerEngine;
@@ -61,6 +65,14 @@ public class Config {
     }
 
     public void init() {
+        // host
+        try {
+            HOST = InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            HOST = "127.0.0.1";
+            e.printStackTrace();
+        }
+
         // config port
         Spark.port(PORT);
 
@@ -109,8 +121,8 @@ public class Config {
         return dataBaseModel;
     }
 
-    public static String getBaseDownLoadFilePath() {
-        return BASE_DOWN_LOAD_FILE_PATH;
+    public static String getDownLoadFilePath() {
+        return DOWN_LOAD_FILE_PATH;
     }
 
     public static class DataBaseModel {
@@ -183,5 +195,13 @@ public class Config {
 
     public static List<City> getCities() {
         return MetaDataHelper.getCities();
+    }
+
+    public static String getDownLoadFileRequestPath() {
+        return DOWN_LOAD_FILE_REQUEST_PATH;
+    }
+
+    public static String getAddressPrefix() {
+        return "http://" + HOST + ":" + PORT + "/";
     }
 }

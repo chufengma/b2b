@@ -61,7 +61,7 @@ public class FileHelper {
 
     public static File saveFile(InputStream inputStream, String subFolder, String suffix) throws IOException {
         subFolder = StringUtils.isEmpty(subFolder) ? "" : subFolder + File.pathSeparator ;
-        String folder = Config.getBaseDownLoadFilePath() + subFolder + DateHelper.getDataStr() + File.pathSeparator;
+        String folder = Config.getDownLoadFilePath() + subFolder + DateHelper.getDataStr() + File.pathSeparator;
         String fileName = folder + IdUtils.md5(UUID.randomUUID().toString());
         File file = new File(fileName);
         FileUtils.copyInputStreamToFile(inputStream, file);
@@ -69,7 +69,8 @@ public class FileHelper {
     }
 
     public static String getFileFolder() {
-        return Config.getBaseDownLoadFilePath() + DateHelper.getDataStr();
+        String subFolder = DateHelper.getYear() + File.separator + DateHelper.getMonth() + File.separator + DateHelper.getDay();
+        return Config.getDownLoadFilePath() + subFolder;
     }
 
     public static class FileRename implements FileRenamePolicy {
@@ -90,5 +91,20 @@ public class FileHelper {
         } else {
             return null;
         }
+    }
+
+    public static String generateInternetUri(String path) {
+        if (StringUtils.isEmpty(path)) {
+            return "";
+        }
+        return Config.getAddressPrefix() + Config.getDownLoadFileRequestPath() + path;
+    }
+
+    public static String generateInternetPath(String path) {
+        if (StringUtils.isEmpty(path)) {
+            return "";
+        }
+        path = path.replace('\\', '/');
+        return path.replace(Config.getDownLoadFilePath(), "");
     }
 }

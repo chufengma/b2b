@@ -4,8 +4,8 @@ import java.lang.reflect.Field;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import onefengma.demo.common.DateHelper;
 import onefengma.demo.common.StringUtils;
-import onefengma.demo.server.config.MetaDataHelper;
 import onefengma.demo.server.core.LogUtils;
 
 /**
@@ -19,7 +19,7 @@ public class ReDemo {
     private String ccc = "fengma2";
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException {
-        MetaDataHelper.getCities();
+        System.out.println(DateHelper.getYear() + "---" + DateHelper.getMonth() + "----" + DateHelper.getDay());
     }
 
 

@@ -71,7 +71,7 @@ public class UserManager extends BaseManager {
         // 用户列表
         get("userList", AuthSession.class, (request, response, requestBean) -> success(getUserDataHelper().getUserList()));
 
-        multiPost("upload", UploadDemo.class, (request, response, requestBean) -> {
+        post("upload", UploadDemo.class, (request, response, requestBean) -> {
             return success(requestBean);
         });
 

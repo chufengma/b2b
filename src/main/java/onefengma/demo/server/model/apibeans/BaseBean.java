@@ -23,6 +23,8 @@ public class BaseBean {
     public Map<String, String> cookies = new HashMap<>();
     @NotRequired
     public Session session;
+    @NotRequired
+    public Object extra;
 
     public boolean checkParams(JSONObject jsonObject) throws ParamsMissException {
         for(String key : getRequiredParams()) {

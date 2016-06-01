@@ -7,6 +7,7 @@ import com.oreilly.servlet.MultipartRequest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 
 import onefengma.demo.common.FileHelper;
@@ -93,8 +94,8 @@ public abstract class BaseManager {
     private Route doMultiRequest(TypedRoute route, Class tClass) {
         return (request, response) -> {
             try {
-                Object requestBean = getMultiBean(request, tClass);
                 jsonContentType(response);
+                BaseBean requestBean = getPostBean(request, tClass);
                 setupAuth(request, request);
                 if (loginSessionCheck(requestBean)) {
                     return route.handle(request, response, requestBean);
@@ -191,35 +192,63 @@ public abstract class BaseManager {
         return jsonResult;
     }
 
-    private <T extends BaseBean> T getMultiBean(Request request, Class<T> tClass) throws IOException, IllegalAccessException, ParamsMissException {
+    private <T extends BaseBean> T getPostBean(Request request, Class<T> tClass) throws ParamsMissException, IOException {
         String parentFilePath = FileHelper.getFileFolder();
         File file = new File(parentFilePath);
         if (!file.exists()) {
             file.mkdirs();
         }
-        MultipartRequest multipartRequest = new MultipartRequest(request.raw(), FileHelper.getFileFolder(), 10048576, "utf-8", FileHelper.getFileRename());
         JSONObject beanJson = new JSONObject();
 
-        // params
-        Enumeration paramsEnum = multipartRequest.getParameterNames();
-        while (paramsEnum.hasMoreElements()) {
-            String paramsName = (String) paramsEnum.nextElement();
-            String value = multipartRequest.getParameter(paramsName);
-            beanJson.put(paramsName, value);
-        }
+        ArrayList<File> files = null;
+        T requestBean = null;
+        try {
+            MultipartRequest multipartRequest = new MultipartRequest(request.raw(), FileHelper.getFileFolder(), 10048576, "utf-8", FileHelper.getFileRename());
 
-        // files
-        Enumeration filesEnum = multipartRequest.getFileNames();
-        while (filesEnum.hasMoreElements()) {
-            String paramsName = (String) filesEnum.nextElement();
-            File value = multipartRequest.getFile(paramsName);
-            beanJson.put(paramsName, value);
-        }
+            // params
+            Enumeration paramsEnum = multipartRequest.getParameterNames();
+            while (paramsEnum.hasMoreElements()) {
+                String paramsName = (String) paramsEnum.nextElement();
+                String value = multipartRequest.getParameter(paramsName);
+                beanJson.put(paramsName, value);
+            }
 
-        T requestBean = beanJson.toJavaObject(tClass);
-        requestBean.checkParams(beanJson);
+            // files
+            Enumeration filesEnum = multipartRequest.getFileNames();
+
+            while (filesEnum.hasMoreElements()) {
+                if (files == null) {
+                    files = new ArrayList<>();
+                }
+                String paramsName = (String) filesEnum.nextElement();
+                File value = multipartRequest.getFile(paramsName);
+                System.out.println("-----------" + FileHelper.generateInternetPath(value.getPath()));
+                files.add(value);
+                beanJson.put(paramsName, value);
+            }
+
+            requestBean = beanJson.toJavaObject(tClass);
+            requestBean.checkParams(beanJson);
+            requestBean.extra = files;
+
+        } catch (Exception e) {
+            cleanTmpFiles(files);
+            LogUtils.e(e, "error when getPostBean");
+            throw e;
+        }
 
         return requestBean;
+    }
+
+    public static void cleanTmpFiles(Object extra) {
+        if (extra != null && extra instanceof ArrayList) {
+            ArrayList arrayList = (ArrayList) extra;
+            for(int i = 0; i< arrayList.size() ; i++) {
+                if (arrayList.get(i) instanceof File) {
+                    ((File)arrayList.get(i)).delete();
+                }
+            }
+        }
     }
 
     private static <T extends BaseBean> T getRequest(Request request, Class<T> tClass) throws IllegalAccessException, InstantiationException, ParamsMissException {
