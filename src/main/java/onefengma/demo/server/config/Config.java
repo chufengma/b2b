@@ -35,7 +35,7 @@ public class Config {
 
     private static final String BASE_FILE_PATH = "./res/files/";
     private static final String VALIDATE_PATH = "./res/validate/";
-    private static final String BASE_PAGE_PATH = "./res/views/";
+    private static final String BASE_PAGE_PATH = "./res/B2BPlatformFront/";
 
 
     private static DataBaseModel dataBaseModel;
@@ -62,13 +62,13 @@ public class Config {
         Spark.port(PORT);
 
         // static files
-        Spark.externalStaticFileLocation("./res/views/");
+        Spark.externalStaticFileLocation("./res/B2BPlatformFront/");
 
         // free marker engine
         freeMarkerEngine = new FreeMarkerEngine();
         Configuration freeMarkerConfiguration = new Configuration();
         try {
-            freeMarkerConfiguration.setTemplateLoader(new FileTemplateLoader(new File("./res/views")));
+            freeMarkerConfiguration.setTemplateLoader(new FileTemplateLoader(new File("./res/B2BPlatformFront")));
             freeMarkerConfiguration.setEncoding(new Locale("zh"), "utf8");
             freeMarkerConfiguration.setTemplateExceptionHandler(new TemplateExceptionHandler() {
                 @Override
