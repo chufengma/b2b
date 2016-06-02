@@ -93,16 +93,21 @@ public abstract class BaseManager {
     // really request logic body
     private Route doMultiRequest(TypedRoute route, Class tClass) {
         return (request, response) -> {
+            BaseBean requestBean = null;
             try {
                 jsonContentType(response);
-                BaseBean requestBean = getPostBean(request, tClass);
-                setupAuth(request, request);
+                requestBean = getPostBean(request, tClass);
+                setupAuth(requestBean, request);
                 if (loginSessionCheck(requestBean)) {
                     return route.handle(request, response, requestBean);
                 } else {
+                    cleanTmpFiles(requestBean.extra);
                     return error(STATUS_NOT_LOGIN, "not login", null);
                 }
             } catch (Exception e) {
+                if (requestBean != null) {
+                    cleanTmpFiles(requestBean.extra);
+                }
                 return exception(e);
             }
         };
@@ -174,6 +179,13 @@ public abstract class BaseManager {
 
     public static String error(String errorMsg, Throwable exception) {
         return error(STATUS_ERROR, errorMsg, exception);
+    }
+
+    public static String errorAndClear(BaseBean baseBean, String errorMsg) {
+        if (baseBean != null) {
+            cleanTmpFiles(baseBean.extra);
+        }
+        return error(STATUS_ERROR, errorMsg, null);
     }
 
     public static String error(String errorMsg) {

@@ -10,6 +10,15 @@ public class User {
     private String name;
     private String password;
     private String mobile;
+    private boolean isSeller;
+
+    public boolean isSeller() {
+        return isSeller;
+    }
+
+    public void setIsSeller(boolean isSeller) {
+        this.isSeller = isSeller;
+    }
 
     public String getName() {
         return name;

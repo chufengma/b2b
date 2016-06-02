@@ -6,6 +6,7 @@ import java.util.Map;
 import onefengma.demo.common.IdUtils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.ValidateCode;
+import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.UploadDemo;
 import onefengma.demo.server.model.User;
 import onefengma.demo.server.core.BaseManager;
@@ -14,6 +15,7 @@ import onefengma.demo.server.core.ValidateHelper;
 import onefengma.demo.server.core.request.AuthHelper;
 import onefengma.demo.server.model.apibeans.AuthSession;
 import onefengma.demo.server.model.apibeans.BaseBean;
+import onefengma.demo.server.model.apibeans.SellerRequest;
 import onefengma.demo.server.model.apibeans.login.Login;
 import onefengma.demo.server.model.apibeans.login.Register;
 
@@ -24,6 +26,7 @@ import onefengma.demo.server.model.apibeans.login.Register;
 public class UserManager extends BaseManager {
 
     private UserDataHelper userDataHelper;
+    private SellerDataHelper sellerDataHelper;
 
     @Override
     public void init() {
@@ -71,9 +74,47 @@ public class UserManager extends BaseManager {
         // 用户列表
         get("userList", AuthSession.class, (request, response, requestBean) -> success(getUserDataHelper().getUserList()));
 
+        // 商家信息
+        post("fillSellerInfo", SellerRequest.class, ((request, response, requestBean) -> {
+            User user = getUserDataHelper().findUserByUserId(requestBean.getUserId());
+            Seller s = getSellerDataHelper().getSellerByUserId(requestBean.getUserId());
+            if (user == null) {
+                return errorAndClear(requestBean, "找不到该用户");
+            }
+            if (user.isSeller() || s != null) {
+                return errorAndClear(requestBean, "用户已填写商家信息");
+            }
+
+            // 相关证件
+            if (requestBean.isThreeInOne) {
+                if(requestBean.allCer == null) {
+                    return errorAndClear(requestBean, "需要填写三证合一");
+                }
+                requestBean.businessLic = null;
+                requestBean.financeLic = null;
+                requestBean.codeLic = null;
+            } else {
+                if (requestBean.businessLic == null) {
+                    return errorAndClear(requestBean, "需要填写营业执照");
+                }
+                if (requestBean.codeLic == null) {
+                    return errorAndClear(requestBean, "需要填写组织机构代码");
+                }
+                if (requestBean.financeLic == null) {
+                    return errorAndClear(requestBean, "需要填写财务执照");
+                }
+                requestBean.allCer = null;
+            }
+            Seller seller = requestBean.generateSeller();
+            getSellerDataHelper().insertSeller(seller);
+            getUserDataHelper().setSeller(seller.userId, true);
+            return success(seller);
+        }));
+
         post("upload", UploadDemo.class, (request, response, requestBean) -> {
             return success(requestBean);
         });
+
 
     }
 
@@ -98,6 +139,13 @@ public class UserManager extends BaseManager {
             userDataHelper = new UserDataHelper();
         }
         return userDataHelper;
+    }
+
+    private SellerDataHelper getSellerDataHelper() {
+        if (sellerDataHelper == null) {
+            sellerDataHelper = new SellerDataHelper();
+        }
+        return sellerDataHelper;
     }
 
     @Override

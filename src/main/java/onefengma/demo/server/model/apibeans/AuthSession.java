@@ -23,4 +23,8 @@ public class AuthSession extends BaseBean {
     public boolean isNotValid() {
         return serverData == null || !serverData.equals(clientData);
     }
+
+    public String getUserId() {
+        return serverData.getUserId();
+    }
 }
