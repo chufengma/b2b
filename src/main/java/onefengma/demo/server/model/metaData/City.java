@@ -13,6 +13,7 @@ public class City {
     public ArrayList<City> sub;
     public int type = -1;
     public String id;
+    public String fatherId;
 
     public void setId(String id) {
         this.id = id;

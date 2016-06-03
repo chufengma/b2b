@@ -6,6 +6,7 @@ import java.util.Map;
 import onefengma.demo.common.IdUtils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.ValidateCode;
+import onefengma.demo.common.VerifyUtils;
 import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.UploadDemo;
 import onefengma.demo.server.model.User;
@@ -18,6 +19,8 @@ import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.SellerRequest;
 import onefengma.demo.server.model.apibeans.login.Login;
 import onefengma.demo.server.model.apibeans.login.Register;
+import onefengma.demo.server.model.metaData.City;
+import onefengma.demo.server.services.funcs.CityDataHelper;
 
 /**
  * @author yfchu
@@ -39,6 +42,9 @@ public class UserManager extends BaseManager {
             }
             if (!register.isPasswordRight()) {
                 return error("密码长度为 6~16");
+            }
+            if (!VerifyUtils.isMobile(register.mobile)) {
+                return error("手机号码输入不正确");
             }
             if(!ValidateHelper.isCodeValid(register.validateCode, req.session())) {
                 return error("验证码不正确");
@@ -83,6 +89,19 @@ public class UserManager extends BaseManager {
             }
             if (user.isSeller() || s != null) {
                 return errorAndClear(requestBean, "用户已填写商家信息");
+            }
+
+            if (!VerifyUtils.isMobile(requestBean.cantactTel)) {
+                return errorAndClear(requestBean, "手机号码输入不正确");
+            }
+
+            if (!(requestBean.regMoney > 0)) {
+                return errorAndClear(requestBean, "注册资本填写有误");
+            }
+
+            City city = CityDataHelper.instance().getCityById(requestBean.cityId);
+            if (city == null) {
+                return errorAndClear(requestBean, "城市选择有误");
             }
 
             // 相关证件

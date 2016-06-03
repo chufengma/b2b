@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import onefengma.demo.common.DateHelper;
 import onefengma.demo.common.StringUtils;
+import onefengma.demo.common.VerifyUtils;
 import onefengma.demo.server.core.LogUtils;
 
 /**
@@ -19,7 +20,7 @@ public class ReDemo {
     private String ccc = "fengma2";
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException {
-        System.out.println(DateHelper.getYear() + "---" + DateHelper.getMonth() + "----" + DateHelper.getDay());
+        System.out.println(VerifyUtils.isFox("519-85129131"));
     }
 
 
