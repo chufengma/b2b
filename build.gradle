@@ -7,6 +7,8 @@ repositories {
     mavenCentral()
 }
 
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
 dependencies {
 
     // http://mvnrepository.com/artifact/servlets.com/cos
