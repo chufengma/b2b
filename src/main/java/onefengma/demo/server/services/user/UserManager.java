@@ -130,10 +130,9 @@ public class UserManager extends BaseManager {
             return success(seller);
         }));
 
-        post("upload", UploadDemo.class, (request, response, requestBean) -> {
+        multiPost("upload", UploadDemo.class, (request, response, requestBean) -> {
             return success(requestBean);
         });
-
 
     }
 
