@@ -10,8 +10,5 @@ import onefengma.demo.server.model.apibeans.BaseBean;
  */
 public class UploadDemo extends BaseBean {
     public String test;
-    public File myFile1;
-    public File myFile2;
-    public File myFile3;
-    public File myFile4;
+    public File file;
 }
