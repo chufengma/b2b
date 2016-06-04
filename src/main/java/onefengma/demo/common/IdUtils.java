@@ -14,12 +14,12 @@ public class IdUtils {
 
     public static String id() {
         SecureRandom rand = new SecureRandom();
-        byte[] randomBytes = new byte[6];
+        byte[] randomBytes = new byte[9];
         String idStr = null;
         do {
             rand.nextBytes(randomBytes);
             idStr = Base64.getEncoder().encodeToString(randomBytes);
-        } while (idStr.contains("/") || idStr.contains("\\"));
+        } while (idStr.contains("/") || idStr.contains("\\") || idStr.contains("+"));
         return idStr;
     }
 

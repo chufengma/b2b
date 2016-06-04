@@ -15,4 +15,14 @@ public class IconDataCategory {
     public List<String> productPlaces = Arrays.asList("太钢", "天管", "酒钢", "泰山钢铁", "宝钢", "东特", "广青", "福欣", "张浦", "联众",
             "诚德", "鼎信", "飞达", "上克", "青浦", "宝新", "甬金", "压延", "金汇", "宏旺", "新行健", "建恒", "山东澳星", "戴南", "远东", "其他");
 
+
+    private static IconDataCategory iconDataCategory;
+
+    public static IconDataCategory get() {
+        if (iconDataCategory == null) {
+            iconDataCategory = new IconDataCategory();
+        }
+        return iconDataCategory;
+    }
+
 }

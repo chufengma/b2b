@@ -48,7 +48,7 @@ public abstract class BaseManager {
     /*------------------------------ http methods start --------------------------- */
     // wrap http post
     public <T extends BaseBean> void post(String path, Class<T> tClass, TypedRoute<T> route) {
-        Spark.post(generatePath(path), doMultiRequest(route, tClass));
+        Spark.post(generatePath(path), doRequest(route, tClass));
     }
 
     // wrap http get
@@ -122,6 +122,7 @@ public abstract class BaseManager {
                 T reqBean = getRequest(request, tClass);
                 jsonContentType(response);
                 addHeaders(response);
+                response.raw().setCharacterEncoding("UTF-8");
                 if (loginSessionCheck(reqBean)) {
                     return route.handle(request, response, reqBean);
                 } else {
@@ -268,15 +269,21 @@ public abstract class BaseManager {
 
     private static <T extends BaseBean> T getRequest(Request request, Class<T> tClass) throws IllegalAccessException, InstantiationException, ParamsMissException {
         T baseBean = null;
-        JSONObject beanJson;
+        JSONObject beanJson = new JSONObject();
         // parse params
         if (request.requestMethod() == "GET") {
-            beanJson = new JSONObject();
             for (String key : request.queryParams()) {
                 beanJson.put(key, request.queryMap(key).value());
             }
         } else {
-            beanJson = JSON.parseObject(request.body());
+            String[] params = request.body().split("&");
+            for(String param : params) {
+                String[] realParams = param.split("=");
+                if (realParams.length != 2) {
+                    continue;
+                }
+                beanJson.put(realParams[0], realParams[1]);
+            }
         }
 
         if (beanJson == null) {

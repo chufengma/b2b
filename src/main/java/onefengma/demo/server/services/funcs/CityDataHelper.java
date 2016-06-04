@@ -63,4 +63,8 @@ public class CityDataHelper extends BaseDataHelper {
         return cityDescBuilder.toString();
     }
 
+    public boolean isCityExist(String cityId) throws NoSuchFieldException, IllegalAccessException {
+        return getCityById(cityId) != null;
+    }
+
 }
