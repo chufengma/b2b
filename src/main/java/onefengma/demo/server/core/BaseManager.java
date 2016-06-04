@@ -309,7 +309,7 @@ public abstract class BaseManager {
     }
 
     private static void addHeaders(Response response) {
-        response.header("Access-Control-Allow-Origin", "127.0.0.1:" + Config.PORT + ",localhost:" + Config.PORT+ ",localhost:2000,127.0.0.1:2000");
+        response.header("Access-Control-Allow-Origin", "*");
     }
 
     /*------------------------login handler-----------------------------------*/

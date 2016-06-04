@@ -20,7 +20,7 @@ public class ReDemo {
     private String ccc = "fengma2";
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException {
-        System.out.println(VerifyUtils.isFox("519-85129131"));
+        System.out.println(VerifyUtils.isMobile("18355551276"));
     }
 
 

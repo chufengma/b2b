@@ -93,11 +93,11 @@ public class FileHelper {
         }
     }
 
-    public static String generateInternetUri(String path) {
-        if (StringUtils.isEmpty(path)) {
+    public static String generateRelativeInternetUri(String filePath) {
+        if (StringUtils.isEmpty(filePath)) {
             return "";
         }
-        return Config.getAddressPrefix() + Config.getDownLoadFileRequestPath() + path;
+        return filePath.replace(Config.getDownLoadFilePath(), "./" + Config.getDownLoadFileRequestPath());
     }
 
     public static String generateInternetPath(String path) {
