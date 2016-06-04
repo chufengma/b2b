@@ -99,6 +99,7 @@ public abstract class BaseManager {
                 requestBean = getPostBean(request, tClass);
                 setupAuth(requestBean, request);
                 addHeaders(response);
+                response.raw().setCharacterEncoding("UTF-8");
                 if (loginSessionCheck(requestBean)) {
                     return route.handle(request, response, requestBean);
                 } else {
