@@ -24,6 +24,8 @@ public class ValidateHelper {
         ValidateCode validateCode = ValidateCode.getDefaultValidateCode(request.session());
         response.type("image/png");
         validateCode.write(response.raw().getOutputStream());
+
+        response.cookie("JSESSIONID", request.session().id());
         request.session().attribute(VALIDATE_CODE, validateCode.getCode());
         request.session().attribute(VALIDATE_CODE_GE_TIME, System.currentTimeMillis());
         return validateCode;
