@@ -38,6 +38,9 @@ public class Enter {
             if (file == null) {
                 response.redirect(Config.getNotFoundPath());
             }
+            if (request.pathInfo().equals(Config.getNotFoundPath())) {
+                return "真 404";
+            }
             return null;
         });
     }

@@ -33,6 +33,6 @@ public class Register extends BaseBean {
     }
 
     public boolean isPasswordRight() {
-        return password.length() > 6 && password.length() <= 16;
+        return password.length() >= 6 && password.length() <= 16;
     }
 }

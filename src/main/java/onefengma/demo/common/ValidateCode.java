@@ -129,7 +129,7 @@ public class ValidateCode {
     }
 
     public static ValidateCode getDefaultValidateCode(Session session) throws IOException {
-        ValidateCode vCode = new ValidateCode(120,40,5,100);
+        ValidateCode vCode = new ValidateCode(120,40, 1,100);
         return vCode;
     }
 
