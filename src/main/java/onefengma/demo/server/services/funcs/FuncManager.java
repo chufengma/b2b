@@ -11,6 +11,7 @@ import onefengma.demo.server.core.ValidateHelper;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.codes.MsgCode.MsgCodeResponse;
 import onefengma.demo.server.model.apibeans.codes.ValidateCodeBean;
+import onefengma.demo.server.model.apibeans.meta.CityDescRequest;
 import spark.utils.IOUtils;
 
 /**
@@ -67,6 +68,10 @@ public class FuncManager extends BaseManager {
 
         // 获取城市列表
         get("cities", BaseBean.class, ((request, response, requestBean) -> success(Config.getCities())));
+
+        get("cityDesc", CityDescRequest.class, ((request, response, requestBean) -> {
+            return success(CityDataHelper.instance().getCityDescById(requestBean.cityId));
+        }));
     }
 
     @Override

@@ -22,8 +22,6 @@ public class IronManager extends BaseManager {
     @Override
     public void init() {
         get("categories", BaseBean.class, ((request, response, requestBean) -> success(Config.getIconDataCategory()) ));
-
-
     }
 
     @Override

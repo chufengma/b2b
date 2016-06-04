@@ -26,7 +26,7 @@ import spark.template.freemarker.FreeMarkerEngine;
 public class Config {
 
     // environment
-    private static final ENVI ENV = ENVI.DEV;
+    public static final ENVI ENV = ENVI.DEV;
     // data
     private static final String DATA_BASE_URL = "jdbc:mysql://localhost:3306/b2b?useUnicode=true&characterEncoding=utf8&useSSL=false";
     private static final String DATA_BASE_USER = "root";
@@ -42,7 +42,7 @@ public class Config {
     private static final String BASE_PAGE_PATH = "./res/B2BPlatformFront/";
     private static final String BASE_META_PATH = "./res/meta/";
 
-    private static final int PORT = 9090;
+    public static final int PORT = 9090;
     private static String HOST;
 
     private static DataBaseModel dataBaseModel;

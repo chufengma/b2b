@@ -3,7 +3,9 @@ package onefengma.demo.server.services.funcs;
 import org.sql2o.Connection;
 
 import java.util.List;
+import java.util.Stack;
 
+import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.model.metaData.City;
 
@@ -44,6 +46,21 @@ public class CityDataHelper extends BaseDataHelper {
                 return cities.get(0);
             }
         }
+    }
+
+    public String getCityDescById(String cityID) throws NoSuchFieldException, IllegalAccessException {
+        City currentCity = getCityById(cityID);
+        Stack<String> stringStack = new Stack<>();
+        stringStack.push(currentCity.name);
+        while (!StringUtils.isEmpty(currentCity.fatherId)) {
+            currentCity = getCityById(currentCity.fatherId);
+            stringStack.push(currentCity.name);
+        }
+        StringBuffer cityDescBuilder = new StringBuffer();
+        while(!stringStack.isEmpty()) {
+            cityDescBuilder.append(stringStack.pop() + " ");
+        }
+        return cityDescBuilder.toString();
     }
 
 }

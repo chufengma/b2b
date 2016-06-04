@@ -47,12 +47,12 @@ public abstract class BaseManager {
 
     /*------------------------------ http methods start --------------------------- */
     // wrap http post
-    public <T> void post(String path, Class<T> tClass, TypedRoute<T> route) {
+    public <T extends BaseBean> void post(String path, Class<T> tClass, TypedRoute<T> route) {
         Spark.post(generatePath(path), doMultiRequest(route, tClass));
     }
 
     // wrap http get
-    public void get(String path, Class tClass, TypedRoute route) {
+    public <T extends BaseBean> void get(String path, Class<T> tClass, TypedRoute<T> route) {
         Spark.get(generatePath(path), doRequest(route, tClass));
     }
 
@@ -69,7 +69,7 @@ public abstract class BaseManager {
     }
 
     // wrap http multipost pages
-    public <T> void multiPost(String path, Class<T> tClass, TypedRoute<T> route) {
+    public <T extends BaseBean> void multiPost(String path, Class<T> tClass, TypedRoute<T> route) {
         Spark.post(generatePath(path), doMultiRequest(route, tClass));
     }
 
@@ -91,13 +91,14 @@ public abstract class BaseManager {
     }
 
     // really request logic body
-    private Route doMultiRequest(TypedRoute route, Class tClass) {
+    private <T extends BaseBean> Route doMultiRequest(TypedRoute route, Class<T> tClass) {
         return (request, response) -> {
             BaseBean requestBean = null;
             try {
                 jsonContentType(response);
                 requestBean = getPostBean(request, tClass);
                 setupAuth(requestBean, request);
+                addHeaders(response);
                 if (loginSessionCheck(requestBean)) {
                     return route.handle(request, response, requestBean);
                 } else {
@@ -114,11 +115,12 @@ public abstract class BaseManager {
     }
 
     // really request logic body
-    private Route doRequest(TypedRoute route, Class tClass) {
+    private <T extends BaseBean> Route doRequest(TypedRoute route, Class<T> tClass) {
         return (request, response) -> {
             try {
-                Object reqBean = getRequest(request, tClass);
+                T reqBean = getRequest(request, tClass);
                 jsonContentType(response);
+                addHeaders(response);
                 if (loginSessionCheck(reqBean)) {
                     return route.handle(request, response, reqBean);
                 } else {
@@ -296,6 +298,10 @@ public abstract class BaseManager {
         if (authSession instanceof AuthSession) {
             ((AuthSession) authSession).setAuthData(request);
         }
+    }
+
+    private static void addHeaders(Response response) {
+        response.header("Access-Control-Allow-Origin", "127.0.0.1:" + Config.PORT + ",localhost:" + Config.PORT);
     }
 
     /*------------------------login handler-----------------------------------*/
