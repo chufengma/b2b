@@ -28,18 +28,12 @@ public class IronDataHelper extends BaseDataHelper {
     }
 
     public int getMaxCounts() {
-        String sql = "select count(id) from iron_product";
-        try(Connection conn = getConn()) {
-            int count = conn.createQuery(sql).executeScalar(Integer.class);
-            return count;
-        }
+        return getMaxCounts("iron_product");
     }
 
     public List<IronProduct>  getIronProducts(PageBuilder pageBuilder) {
-        if (pageBuilder.pageCount <=0 || pageBuilder.pageCount >= 300) {
-            pageBuilder.pageCount = 300;
-        }
         String sql = "select * from iron_product " + (pageBuilder.hasWhere() ? " where " : "") + pageBuilder.generateSql();
+        System.out.print("---" + sql);
         System.out.print("---" + sql);
         try (Connection conn = getConn()){
             return conn.createQuery(sql).executeAndFetch(IronProduct.class);

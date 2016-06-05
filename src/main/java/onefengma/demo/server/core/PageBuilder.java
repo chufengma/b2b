@@ -54,6 +54,9 @@ public class PageBuilder {
     public PageBuilder(int currentPage, int pageCount) {
         this.currentPage = currentPage;
         this.pageCount = pageCount;
+        if (pageCount <=0 || pageCount >= 300) {
+            this.pageCount = 300;
+        }
     }
 
     public PageBuilder addEqualWhere(String key, Object value) {

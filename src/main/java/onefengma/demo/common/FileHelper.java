@@ -93,6 +93,14 @@ public class FileHelper {
         }
     }
 
+    public static String generateRelativeInternetUri(File file) {
+        if (file == null) {
+            return "";
+        }
+        return generateRelativeInternetUri(file.getPath());
+    }
+
+
     public static String generateRelativeInternetUri(String filePath) {
         if (StringUtils.isEmpty(filePath)) {
             return "";

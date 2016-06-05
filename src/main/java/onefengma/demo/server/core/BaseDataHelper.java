@@ -59,6 +59,14 @@ public abstract class BaseDataHelper {
         return sqlBuilder.toString();
     }
 
+    public int getMaxCounts(String table) {
+        String sql = "select count(id) from " + table;
+        try(Connection conn = getConn()) {
+            int count = conn.createQuery(sql).executeScalar(Integer.class);
+            return count;
+        }
+    }
+
     protected static Query createInsertQuery(Connection conn, String table, Object bean) throws IllegalAccessException, UnsupportedEncodingException, NoSuchMethodException, InvocationTargetException {
         return bind(conn.createQuery(createInsetStr(table, bean).toString()), bean);
     }
