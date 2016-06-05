@@ -21,4 +21,5 @@ public class Seller {
     public String businessLic;
     public String codeLic;
     public String financeLic;
+    public String cover;
 }

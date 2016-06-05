@@ -7,7 +7,7 @@
 #
 # Host: 127.0.0.1 (MySQL 5.1.63)
 # Database: b2b
-# Generation Time: 2016-06-05 12:58:03 +0000
+# Generation Time: 2016-06-05 13:27:11 +0000
 # ************************************************************
 
 
@@ -3771,15 +3771,16 @@ CREATE TABLE `seller` (
   `businessLic` varchar(100) DEFAULT NULL,
   `codeLic` varchar(100) DEFAULT NULL,
   `financeLic` varchar(100) DEFAULT NULL,
+  `cover` varchar(200) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 LOCK TABLES `seller` WRITE;
 /*!40000 ALTER TABLE `seller` DISABLE KEYS */;
 
-INSERT INTO `seller` (`id`, `userId`, `companyName`, `regMoney`, `contact`, `cantactTel`, `fax`, `cityId`, `officeAddress`, `qq`, `shopProfile`, `allCer`, `businessLic`, `codeLic`, `financeLic`)
+INSERT INTO `seller` (`id`, `userId`, `companyName`, `regMoney`, `contact`, `cantactTel`, `fax`, `cityId`, `officeAddress`, `qq`, `shopProfile`, `allCer`, `businessLic`, `codeLic`, `financeLic`, `cover`)
 VALUES
-	(8,'527cec6a380046b5b813537e10d065e9','风马科技有限公司',1000,'将三米','18355551276','12300991','gVgwxppO','你打打发打发斯蒂芬','578323123','阿斯顿发撒旦法师打发士大夫','./res/files/2016/6/4/55RmFOs1.png','','','');
+	(8,'527cec6a380046b5b813537e10d065e9','风马科技有限公司',1000,'将三米','18355551276','12300991','gVgwxppO','你打打发打发斯蒂芬','578323123','阿斯顿发撒旦法师打发士大夫','./res/files/2016/6/4/55RmFOs1.png','','','','');
 
 /*!40000 ALTER TABLE `seller` ENABLE KEYS */;
 UNLOCK TABLES;
