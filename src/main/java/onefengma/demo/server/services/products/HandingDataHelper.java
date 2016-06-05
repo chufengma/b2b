@@ -9,7 +9,9 @@ import java.util.List;
 
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.model.product.HandingBuy;
 import onefengma.demo.server.model.product.HandingProduct;
+import onefengma.demo.server.model.product.IronBuy;
 
 /**
  * Created by chufengma on 16/6/5.
@@ -38,11 +40,15 @@ public class HandingDataHelper extends BaseDataHelper {
 
     public List<HandingProduct> getHandingProducts(PageBuilder pageBuilder) {
         String sql = "select * from handing_product " + (pageBuilder.hasWhere() ? " where " : "") + pageBuilder.generateSql();
-        System.out.println("---"+sql);
         try (Connection conn = getConn()){
             return conn.createQuery(sql).executeAndFetch(HandingProduct.class);
         }
     }
 
+    public void pushHandingBuy(HandingBuy handingBuy) throws InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException, IllegalAccessException {
+        try (Connection conn = getConn()){
+            createInsertQuery(conn, "handing_buy", handingBuy).executeUpdate();
+        }
+    }
 
 }

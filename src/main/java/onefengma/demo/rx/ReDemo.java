@@ -1,13 +1,16 @@
 package onefengma.demo.rx;
 
 import com.alibaba.fastjson.JSON;
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 
 import org.sql2o.Connection;
 import org.sql2o.Query;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,13 +33,10 @@ public class ReDemo {
     private String bbb = "fengma1";
     private String ccc = "fengma2";
 
-    public static void main(String[] args) throws IllegalAccessException, InstantiationException {
-        System.out.println(new PageBuilder(1, 3)
-                .addEqualWhere("haha", "fengma")
-                .addEqualWhere("days", 12)
-                .orderByPrice(true)
-                .orderByTime(23123,1111111)
-                .orderBySales(false).generateSql());
+    public static void main(String[] args) throws IllegalAccessException, InstantiationException, UnsupportedEncodingException {
+        String url = "%E4%B8%8D%E9%94%88%E9%92%A2%E7%AE%A1";
+
+        System.out.println(URLDecoder.decode(url, "utf-8"));
     }
 
     protected  static  String createInsertSql(String table, Class clazz) {

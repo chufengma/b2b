@@ -7,7 +7,7 @@
 #
 # Host: 127.0.0.1 (MySQL 5.1.63)
 # Database: b2b
-# Generation Time: 2016-06-05 13:27:11 +0000
+# Generation Time: 2016-06-05 14:20:39 +0000
 # ************************************************************
 
 
@@ -3676,6 +3676,30 @@ VALUES
 UNLOCK TABLES;
 
 
+# Dump of table handing_buy
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `handing_buy`;
+
+CREATE TABLE `handing_buy` (
+  `id` varchar(100) NOT NULL DEFAULT '',
+  `handingType` varchar(100) NOT NULL DEFAULT '',
+  `souCityId` varchar(100) NOT NULL DEFAULT '',
+  `message` varchar(500) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+LOCK TABLES `handing_buy` WRITE;
+/*!40000 ALTER TABLE `handing_buy` DISABLE KEYS */;
+
+INSERT INTO `handing_buy` (`id`, `handingType`, `souCityId`, `message`)
+VALUES
+	('d0p50HOYdWCc','冲花板','PwUgn58r','asfasdf');
+
+/*!40000 ALTER TABLE `handing_buy` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
 # Dump of table handing_product
 # ------------------------------------------------------------
 
@@ -3704,6 +3728,35 @@ VALUES
 	('5Gpr2IaEUKm9','整卷油磨','wYC4sP3V','sss',123,'米','./files/2016/6/5/nbzxo95rfgHM.png','','','');
 
 /*!40000 ALTER TABLE `handing_product` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+# Dump of table iron_buy
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `iron_buy`;
+
+CREATE TABLE `iron_buy` (
+  `id` varchar(100) NOT NULL DEFAULT '',
+  `ironType` varchar(100) NOT NULL DEFAULT '',
+  `material` varchar(100) NOT NULL DEFAULT '',
+  `surface` varchar(100) NOT NULL DEFAULT '',
+  `proPlace` varchar(100) NOT NULL DEFAULT '',
+  `locationCityId` varchar(100) NOT NULL DEFAULT '',
+  `userId` varchar(100) NOT NULL DEFAULT '',
+  `message` varchar(500) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+LOCK TABLES `iron_buy` WRITE;
+/*!40000 ALTER TABLE `iron_buy` DISABLE KEYS */;
+
+INSERT INTO `iron_buy` (`id`, `ironType`, `material`, `surface`, `proPlace`, `locationCityId`, `userId`, `message`)
+VALUES
+	('L5RGy7O98VYk','不锈钢管','409L','No.1','宝新','LnbsZoa2','527cec6a380046b5b813537e10d065e9','ASFASFASF'),
+	('P7x9wpB1lqtE','不锈钢管','409L','No.1','宝新','LnbsZoa2','527cec6a380046b5b813537e10d065e9','非常好的是不是，我要这个和那个');
+
+/*!40000 ALTER TABLE `iron_buy` ENABLE KEYS */;
 UNLOCK TABLES;
 
 

@@ -2,6 +2,7 @@ package onefengma.demo.server.services.products;
 
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.model.apibeans.product.HandingBuyRequest;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.product.HandingGetRequest;
 import onefengma.demo.server.model.apibeans.product.HandingGetResponse;
@@ -40,6 +41,17 @@ public class HandingManager extends BaseManager{
                 .addEqualWhere("type", requestBean.handingType)
                 .addEqualWhere("souCityId", requestBean.souCityId));
             return success(handingGetResponse);
+        }));
+
+        post("buy", HandingBuyRequest.class, ((request, response, requestBean) -> {
+            if (!HandingDataCategory.get().handingTypes.contains(requestBean.handingType)) {
+                return errorAndClear(requestBean, "加工种类选择有误");
+            }
+            if (!CityDataHelper.instance().isCityExist(requestBean.souCityId)) {
+                return errorAndClear(requestBean, "加工所在城市选择有误");
+            }
+            HandingDataHelper.getHandingDataHelper().pushHandingBuy(requestBean.generateBuy());
+            return success();
         }));
 
     }

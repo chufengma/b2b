@@ -10,6 +10,7 @@ import java.util.List;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.model.product.IronBuy;
 import onefengma.demo.server.model.product.IronProduct;
 
 /**
@@ -37,6 +38,12 @@ public class IronDataHelper extends BaseDataHelper {
         System.out.print("---" + sql);
         try (Connection conn = getConn()){
             return conn.createQuery(sql).executeAndFetch(IronProduct.class);
+        }
+    }
+
+    public void pushIronBuy(IronBuy ironBuy) throws InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException, IllegalAccessException {
+        try (Connection conn = getConn()){
+            createInsertQuery(conn, "iron_buy", ironBuy).executeUpdate();
         }
     }
 

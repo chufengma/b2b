@@ -7,6 +7,8 @@ import com.oreilly.servlet.MultipartRequest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
@@ -267,13 +269,13 @@ public abstract class BaseManager {
         }
     }
 
-    private static <T extends BaseBean> T getRequest(Request request, Class<T> tClass) throws IllegalAccessException, InstantiationException, ParamsMissException {
+    private static <T extends BaseBean> T getRequest(Request request, Class<T> tClass) throws IllegalAccessException, InstantiationException, ParamsMissException, UnsupportedEncodingException {
         T baseBean = null;
         JSONObject beanJson = new JSONObject();
         // parse params
         if (request.requestMethod() == "GET") {
             for (String key : request.queryParams()) {
-                beanJson.put(key, request.queryMap(key).value());
+                beanJson.put(key, StringUtils.urlDecodeStr(request.queryMap(key).value()));
             }
         } else {
             String[] params = request.body().split("&");
@@ -282,7 +284,7 @@ public abstract class BaseManager {
                 if (realParams.length != 2) {
                     continue;
                 }
-                beanJson.put(realParams[0], realParams[1]);
+                beanJson.put(realParams[0], StringUtils.urlDecodeStr(realParams[1]));
             }
         }
 

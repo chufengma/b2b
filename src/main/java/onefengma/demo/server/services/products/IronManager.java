@@ -4,6 +4,7 @@ import onefengma.demo.server.config.Config;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.BaseBean;
+import onefengma.demo.server.model.apibeans.product.IronBuyRequest;
 import onefengma.demo.server.model.apibeans.product.IronPushRequest;
 import onefengma.demo.server.model.apibeans.product.IronsGetRequest;
 import onefengma.demo.server.model.apibeans.product.IronsGetResponse;
@@ -78,6 +79,31 @@ public class IronManager extends BaseManager {
                 cleanTmpFiles(requestBean.extra);
             }
 
+            return success();
+        }));
+
+        post("buy", IronBuyRequest.class, ((request, response, requestBean) -> {
+            // 材料种类
+            if (!IconDataCategory.get().materials.contains(requestBean.material)) {
+                return errorAndClear(requestBean, "材料种类填写不正确");
+            }
+            // 表面种类
+            if (!IconDataCategory.get().surfaces.contains(requestBean.surface)) {
+                return errorAndClear(requestBean, "表面种类填写不正确");
+            }
+            // 不锈钢品类
+            if (!IconDataCategory.get().types.contains(requestBean.ironType)) {
+                return errorAndClear(requestBean, "不锈钢品类填写不正确");
+            }
+            // 不锈钢产地
+            if (!IconDataCategory.get().productPlaces.contains(requestBean.proPlace)) {
+                return errorAndClear(requestBean, "不锈钢产地填写不正确");
+            }
+
+            if (!CityDataHelper.instance().isCityExist(requestBean.locationCityId)) {
+                return errorAndClear(requestBean, "交货地点不存在");
+            }
+            IronDataHelper.getIronDataHelper().pushIronBuy(requestBean.generateIronBug());
             return success();
         }));
     }
