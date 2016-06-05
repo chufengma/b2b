@@ -119,8 +119,8 @@ public abstract class BaseManager {
     private <T extends BaseBean> Route doRequest(TypedRoute route, Class<T> tClass) {
         return (request, response) -> {
             try {
-                T reqBean = getRequest(request, tClass);
                 jsonContentType(response);
+                T reqBean = getRequest(request, tClass);
                 addHeaders(response);
                 response.raw().setCharacterEncoding("UTF-8");
                 if (loginSessionCheck(reqBean)) {

@@ -1,11 +1,13 @@
 package onefengma.demo.server.model.product;
 
+import onefengma.demo.annotation.NotRequired;
+
 /**
  * Created by chufengma on 16/6/4.
  */
 public class IronProduct {
-
-    public int id;
+    @NotRequired
+    public String id;
     public String userId;
     public String proId;
     public String surface;
@@ -16,9 +18,9 @@ public class IronProduct {
     public String title;
     public float price;
     public String cover;
-    public String image1;
-    public String image2;
-    public String image3;
+    public String image1 = "";
+    public String image2 = "";
+    public String image3 = "";
     public boolean isSpec;
-
+    public long pushTime;
 }

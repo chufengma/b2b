@@ -4,6 +4,7 @@ import java.util.List;
 
 import onefengma.demo.server.config.Config;
 import onefengma.demo.server.core.BaseManager;
+import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.product.IronPushRequest;
 import onefengma.demo.server.model.apibeans.product.IronsRequest;
@@ -35,8 +36,13 @@ public class IronManager extends BaseManager {
             IronsResponse ironsResponse = new IronsResponse();
             ironsResponse.currentPage = requestBean.currentPage;
             ironsResponse.maxCount = IronDataHelper.getIronDataHelper().getMaxCounts();
-            ironsResponse.irons = IronDataHelper.getIronDataHelper().getIronProducts(requestBean.currentPage, requestBean.pageCount);
             ironsResponse.pageCount = requestBean.pageCount;
+            ironsResponse.irons = IronDataHelper.getIronDataHelper()
+                    .getIronProducts(new PageBuilder(requestBean.currentPage, requestBean.pageCount)
+                            .addEqualWhere("material", requestBean.material)
+                            .addEqualWhere("ironType", requestBean.ironType)
+                            .addEqualWhere("surface", requestBean.surface)
+                            .addEqualWhere("proPlace", requestBean.proPlace));
             return success(ironsResponse);
         }));
 
@@ -60,6 +66,10 @@ public class IronManager extends BaseManager {
 
             if (!CityDataHelper.instance().isCityExist(requestBean.sourceCityId)) {
                 return error("货源产地不存在");
+            }
+
+            if (requestBean.cover == null) {
+                return error("产品封面必须填写");
             }
 
             if (requestBean.price <= 0) {

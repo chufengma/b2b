@@ -1,12 +1,17 @@
 package onefengma.demo.server.core;
 
 import org.sql2o.Connection;
+import org.sql2o.Query;
 import org.sql2o.Sql2o;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import onefengma.demo.annotation.NotRequired;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.config.Config;
 import onefengma.demo.server.config.Config.DataBaseModel;
@@ -30,6 +35,54 @@ public abstract class BaseDataHelper {
 
     protected Connection getConn() {
         return getSql2o().open();
+    }
+
+    protected static String createInsetStr(String table, Object bean) {
+        Field[] fields = bean.getClass().getDeclaredFields();
+        StringBuffer sqlBuilder = new StringBuffer("insert into " + table + " ( ");
+        StringBuffer valueBuilder = new StringBuffer(" values ( ");
+        for (int i = 0;i < fields.length; i++) {
+            Field field = fields[i];
+            if (field.isAnnotationPresent(NotRequired.class)) {
+                continue;
+            }
+            sqlBuilder.append(field.getName());
+            valueBuilder.append(" :" + field.getName());
+            sqlBuilder.append(',');
+            valueBuilder.append(',');
+        }
+        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
+        sqlBuilder.append(")");
+        valueBuilder.deleteCharAt(valueBuilder.length() - 1);
+        valueBuilder.append(")");
+        sqlBuilder.append(valueBuilder);
+        return sqlBuilder.toString();
+    }
+
+    protected static Query createInsertQuery(Connection conn, String table, Object bean) throws IllegalAccessException, UnsupportedEncodingException, NoSuchMethodException, InvocationTargetException {
+        return bind(conn.createQuery(createInsetStr(table, bean).toString()), bean);
+    }
+
+    public static Query bind(Query query, Object bean) throws IllegalAccessException, UnsupportedEncodingException, InvocationTargetException {
+        Field[] fields = bean.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            if (field.isAnnotationPresent(NotRequired.class)) {
+                continue;
+            }
+//            try {
+//                Method addParam = query.getClass().getDeclaredMethod("addParameter", String.class, field.getType());
+//                addParam.invoke(query, field.getName(), field.get(bean));
+//            } catch (NoSuchMethodException e) {
+//                LogUtils.e(e, e.getMessage());
+//                query.addParameter(field.getName(), field.get(bean));
+//            }
+            if (field.getType() == String.class) {
+                query.addParameter(field.getName(), (String)field.get(bean));
+            } else {
+                query.addParameter(field.getName(), field.get(bean));
+            }
+        }
+        return query;
     }
 
     protected String createSql(String sql) throws NoSuchFieldException, IllegalAccessException {

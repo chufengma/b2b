@@ -44,6 +44,7 @@ public class IronPushRequest extends AuthSession {
         ironProduct.cover = FileHelper.generateRelativeInternetUri(cover.getPath());
         ironProduct.surface = surface;
         ironProduct.isSpec = isSpec;
+        ironProduct.pushTime = System.currentTimeMillis();
         if (image1 != null) {
             ironProduct.image1 = FileHelper.generateRelativeInternetUri(image1.getPath());
         }

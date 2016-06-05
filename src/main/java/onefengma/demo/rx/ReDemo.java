@@ -1,6 +1,14 @@
 package onefengma.demo.rx;
 
+import com.alibaba.fastjson.JSON;
+
+import org.sql2o.Connection;
+import org.sql2o.Query;
+
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -8,6 +16,9 @@ import onefengma.demo.common.DateHelper;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.VerifyUtils;
 import onefengma.demo.server.core.LogUtils;
+import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.model.product.IronProduct;
+import onefengma.demo.server.services.products.IronDataHelper;
 
 /**
  * @author yfchu
@@ -20,9 +31,70 @@ public class ReDemo {
     private String ccc = "fengma2";
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException {
-        System.out.println(VerifyUtils.isMobile("18355551276"));
+        System.out.println(new PageBuilder(1, 3)
+                .addEqualWhere("haha", "fengma")
+                .addEqualWhere("days", 12)
+                .orderByPrice(true)
+                .orderByTime(23123,1111111)
+                .orderBySales(false).generateSql());
     }
 
+    protected  static  String createInsertSql(String table, Class clazz) {
+        Field[] fields = clazz.getDeclaredFields();
+        StringBuffer sqlBuilder = new StringBuffer("insert into " + table + "(");
+        StringBuffer valueBuilder = new StringBuffer(" values (");
+        for (Field field : fields) {
+            sqlBuilder.append(field.getName());
+            valueBuilder.append(":" + field.getName());
+            if (fields[fields.length - 1] == field) {
+                sqlBuilder.append(")");
+                valueBuilder.append(")");
+            } else {
+                sqlBuilder.append(",");
+                valueBuilder.append(",");
+            }
+        }
+        sqlBuilder.append(valueBuilder);
+        return sqlBuilder.toString();
+    }
+
+    public Query bind(Query query, Object bean){
+        Class clazz = bean.getClass();
+        Method[] methods = clazz.getDeclaredMethods();
+        for(Method method : methods){
+            try{
+                method.setAccessible(true);
+                String methodName = method.getName();
+                /*
+                It looks in the class for all the methods that start with get
+                */
+                if(methodName.startsWith("get") && method.getParameterTypes().length == 0){
+                    String param = methodName.substring(3);//remove the get prefix
+                    param = param.substring(0, 1).toLowerCase() + param.substring(1);//set the first letter in Lowercase => so getItem produces item
+                    Object res = method.invoke(bean);
+                    if( res!= null){
+                        try {
+                            Method addParam = this.getClass().getDeclaredMethod("addParameter", param.getClass(), method.getReturnType());
+                            addParam.invoke(this, param, res);
+                        } catch (NoSuchMethodException ex) {
+                            LogUtils.e(ex, ex.getMessage());
+                            query.addParameter(param, res);
+                        }
+                    }else
+                        query.addParameter(param, res);
+                }
+            }catch(IllegalArgumentException ex){
+                LogUtils.e(ex, ex.getMessage());
+            }catch(IllegalAccessException ex){
+                throw new RuntimeException(ex);
+            } catch (SecurityException ex) {
+                throw new RuntimeException(ex);
+            } catch (InvocationTargetException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+        return query;
+    }
 
     public static class IronDatas {
         private String aaa = "FFFFF";
