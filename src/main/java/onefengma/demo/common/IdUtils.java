@@ -4,6 +4,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -11,6 +12,15 @@ import java.util.UUID;
  * @date 2016/5/24
  */
 public class IdUtils {
+
+    public static int intId(int count) {
+        Random random = new Random();
+        int value = 0;
+        for(int i = 0;i < count; i++) {
+            value = (int) (value + random.nextInt(9) * ( Math.pow(10, i) ));
+        }
+        return value;
+    }
 
     public static String id() {
         SecureRandom rand = new SecureRandom();

@@ -49,7 +49,7 @@ public class UserManager extends BaseManager {
             if(!ValidateHelper.isCodeValid(register.validateCode, req.session())) {
                 return error("验证码不正确");
             }
-            if (!MsgCodeHelper.isMsgCodeRight(register.msgCode, register.mobile)) {
+            if (!MsgCodeHelper.isMsgCodeRight(req, register.msgCode, register.mobile)) {
                 return error("短信验证码不正确");
             }
 

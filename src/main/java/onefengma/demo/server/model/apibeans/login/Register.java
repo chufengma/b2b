@@ -17,7 +17,7 @@ public class Register extends BaseBean {
     public String password;
     public String passwordConfirm;
     public String mobile;
-    public String msgCode;
+    public int msgCode;
 
     public User generateUser() {
         User user = new User();

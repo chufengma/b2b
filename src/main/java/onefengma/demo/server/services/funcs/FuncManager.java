@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.FileInputStream;
 
 import onefengma.demo.common.FileHelper;
+import onefengma.demo.common.VerifyUtils;
 import onefengma.demo.server.config.Config;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.MsgCodeHelper;
 import onefengma.demo.server.core.ValidateHelper;
 import onefengma.demo.server.model.apibeans.BaseBean;
+import onefengma.demo.server.model.apibeans.codes.MsgCode;
 import onefengma.demo.server.model.apibeans.codes.MsgCode.MsgCodeResponse;
 import onefengma.demo.server.model.apibeans.codes.ValidateCodeBean;
 import onefengma.demo.server.model.apibeans.meta.CityDescRequest;
@@ -40,14 +42,29 @@ public class FuncManager extends BaseManager {
         }));
 
         //  获取手机号码
-        get("msgCode", BaseBean.class, ((request, response, requestBean1) -> {
-            MsgCodeHelper.generateMsgCode();
-            return success(new MsgCodeResponse("1111"));
+        get("msgCode", MsgCode.MsgCodeGetRequest.class, ((request, response, requestBean) -> {
+            if (!VerifyUtils.isMobile(requestBean.mobile)) {
+                return error("请输入正确的手机号");
+            }
+            if (MsgCodeHelper.hasSendLateMinitue(request)) {
+                return error("请求验证码太频繁，请稍后再试");
+            }
+            try {
+                MsgCodeHelper.generateMsgCode(request, requestBean.mobile);
+            } catch (Exception e) {
+                return error("请求失败，请稍后再试");
+            }
+            return success();
         }));
 
         //  验证手机号码
-        post("msgCode", BaseBean.class, ((request1, response1, requestBean1) -> {
-            return error("验证码错误");
+        post("msgCode", MsgCode.MsgCodePostRequest.class, ((request1, response1, requestBean1) -> {
+            boolean success = MsgCodeHelper.isMsgCodeRight(request1, requestBean1.code, requestBean1.mobile);
+            if (success) {
+                return success();
+            } else {
+                return error("验证失败");
+            }
         }));
 
         // 上传的文件

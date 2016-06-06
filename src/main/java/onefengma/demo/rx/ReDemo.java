@@ -16,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import onefengma.demo.common.DateHelper;
+import onefengma.demo.common.IdUtils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.VerifyUtils;
 import onefengma.demo.server.core.LogUtils;
@@ -36,7 +37,7 @@ public class ReDemo {
     public static void main(String[] args) throws IllegalAccessException, InstantiationException, UnsupportedEncodingException {
         String url = "%E4%B8%8D%E9%94%88%E9%92%A2%E7%AE%A1";
 
-        System.out.println(URLDecoder.decode(url, "utf-8"));
+        System.out.println(IdUtils.intId(6));
     }
 
     protected  static  String createInsertSql(String table, Class clazz) {
