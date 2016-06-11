@@ -311,7 +311,9 @@ public abstract class BaseManager {
     }
 
     private static void addHeaders(Response response) {
-        response.header("Access-Control-Allow-Origin", "*");
+        response.header("Access-Control-Allow-Origin", "http://localhost:9090");
+        response.header("Access-Control-Allow-Headers", "origin, content-type, accept");
+        response.header("Access-Control-Allow-Credentials", "true");
     }
 
     /*------------------------login handler-----------------------------------*/
