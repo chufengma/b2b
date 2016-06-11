@@ -34,10 +34,34 @@ public class IronDataHelper extends BaseDataHelper {
 
     public List<IronProduct>  getIronProducts(PageBuilder pageBuilder) {
         String sql = "select * from iron_product " + (pageBuilder.hasWhere() ? " where " : "") + pageBuilder.generateSql();
-        System.out.print("---" + sql);
-        System.out.print("---" + sql);
         try (Connection conn = getConn()){
             return conn.createQuery(sql).executeAndFetch(IronProduct.class);
+        }
+    }
+
+    public List<IronProduct> searchIronProducts(String keyword, PageBuilder pageBuilder) {
+        keyword = "%" + keyword + "%";
+        String sql = "select * from iron_product " +
+                "where surface like \"" + keyword + "\"" +
+                "or ironType like \"" + keyword + "\"" +
+                "or proPlace like \"" + keyword + "\"" +
+                "or material like \"" + keyword + "\"" +
+                "or title like  \"" + keyword + "\"" + pageBuilder.generateLimit();
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql).executeAndFetch(IronProduct.class);
+        }
+    }
+
+    public int searchIronProductsMaxCount(String keyword) {
+        keyword = "%" + keyword + "%";
+        String sql = "select count(*) from iron_product " +
+                "where surface like \"" + keyword + "\"" +
+                "or ironType like \"" + keyword + "\"" +
+                "or proPlace like \"" + keyword + "\"" +
+                "or material like \"" + keyword + "\"" +
+                "or title like  \"" + keyword + "\"";
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql).executeScalar(Integer.class);
         }
     }
 

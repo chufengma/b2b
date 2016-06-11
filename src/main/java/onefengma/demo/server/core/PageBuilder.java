@@ -121,4 +121,8 @@ public class PageBuilder {
         stringBuffer.append(" limit " + currentPage * pageCount + ", " + pageCount);
         return stringBuffer.toString();
     }
+
+    public String generateLimit() {
+        return " limit " + currentPage * pageCount + ", " + pageCount;
+    }
 }

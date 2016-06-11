@@ -5,7 +5,10 @@ import org.sql2o.Connection;
 import java.util.List;
 
 import onefengma.demo.server.core.BaseDataHelper;
+import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.Seller;
+import onefengma.demo.server.model.product.IronProduct;
+import onefengma.demo.server.model.product.Shop;
 
 /**
  * Created by chufengma on 16/6/2.
@@ -78,6 +81,28 @@ public class SellerDataHelper extends BaseDataHelper {
 
     public boolean isSeller(String userID) throws NoSuchFieldException, IllegalAccessException {
         return getSellerByUserId(userID) == null ? false : true;
+    }
+
+    public List<Shop> searchShops(String keyword, PageBuilder pageBuilder) {
+        keyword = "%" + keyword + "%";
+        String sql = "select * from seller " +
+                "where companyName like \"" + keyword + "\"" +
+                "or officeAddress like \"" + keyword + "\"" +
+                "or shopProfile like \"" + keyword + "\"" + pageBuilder.generateLimit();
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql).executeAndFetch(Shop.class);
+        }
+    }
+
+    public int searchShopCount(String keyword) {
+        keyword = "%" + keyword + "%";
+        String sql = "select count(*) from seller " +
+                "where companyName like \"" + keyword + "\"" +
+                "or officeAddress like \"" + keyword + "\"" +
+                "or shopProfile like \"" + keyword + "\"";
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql).executeScalar(Integer.class);
+        }
     }
     
 }
