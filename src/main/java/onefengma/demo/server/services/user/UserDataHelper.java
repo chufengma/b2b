@@ -50,6 +50,13 @@ public class UserDataHelper extends BaseDataHelper {
         return users.get(0);
     }
 
+    public void changeUserPassword(String userId, String password) {
+        String sql = "update user set password=:password where userId=:userId";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("password", password)
+                    .addParameter("userId", userId).executeUpdate();
+        }
+    }
 
     public void insertUser(User user) throws NoSuchFieldException, IllegalAccessException {
         String sql = createSql("insert into @USER_TABLE(@USER_ID, @NAME, @PASSWORD, @MOBILE) values (:id, :name, :pass, :mobile)");

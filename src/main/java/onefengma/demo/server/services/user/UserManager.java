@@ -17,6 +17,7 @@ import onefengma.demo.server.core.request.AuthHelper;
 import onefengma.demo.server.model.apibeans.AuthSession;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.SellerRequest;
+import onefengma.demo.server.model.apibeans.login.ChangePassword;
 import onefengma.demo.server.model.apibeans.login.Login;
 import onefengma.demo.server.model.apibeans.login.Register;
 import onefengma.demo.server.model.metaData.City;
@@ -37,10 +38,10 @@ public class UserManager extends BaseManager {
         /* 注册 */
         post("register", Register.class, (req, rep, register) -> {
             // 输入验证
-            if (!register.isPasswordComfirmed()) {
+            if (!ValidateHelper.isPasswordConfirmed(register.password, register.passwordConfirm)) {
                 return error("俩次密码输入不一致");
             }
-            if (!register.isPasswordRight()) {
+            if (!ValidateHelper.isPasswordRight(register.password)) {
                 return error("密码长度为 6~16");
             }
             if (!VerifyUtils.isMobile(register.mobile)) {
@@ -130,6 +131,23 @@ public class UserManager extends BaseManager {
             return success(seller);
         }));
 
+        post("changePassword", ChangePassword.class, ((request, response, requestBean) -> {
+            if (!ValidateHelper.isPasswordConfirmed(requestBean.newPassword, requestBean.newPasswordConfirm)) {
+                return error("俩次密码输入不一致");
+            }
+            if (!ValidateHelper.isPasswordRight(requestBean.newPassword)) {
+                return error("密码长度为 6~16");
+            }
+            User user = getUserDataHelper().findUserByUserId(requestBean.getUserId());
+            // 输入验证
+            if (!StringUtils.equals(user.getPassword(), IdUtils.md5(requestBean.oldPassword))) {
+                return error("旧密码不正确");
+            }
+            getUserDataHelper().changeUserPassword(requestBean.getUserId(), IdUtils.md5(requestBean.newPassword));
+            return success();
+        }));
+
+        // just for test
         multiPost("upload", UploadDemo.class, (request, response, requestBean) -> {
             return success(requestBean);
         });

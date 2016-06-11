@@ -28,7 +28,16 @@ public class SellerDataHelper extends BaseDataHelper {
     private static final String BUSINESS_LIC = "businessLic";
     private static final String CODE_LIC = "codeLic";
     private static final String FINANCE_LIC = "financeLic";
-    
+
+    private static SellerDataHelper sellerDataHelper;
+
+    public static SellerDataHelper instance() {
+        if (sellerDataHelper == null) {
+            sellerDataHelper = new SellerDataHelper();
+        }
+        return sellerDataHelper;
+    }
+
     public void insertSeller(Seller seller) throws NoSuchFieldException, IllegalAccessException {
         String sql = createSql("insert into @TABLE(@USER_ID, @COMPANY_NAME, @REG_MONEY, @CONTACT," +
                 "@CANTACT_TEL, @FAX, @CITY_ID, @OFFICE_ADDRESS, @QQ, @SHOP_PROFILE, " +
@@ -65,6 +74,10 @@ public class SellerDataHelper extends BaseDataHelper {
                 return sellerList.get(0);
             }
         }
+    }
+
+    public boolean isSeller(String userID) throws NoSuchFieldException, IllegalAccessException {
+        return getSellerByUserId(userID) == null ? false : true;
     }
     
 }

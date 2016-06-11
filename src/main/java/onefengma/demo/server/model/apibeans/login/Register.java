@@ -27,12 +27,4 @@ public class Register extends BaseBean {
         user.setMobile(mobile);
         return user;
     }
-
-    public boolean isPasswordComfirmed() {
-        return StringUtils.equals(password, passwordConfirm);
-    }
-
-    public boolean isPasswordRight() {
-        return password.length() >= 6 && password.length() <= 16;
-    }
 }

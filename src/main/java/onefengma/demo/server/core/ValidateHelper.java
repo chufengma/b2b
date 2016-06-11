@@ -40,4 +40,11 @@ public class ValidateHelper {
         return StringUtils.equalsIngcase(clientCode, session.attribute(VALIDATE_CODE));
     }
 
+    public static boolean isPasswordConfirmed(String password, String passwordConfirm) {
+        return StringUtils.equals(password, passwordConfirm);
+    }
+
+    public static boolean isPasswordRight(String password) {
+        return password.length() >= 6 && password.length() <= 16;
+    }
 }
