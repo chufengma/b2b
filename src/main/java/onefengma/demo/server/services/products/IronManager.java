@@ -5,10 +5,12 @@ import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.product.IronBuyRequest;
+import onefengma.demo.server.model.apibeans.product.IronDetailRequest;
 import onefengma.demo.server.model.apibeans.product.IronPushRequest;
 import onefengma.demo.server.model.apibeans.product.IronsGetRequest;
 import onefengma.demo.server.model.apibeans.product.IronsGetResponse;
 import onefengma.demo.server.model.metaData.IconDataCategory;
+import onefengma.demo.server.model.product.IronProduct;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 
 /**
@@ -105,6 +107,14 @@ public class IronManager extends BaseManager {
             }
             IronDataHelper.getIronDataHelper().pushIronBuy(requestBean.generateIronBug());
             return success();
+        }));
+
+        get("ironDetail", IronDetailRequest.class, ((request, response, requestBean) -> {
+            IronProduct ironProduct = getIronDataHelper().getIronProductById(requestBean.ironId);
+            if (ironProduct == null) {
+                return error("未找到相关不锈钢产品");
+            }
+            return success(ironProduct);
         }));
     }
 

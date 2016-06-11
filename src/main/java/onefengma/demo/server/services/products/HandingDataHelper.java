@@ -10,6 +10,7 @@ import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.product.HandingBuy;
 import onefengma.demo.server.model.product.HandingProduct;
+import onefengma.demo.server.model.product.IronProduct;
 
 /**
  * Created by chufengma on 16/6/5.
@@ -69,4 +70,15 @@ public class HandingDataHelper extends BaseDataHelper {
         }
     }
 
+    public HandingProduct getHandingProductById(String id) {
+        String sql = "select * from handing_product where id=:id";
+        try(Connection conn = getConn()) {
+            List<HandingProduct> handingProducts = conn.createQuery(sql).addParameter("id", id).executeAndFetch(HandingProduct.class);
+            if (handingProducts.isEmpty()) {
+                return null;
+            } else {
+                return handingProducts.get(0);
+            }
+        }
+    }
 }

@@ -4,10 +4,12 @@ import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.product.HandingBuyRequest;
 import onefengma.demo.server.model.apibeans.BaseBean;
+import onefengma.demo.server.model.apibeans.product.HandingDetailRequest;
 import onefengma.demo.server.model.apibeans.product.HandingGetRequest;
 import onefengma.demo.server.model.apibeans.product.HandingGetResponse;
 import onefengma.demo.server.model.apibeans.product.HandingPushRequest;
 import onefengma.demo.server.model.metaData.HandingDataCategory;
+import onefengma.demo.server.model.product.HandingProduct;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 
 /**
@@ -54,6 +56,13 @@ public class HandingManager extends BaseManager{
             return success();
         }));
 
+        get("handingDetail", HandingDetailRequest.class, ((request, response, requestBean) -> {
+            HandingProduct handingProduct = HandingDataHelper.getHandingDataHelper().getHandingProductById(requestBean.handingId);
+            if (handingProduct == null) {
+                return error("未找到相关加工信息");
+            }
+            return success(handingProduct);
+        }));
     }
 
     @Override
