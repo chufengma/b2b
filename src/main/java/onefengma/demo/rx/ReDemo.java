@@ -35,9 +35,7 @@ public class ReDemo {
     private String ccc = "fengma2";
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException, UnsupportedEncodingException {
-        String url = "%E4%B8%8D%E9%94%88%E9%92%A2%E7%AE%A1";
-
-        System.out.println(IdUtils.intId(6));
+        System.out.println("-----" + DateHelper.getNextDayTimestamp());
     }
 
     protected  static  String createInsertSql(String table, Class clazz) {

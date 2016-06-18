@@ -19,6 +19,7 @@ public class HandingBuyRequest extends AuthSession {
         handingBuy.message = message;
         handingBuy.souCityId = souCityId;
         handingBuy.userId = getUserId();
+        handingBuy.pushTime = System.currentTimeMillis();
         return handingBuy;
     }
 }

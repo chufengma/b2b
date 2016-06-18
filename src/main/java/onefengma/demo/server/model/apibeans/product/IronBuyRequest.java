@@ -25,6 +25,7 @@ public class IronBuyRequest extends AuthSession {
         ironBuy.locationCityId = locationCityId;
         ironBuy.message = message;
         ironBuy.userId = getUserId();
+        ironBuy.pushTime = System.currentTimeMillis();
         return ironBuy;
     }
 }

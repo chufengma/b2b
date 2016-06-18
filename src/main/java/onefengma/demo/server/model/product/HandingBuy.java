@@ -9,4 +9,5 @@ public class HandingBuy {
     public String souCityId;
     public String message;
     public String userId;
+    public long pushTime;
 }

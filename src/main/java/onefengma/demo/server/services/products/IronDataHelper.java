@@ -5,6 +5,7 @@ import org.sql2o.Query;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 import onefengma.demo.common.StringUtils;
@@ -12,6 +13,7 @@ import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.product.IronBuy;
 import onefengma.demo.server.model.product.IronProduct;
+import onefengma.demo.server.model.product.IronRecommend;
 
 /**
  * @author yfchu
@@ -86,6 +88,22 @@ public class IronDataHelper extends BaseDataHelper {
            } else {
                return ironProducts.get(0);
            }
+        }
+    }
+
+    public List<IronRecommend> getIronRecommend() {
+        String sql = "select * from iron_buy order by pushTime limit 0,10";
+        try(Connection conn = getConn()) {
+            List<IronRecommend> ironRecommends = new ArrayList<>();
+            List<IronBuy> ironBuys = conn.createQuery(sql).executeAndFetch(IronBuy.class);
+            for(IronBuy ironBuy : ironBuys) {
+                IronRecommend ironRecommend = new IronRecommend();
+                ironRecommend.id = ironBuy.id;
+                ironRecommend.time = ironBuy.pushTime;
+                ironRecommend.title = "求购" + ironBuy.ironType;
+                ironRecommends.add(ironRecommend);
+            }
+            return ironRecommends;
         }
     }
 }

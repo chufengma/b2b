@@ -15,6 +15,27 @@ public class DateHelper {
         return dateFormat.format(new Date());
     }
 
+    public static String getDayStr() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd");
+        return dateFormat.format(new Date());
+    }
+
+    public static long getLastDayTimestamp() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+        return calendar.getTimeInMillis() - 24 * 60 * 60 * 1000;
+    }
+
+    public static long getNextDayTimestamp() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+        return calendar.getTimeInMillis() + 24 * 60 * 60 * 1000;
+    }
+
+    public static boolean isToday(long time) {
+        return time < getLastDayTimestamp() && time >= getLastDayTimestamp();
+    }
+
     public static int getYear() {
         return Calendar.getInstance().get(Calendar.YEAR);
     }

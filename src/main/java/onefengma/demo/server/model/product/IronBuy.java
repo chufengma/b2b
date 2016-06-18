@@ -12,4 +12,5 @@ public class IronBuy {
     public String locationCityId;
     public String userId;
     public String message;
+    public long pushTime;
 }

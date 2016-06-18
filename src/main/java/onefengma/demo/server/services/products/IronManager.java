@@ -122,6 +122,10 @@ public class IronManager extends BaseManager {
         get("shopRecommend", BaseBean.class, ((request, response, requestBean) -> {
             return success(SellerDataHelper.instance().getRecommendShopsByIron());
         }));
+
+        get("bugRecommend", BaseBean.class, ((request, response, requestBean) -> {
+            return success(IronDataHelper.getIronDataHelper().getIronRecommend());
+        }));
     }
 
     @Override

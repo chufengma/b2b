@@ -89,6 +89,26 @@ public class FuncManager extends BaseManager {
         get("cityDesc", CityDescRequest.class, ((request, response, requestBean) -> {
             return success(CityDataHelper.instance().getCityDescById(requestBean.cityId));
         }));
+
+        // 行业快报
+        get("indexInnerNews", BaseBean.class, ((request, response, requestBean) -> {
+            return success(NewsDataHelper.instance().getIndexInnerNews());
+        }));
+
+        // 行业新闻
+        get("indexNews", BaseBean.class, ((request, response, requestBean) -> {
+            return success(NewsDataHelper.instance().getIndexNews());
+        }));
+
+        // 首页招聘信息
+        get("indexRecruit", BaseBean.class, ((request, response, requestBean) -> {
+            return success(RecruitDataManager.instance().getRecruits());
+        }));
+
+        // 首页他们想对不锈钢说
+        get("theySay", BaseBean.class, ((request, response, requestBean) -> {
+            return success(NewsDataHelper.instance().getTheySay());
+        }));
     }
 
     @Override

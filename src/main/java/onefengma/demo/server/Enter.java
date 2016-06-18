@@ -8,6 +8,7 @@ import onefengma.demo.common.FileHelper;
 import onefengma.demo.server.config.Config;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.services.funcs.FuncManager;
+import onefengma.demo.server.services.order.OrderManager;
 import onefengma.demo.server.services.products.HandingManager;
 import onefengma.demo.server.services.products.IronManager;
 import onefengma.demo.server.services.products.ProductManager;
@@ -25,7 +26,8 @@ public class Enter {
             new ProductManager(),
             new FuncManager(),
             new IronManager(),
-            new HandingManager()
+            new HandingManager(),
+            new OrderManager()
     );
 
     public static void main(String[] args) {
