@@ -78,6 +78,7 @@ public class IronManager extends BaseManager {
             }
             try {
                 IronDataHelper.getIronDataHelper().pushIronProduct(requestBean.generateIconProduct());
+                SellerDataHelper.instance().addIronType(requestBean.getUserId(), requestBean.ironType);
             } finally {
                 cleanTmpFiles(requestBean.extra);
             }

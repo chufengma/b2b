@@ -4,6 +4,7 @@ import org.sql2o.Connection;
 
 import java.util.List;
 
+import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.Seller;
@@ -119,6 +120,48 @@ public class SellerDataHelper extends BaseDataHelper {
                 "where userId = sellerId order by handingCount limit 0, 10";
         try(Connection conn = getConn()) {
             return conn.createQuery(sql).executeAndFetch(ShopBrief.class);
+        }
+    }
+
+    public void addIronType(String userId, String type) {
+        String sqlSelect = "select ironTypeDesc from seller where userId=:userId";
+        String sqlUpdate = "update seller set ironTypeDesc = concat(ironTypeDesc, :newValue) where userId=:userId";
+        try(Connection conn = getConn()) {
+            String oldValue = conn.createQuery(sqlSelect).addParameter("userId", userId).executeScalar(String.class);
+            StringBuilder newValue = new StringBuilder();
+            if (!StringUtils.isEmpty(oldValue)) {
+                if (oldValue.contains(type)){
+                    return;
+                }
+                newValue.append(",");
+            }
+            newValue.append(type);
+
+            conn.createQuery(sqlUpdate)
+                    .addParameter("newValue", newValue.toString())
+                    .addParameter("userId", userId)
+                    .executeUpdate();
+        }
+    }
+
+    public void addHandingType(String userId, String type) {
+        String sqlSelect = "select handingTypeDesc from seller where userId=:userId";
+        String sqlUpdate = "update seller set handingTypeDesc = concat(handingTypeDesc, :newValue) where userId=:userId";
+        try(Connection conn = getConn()) {
+            String oldValue = conn.createQuery(sqlSelect).addParameter("userId", userId).executeScalar(String.class);
+            StringBuilder newValue = new StringBuilder();
+            if (!StringUtils.isEmpty(oldValue)) {
+                if (oldValue.contains(type)){
+                    return;
+                }
+                newValue.append(",");
+            }
+            newValue.append(type);
+
+            conn.createQuery(sqlUpdate)
+                    .addParameter("newValue", newValue.toString())
+                    .addParameter("userId", userId)
+                    .executeUpdate();
         }
     }
 }

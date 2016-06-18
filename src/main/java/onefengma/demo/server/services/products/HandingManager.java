@@ -34,7 +34,8 @@ public class HandingManager extends BaseManager{
                 return errorAndClear(requestBean, "单位选择有误");
             }
             HandingDataHelper.getHandingDataHelper().insertHandingProduct(requestBean.generateHandingProduct());
-            return success(requestBean);
+            SellerDataHelper.instance().addHandingType(requestBean.getUserId(), requestBean.type);
+            return success();
         }));
 
         get("handing", HandingGetRequest.class, ((request, response, requestBean) -> {
