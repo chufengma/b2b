@@ -8,4 +8,5 @@ public class HandingBuy {
     public String handingType;
     public String souCityId;
     public String message;
+    public String userId;
 }

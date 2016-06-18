@@ -12,6 +12,7 @@ import onefengma.demo.server.model.apibeans.product.IronsGetResponse;
 import onefengma.demo.server.model.metaData.IconDataCategory;
 import onefengma.demo.server.model.product.IronProduct;
 import onefengma.demo.server.services.funcs.CityDataHelper;
+import onefengma.demo.server.services.user.SellerDataHelper;
 
 /**
  * @author yfchu
@@ -115,6 +116,10 @@ public class IronManager extends BaseManager {
                 return error("未找到相关不锈钢产品");
             }
             return success(ironProduct);
+        }));
+
+        get("shopRecommend", BaseBean.class, ((request, response, requestBean) -> {
+            return success(SellerDataHelper.instance().getRecommendShopsByIron());
         }));
     }
 

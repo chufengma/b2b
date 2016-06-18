@@ -11,6 +11,7 @@ import onefengma.demo.server.model.apibeans.product.HandingPushRequest;
 import onefengma.demo.server.model.metaData.HandingDataCategory;
 import onefengma.demo.server.model.product.HandingProduct;
 import onefengma.demo.server.services.funcs.CityDataHelper;
+import onefengma.demo.server.services.user.SellerDataHelper;
 
 /**
  * Created by chufengma on 16/6/5.
@@ -62,6 +63,10 @@ public class HandingManager extends BaseManager{
                 return error("未找到相关加工信息");
             }
             return success(handingProduct);
+        }));
+
+        get("shopRecommend", BaseBean.class, ((request, response, requestBean) -> {
+            return success(SellerDataHelper.instance().getRecommendShopsByHanding());
         }));
     }
 

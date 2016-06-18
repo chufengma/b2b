@@ -82,7 +82,7 @@ public class UserManager extends BaseManager {
         get("userList", AuthSession.class, (request, response, requestBean) -> success(getUserDataHelper().getUserList()));
 
         // 商家信息
-        post("fillSellerInfo", SellerRequest.class, ((request, response, requestBean) -> {
+        multiPost("fillSellerInfo", SellerRequest.class, ((request, response, requestBean) -> {
             User user = getUserDataHelper().findUserByUserId(requestBean.getUserId());
             Seller s = getSellerDataHelper().getSellerByUserId(requestBean.getUserId());
             if (user == null) {

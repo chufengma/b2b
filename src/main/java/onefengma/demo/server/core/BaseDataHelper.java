@@ -7,7 +7,6 @@ import org.sql2o.Sql2o;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,7 +40,7 @@ public abstract class BaseDataHelper {
         Field[] fields = bean.getClass().getDeclaredFields();
         StringBuffer sqlBuilder = new StringBuffer("insert into " + table + " ( ");
         StringBuffer valueBuilder = new StringBuffer(" values ( ");
-        for (int i = 0;i < fields.length; i++) {
+        for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             if (field.isAnnotationPresent(NotRequired.class)) {
                 continue;
@@ -61,7 +60,7 @@ public abstract class BaseDataHelper {
 
     public int getMaxCounts(String table) {
         String sql = "select count(id) from " + table;
-        try(Connection conn = getConn()) {
+        try (Connection conn = getConn()) {
             int count = conn.createQuery(sql).executeScalar(Integer.class);
             return count;
         }
@@ -85,7 +84,7 @@ public abstract class BaseDataHelper {
 //                query.addParameter(field.getName(), field.get(bean));
 //            }
             if (field.getType() == String.class) {
-                query.addParameter(field.getName(), (String)field.get(bean));
+                query.addParameter(field.getName(), (String) field.get(bean));
             } else {
                 query.addParameter(field.getName(), field.get(bean));
             }
@@ -110,4 +109,19 @@ public abstract class BaseDataHelper {
         return sql;
     }
 
+    public static String generateFiledString(Class clazz) {
+        if (clazz == null) {
+            return "";
+        }
+        Field fields[] = clazz.getFields();
+        StringBuilder stringBuilder = new StringBuilder("");
+        for (int i = 0; i < fields.length; i++) {
+            Field field = fields[i];
+            stringBuilder.append(field.getName());
+            if (i != fields.length -1) {
+                stringBuilder.append(", ");
+            }
+        }
+        return stringBuilder.toString();
+    }
 }

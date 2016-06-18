@@ -37,6 +37,7 @@ public class HandingPushRequest extends AuthSession {
         handingProduct.image1 = FileHelper.generateRelativeInternetUri(image1);
         handingProduct.image2 = FileHelper.generateRelativeInternetUri(image2);
         handingProduct.image3 = FileHelper.generateRelativeInternetUri(image3);
+        handingProduct.userId = getUserId();
         return handingProduct;
     }
 }

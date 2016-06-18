@@ -5,6 +5,7 @@ import java.io.File;
 import onefengma.demo.annotation.NotRequired;
 import onefengma.demo.common.FileHelper;
 import onefengma.demo.server.model.Seller;
+import onefengma.demo.server.services.funcs.CityDataHelper;
 
 /**
  * Created by chufengma on 16/6/2.
@@ -47,14 +48,20 @@ public class SellerRequest extends AuthSession {
         seller.cantactTel = sellerRequest.cantactTel;
         seller.fax = sellerRequest.fax;
         seller.cityId = sellerRequest.cityId;
-        seller.officeAddress = sellerRequest.officeAddress;
+        String cityDesc = "";
+        try {
+            cityDesc = CityDataHelper.instance().getCityDescById(cityId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        seller.officeAddress = cityDesc + "" + sellerRequest.officeAddress;
         seller.qq = sellerRequest.qq;
         seller.shopProfile = sellerRequest.shopProfile;
+        seller.cover = FileHelper.generateRelativeInternetUri(cover);
         seller.allCer = sellerRequest.allCer == null ? "" : FileHelper.generateRelativeInternetUri(sellerRequest.allCer.getPath());
         seller.businessLic = sellerRequest.businessLic == null ? "" : FileHelper.generateRelativeInternetUri(sellerRequest.businessLic.getPath());
         seller.codeLic = sellerRequest.codeLic == null ? "" : FileHelper.generateRelativeInternetUri(sellerRequest.codeLic.getPath());
         seller.financeLic = sellerRequest.financeLic == null ? "" : FileHelper.generateRelativeInternetUri(sellerRequest.financeLic.getPath());
-        seller.cover = FileHelper.generateRelativeInternetUri(cover);
         return seller;
     }
 }

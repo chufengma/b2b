@@ -18,6 +18,7 @@ public class HandingBuyRequest extends AuthSession {
         handingBuy.handingType = handingType;
         handingBuy.message = message;
         handingBuy.souCityId = souCityId;
+        handingBuy.userId = getUserId();
         return handingBuy;
     }
 }

@@ -22,4 +22,7 @@ public class Seller {
     public String codeLic;
     public String financeLic;
     public String cover;
+
+    public String ironTypeDesc;
+    public String handingTypeDesc;
 }
