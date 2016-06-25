@@ -47,7 +47,7 @@ public class IronManager extends BaseManager {
             return success(ironsGetResponse);
         }));
 
-        multiPost("push", IronPushRequest.class, ((request, response, requestBean) -> {
+        post("push", IronPushRequest.class, ((request, response, requestBean) -> {
             // 材料种类
             if (!IconDataCategory.get().materials.contains(requestBean.material)) {
                 return errorAndClear(requestBean, "材料种类填写不正确");
