@@ -86,7 +86,7 @@ public class IronManager extends BaseManager {
             return success();
         }));
 
-        post("buy", IronBuyRequest.class, ((request, response, requestBean) -> {
+        multiPost("buy", IronBuyRequest.class, ((request, response, requestBean) -> {
             // 材料种类
             if (!IconDataCategory.get().materials.contains(requestBean.material)) {
                 return errorAndClear(requestBean, "材料种类填写不正确");
@@ -123,8 +123,12 @@ public class IronManager extends BaseManager {
             return success(SellerDataHelper.instance().getRecommendShopsByIron());
         }));
 
+        get("productRecommed", BaseBean.class, ((request, response, requestBean) -> {
+            return success();
+        }));
+
         get("bugRecommend", BaseBean.class, ((request, response, requestBean) -> {
-            return success(IronDataHelper.getIronDataHelper().getIronRecommend());
+            return success(IronDataHelper.getIronDataHelper().getIronBuyRecommend());
         }));
     }
 

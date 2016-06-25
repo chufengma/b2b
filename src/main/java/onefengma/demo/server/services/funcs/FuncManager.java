@@ -1,7 +1,10 @@
 package onefengma.demo.server.services.funcs;
 
+import com.alibaba.fastjson.JSON;
+
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.List;
 
 import onefengma.demo.common.FileHelper;
 import onefengma.demo.common.VerifyUtils;
@@ -14,6 +17,7 @@ import onefengma.demo.server.model.apibeans.codes.MsgCode;
 import onefengma.demo.server.model.apibeans.codes.MsgCode.MsgCodeResponse;
 import onefengma.demo.server.model.apibeans.codes.ValidateCodeBean;
 import onefengma.demo.server.model.apibeans.meta.CityDescRequest;
+import onefengma.demo.server.model.metaData.City;
 import spark.utils.IOUtils;
 
 /**
@@ -84,7 +88,9 @@ public class FuncManager extends BaseManager {
         }));
 
         // 获取城市列表
-        get("cities", BaseBean.class, ((request, response, requestBean) -> success(Config.getCities())));
+        get("cities", BaseBean.class, ((request, response, requestBean) -> {
+            return success(Config.getCities());
+        }));
 
         get("cityDesc", CityDescRequest.class, ((request, response, requestBean) -> {
             return success(CityDataHelper.instance().getCityDescById(requestBean.cityId));

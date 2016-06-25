@@ -91,7 +91,12 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
-    public List<IronRecommend> getIronRecommend() {
+    public List<IronProduct> getIronProductRecommend() {
+
+        return null;
+    }
+
+    public List<IronRecommend> getIronBuyRecommend() {
         String sql = "select * from iron_buy order by pushTime limit 0,10";
         try(Connection conn = getConn()) {
             List<IronRecommend> ironRecommends = new ArrayList<>();
@@ -106,4 +111,5 @@ public class IronDataHelper extends BaseDataHelper {
             return ironRecommends;
         }
     }
+
 }

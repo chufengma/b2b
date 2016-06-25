@@ -24,4 +24,5 @@ public class IronProduct {
     public boolean isSpec;
     public long pushTime;
     public long numbers;
+    public boolean reviewed = false;
 }
