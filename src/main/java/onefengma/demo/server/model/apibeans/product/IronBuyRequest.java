@@ -17,7 +17,8 @@ public class IronBuyRequest extends AuthSession {
     public long length;
     public long width;
     public long height;
-    public String tolerance;
+    public String toleranceFrom;
+    public String toleranceTo;
     public long numbers;
     public long timeLimit;
 
@@ -36,7 +37,7 @@ public class IronBuyRequest extends AuthSession {
         ironBuy.length = length;
         ironBuy.width = width;
         ironBuy.height = height;
-        ironBuy.tolerance = tolerance;
+        ironBuy.tolerance = toleranceFrom + "-" + toleranceTo;
         ironBuy.numbers = numbers;
         ironBuy.timeLimit = ironBuy.pushTime + timeLimit * 1000;
         return ironBuy;
