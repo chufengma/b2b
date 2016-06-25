@@ -39,7 +39,7 @@ public class Enter {
         // 404 page
         Spark.get("*", (request, response) -> {
             File file = FileHelper.getFileFromPath(request.pathInfo());
-            if (file != null) {
+            if (file == null) {
                 response.redirect(Config.getNotFoundPath());
             }
             if (request.pathInfo().equals(Config.getNotFoundPath())) {
