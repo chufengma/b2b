@@ -28,13 +28,15 @@ public class MetaDataHelper {
     }
 
     private static List<City> initCities() {
+        if (CITIES != null) {
+            return CITIES;
+        }
         try {
-            String cityFiles = FileUtils.readFileToString(new File(Config.getBaseMetaPath() + "citys.json"));
+            String cityFiles = FileUtils.readFileToString(new File(Config.getBaseMetaPath() + "citys.json"), "utf-8");
             List<City> cities = JSON.parseArray(cityFiles, City.class);
             return cities;
         } catch (Exception e) {
             LogUtils.e(e, "error when load cities");
-            Spark.stop();
             return Arrays.asList();
         }
     }
