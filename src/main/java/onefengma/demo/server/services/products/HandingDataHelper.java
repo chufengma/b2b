@@ -10,7 +10,10 @@ import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.product.HandingBuy;
 import onefengma.demo.server.model.product.HandingProduct;
+import onefengma.demo.server.model.product.HandingProductBrief;
 import onefengma.demo.server.model.product.IronProduct;
+import onefengma.demo.server.model.product.IronProductBrief;
+import onefengma.demo.server.services.funcs.CityDataHelper;
 
 /**
  * Created by chufengma on 16/6/5.
@@ -37,10 +40,14 @@ public class HandingDataHelper extends BaseDataHelper {
         }
     }
 
-    public List<HandingProduct> getHandingProducts(PageBuilder pageBuilder) {
-        String sql = "select * from handing_product " + (pageBuilder.hasWhere() ? " where " : "") + pageBuilder.generateSql();
+    public List<HandingProductBrief> getHandingProducts(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "select " + generateFiledString(HandingProductBrief.class) + " from handing_product " + (pageBuilder.hasWhere() ? " where " : "") + pageBuilder.generateSql();
         try (Connection conn = getConn()) {
-            return conn.createQuery(sql).executeAndFetch(HandingProduct.class);
+            List<HandingProductBrief> briefs =  conn.createQuery(sql).executeAndFetch(HandingProductBrief.class);
+            for(HandingProductBrief brief : briefs) {
+                brief.setSourceCity(CityDataHelper.instance().getCityDescById(brief.souCityId));
+            }
+            return briefs;
         }
     }
 
@@ -50,13 +57,17 @@ public class HandingDataHelper extends BaseDataHelper {
         }
     }
 
-    public List<HandingProduct> searchHandingProduct(String keyword, PageBuilder pageBuilder) {
+    public List<HandingProductBrief> searchHandingProduct(String keyword, PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         keyword = "%" + keyword + "%";
-        String sql = "select * from handing_product " +
+        String sql = "select " + generateFiledString(HandingProductBrief.class) + " from handing_product " +
                 "where title like \"" + keyword + "\"" +
                 "or type like \"" + keyword + "\"" + pageBuilder.generateLimit();
         try (Connection conn = getConn()) {
-            return conn.createQuery(sql).executeAndFetch(HandingProduct.class);
+            List<HandingProductBrief> briefs =  conn.createQuery(sql).executeAndFetch(HandingProductBrief.class);
+            for(HandingProductBrief brief : briefs) {
+                brief.setSourceCity(CityDataHelper.instance().getCityDescById(brief.souCityId));
+            }
+            return briefs;
         }
     }
 
@@ -79,6 +90,17 @@ public class HandingDataHelper extends BaseDataHelper {
             } else {
                 return handingProducts.get(0);
             }
+        }
+    }
+
+    public List<HandingProductBrief> getHandingProductRecommend() throws NoSuchFieldException, IllegalAccessException {
+        String sql =  "select " + generateFiledString(HandingProductBrief.class) + " from handing_product order by monthSellCount desc limit 0, 6";
+        try(Connection conn = getConn()) {
+            List<HandingProductBrief> briefs =  conn.createQuery(sql).executeAndFetch(HandingProductBrief.class);
+            for(HandingProductBrief brief : briefs) {
+                brief.setSourceCity(CityDataHelper.instance().getCityDescById(brief.souCityId));
+            }
+            return briefs;
         }
     }
 

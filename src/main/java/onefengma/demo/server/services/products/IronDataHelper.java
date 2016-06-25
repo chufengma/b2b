@@ -13,7 +13,9 @@ import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.product.IronBuy;
 import onefengma.demo.server.model.product.IronProduct;
+import onefengma.demo.server.model.product.IronProductBrief;
 import onefengma.demo.server.model.product.IronRecommend;
+import onefengma.demo.server.services.funcs.CityDataHelper;
 
 /**
  * @author yfchu
@@ -34,23 +36,31 @@ public class IronDataHelper extends BaseDataHelper {
         return getMaxCounts("iron_product");
     }
 
-    public List<IronProduct>  getIronProducts(PageBuilder pageBuilder) {
-        String sql = "select * from iron_product " + (pageBuilder.hasWhere() ? " where " : "") + pageBuilder.generateSql();
+    public List<IronProductBrief>  getIronProducts(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "select " + generateFiledString(IronProductBrief.class) + " from iron_product " + (pageBuilder.hasWhere() ? " where " : "") + pageBuilder.generateSql();
         try (Connection conn = getConn()){
-            return conn.createQuery(sql).executeAndFetch(IronProduct.class);
+            List<IronProductBrief> ironProductBriefs =  conn.createQuery(sql).executeAndFetch(IronProductBrief.class);
+            for(IronProductBrief ironProductBrief : ironProductBriefs) {
+                ironProductBrief.setSourceCity(CityDataHelper.instance().getCityDescById(ironProductBrief.sourceCityId));
+            }
+            return ironProductBriefs;
         }
     }
 
-    public List<IronProduct> searchIronProducts(String keyword, PageBuilder pageBuilder) {
+    public List<IronProductBrief> searchIronProducts(String keyword, PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         keyword = "%" + keyword + "%";
-        String sql = "select * from iron_product " +
+        String sql = "select " + generateFiledString(IronProductBrief.class) + " from iron_product " +
                 "where surface like \"" + keyword + "\"" +
                 "or ironType like \"" + keyword + "\"" +
                 "or proPlace like \"" + keyword + "\"" +
                 "or material like \"" + keyword + "\"" +
                 "or title like  \"" + keyword + "\"" + pageBuilder.generateLimit();
         try(Connection conn = getConn()) {
-            return conn.createQuery(sql).executeAndFetch(IronProduct.class);
+            List<IronProductBrief> ironProductBriefs =  conn.createQuery(sql).executeAndFetch(IronProductBrief.class);
+            for(IronProductBrief ironProductBrief : ironProductBriefs) {
+                ironProductBrief.setSourceCity(CityDataHelper.instance().getCityDescById(ironProductBrief.sourceCityId));
+            }
+            return ironProductBriefs;
         }
     }
 
@@ -91,8 +101,15 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
-    public List<IronProduct> getIronProductRecommend() {
-        return null;
+    public List<IronProductBrief> getIronProductRecommend() throws NoSuchFieldException, IllegalAccessException {
+        String sql =  "select " + generateFiledString(IronProductBrief.class) + " from iron_product order by monthSellCount desc limit 0, 6";
+        try(Connection conn = getConn()) {
+            List<IronProductBrief> ironProductBriefs =  conn.createQuery(sql).executeAndFetch(IronProductBrief.class);
+            for(IronProductBrief ironProductBrief : ironProductBriefs) {
+                ironProductBrief.setSourceCity(CityDataHelper.instance().getCityDescById(ironProductBrief.sourceCityId));
+            }
+            return ironProductBriefs;
+        }
     }
 
     public List<IronRecommend> getIronBuyRecommend() {

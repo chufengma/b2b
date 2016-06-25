@@ -124,7 +124,7 @@ public class IronManager extends BaseManager {
         }));
 
         get("productRecommed", BaseBean.class, ((request, response, requestBean) -> {
-            return success();
+            return success(IronDataHelper.getIronDataHelper().getIronProductRecommend());
         }));
 
         get("bugRecommend", BaseBean.class, ((request, response, requestBean) -> {
