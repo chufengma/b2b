@@ -23,6 +23,7 @@ public class IronPushRequest extends AuthSession {
     public String title;
     public float price;
     public File cover;
+    public long numbers;
     @NotRequired
     public File image1;
     @NotRequired
@@ -45,6 +46,7 @@ public class IronPushRequest extends AuthSession {
         ironProduct.surface = surface;
         ironProduct.isSpec = isSpec;
         ironProduct.pushTime = System.currentTimeMillis();
+        ironProduct.numbers = numbers;
         if (image1 != null) {
             ironProduct.image1 = FileHelper.generateRelativeInternetUri(image1.getPath());
         }

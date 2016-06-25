@@ -23,4 +23,5 @@ public class IronProduct {
     public String image3 = "";
     public boolean isSpec;
     public long pushTime;
+    public long numbers;
 }
