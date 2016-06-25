@@ -3,6 +3,7 @@ package onefengma.demo.server.services.order;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.LastRecords;
+import onefengma.demo.server.model.apibeans.order.OrderRequest;
 
 /**
  * Created by chufengma on 16/6/18.
@@ -22,6 +23,11 @@ public class OrderManager extends BaseManager{
 
         get("orderDynamic", BaseBean.class, ((request, response, requestBean) -> {
             return success(OrderDataHelper.instance().getOrdersDynamic());
+        }));
+
+        post("translate", OrderRequest.class, ((request, response, requestBean) -> {
+
+            return success();
         }));
     }
 

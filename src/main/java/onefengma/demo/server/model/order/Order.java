@@ -7,11 +7,11 @@ public class Order {
     public int id;
     public String buyerId;
     public String sellerId;
-    public String handingId;
-    public String sellTime;
-    public String ironId;
-    public String productType;
-    public String ironCount;
-    public String ironPrice;
+    public int productType;
+    public String productId;
+    public float count;
     public String salesmanId;
+    public long timeLimit;
+    public long sellTime;
+    public int status;
 }

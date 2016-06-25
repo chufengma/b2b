@@ -2,11 +2,14 @@ package onefengma.demo.server.services.order;
 
 import org.sql2o.Connection;
 
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import onefengma.demo.common.DateHelper;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.model.apibeans.LastRecords;
+import onefengma.demo.server.model.order.Order;
 import onefengma.demo.server.model.order.OrderDynamic;
 
 /**
@@ -58,6 +61,12 @@ public class OrderDataHelper extends BaseDataHelper {
                 "order by sellTime desc limit 0,10";
         try(Connection conn = getConn()) {
             return conn.createQuery(sql).executeAndFetch(OrderDynamic.class);
+        }
+    }
+
+    public void translate(Order order) throws InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException, IllegalAccessException {
+        try(Connection conn = getConn()) {
+            createInsertQuery(conn, "product_orders", order);
         }
     }
 

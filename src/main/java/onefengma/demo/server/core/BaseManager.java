@@ -240,7 +240,9 @@ public abstract class BaseManager {
                 }
                 String paramsName = (String) filesEnum.nextElement();
                 File value = multipartRequest.getFile(paramsName);
-                System.out.println("-----------" + FileHelper.generateInternetPath(value.getPath()));
+                if (value == null) {
+                    continue;
+                }
                 files.add(value);
                 beanJson.put(paramsName, value);
             }
