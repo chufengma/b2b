@@ -10,4 +10,5 @@ public class HandingBuy {
     public String message;
     public String userId;
     public long pushTime;
+    public long timeLimit;
 }

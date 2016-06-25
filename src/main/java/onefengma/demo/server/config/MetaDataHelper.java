@@ -28,9 +28,6 @@ public class MetaDataHelper {
     }
 
     private static List<City> initCities() {
-        if (CITIES != null) {
-            return CITIES;
-        }
         try {
             String cityFiles = FileUtils.readFileToString(new File(Config.getBaseMetaPath() + "citys.json"), "utf-8");
             List<City> cities = JSON.parseArray(cityFiles, City.class);

@@ -13,4 +13,11 @@ public class IronBuy {
     public String userId;
     public String message;
     public long pushTime;
+
+    public long length;
+    public long width;
+    public long height;
+    public String tolerance;
+    public long numbers;
+    public long timeLimit;
 }

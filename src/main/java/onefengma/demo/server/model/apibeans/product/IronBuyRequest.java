@@ -14,6 +14,12 @@ public class IronBuyRequest extends AuthSession {
     public String proPlace;
     public String locationCityId;
     public String message;
+    public long length;
+    public long width;
+    public long height;
+    public String tolerance;
+    public long numbers;
+    public long timeLimit;
 
     public IronBuy generateIronBug() {
         IronBuy ironBuy = new IronBuy();
@@ -26,6 +32,13 @@ public class IronBuyRequest extends AuthSession {
         ironBuy.message = message;
         ironBuy.userId = getUserId();
         ironBuy.pushTime = System.currentTimeMillis();
+
+        ironBuy.length = length;
+        ironBuy.width = width;
+        ironBuy.height = height;
+        ironBuy.tolerance = tolerance;
+        ironBuy.numbers = numbers;
+        ironBuy.timeLimit = ironBuy.pushTime + timeLimit * 1000;
         return ironBuy;
     }
 }
