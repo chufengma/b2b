@@ -2,14 +2,13 @@ package onefengma.demo.server.services.products;
 
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
-import onefengma.demo.server.core.request.PageRoute;
 import onefengma.demo.server.model.apibeans.product.SearchRequest;
 import onefengma.demo.server.model.apibeans.product.SearchResponse;
+import onefengma.demo.server.model.apibeans.product.ShopDetailRequest;
 import onefengma.demo.server.model.apibeans.product.ShopRequest;
 import onefengma.demo.server.model.apibeans.product.ShopResponse;
+import onefengma.demo.server.model.product.ShopDetail;
 import onefengma.demo.server.services.user.SellerDataHelper;
-import spark.Request;
-import spark.Response;
 
 /**
  * @author yfchu
@@ -60,6 +59,14 @@ public class ProductManager extends BaseManager {
             shopResponse.shops = SellerDataHelper.instance().getShops(pageBuilder);
             shopResponse.maxCount = SellerDataHelper.instance().getShopCount(pageBuilder);
             return success(shopResponse);
+        }));
+
+        get("shopDetail", ShopDetailRequest.class, ((request, response, requestBean) -> {
+            ShopDetail shopDetail = SellerDataHelper.instance().getShopDetail(requestBean.sellerId);
+            if (shopDetail == null) {
+                return error("没找到相关店铺");
+            }
+            return success(shopDetail);
         }));
     }
 

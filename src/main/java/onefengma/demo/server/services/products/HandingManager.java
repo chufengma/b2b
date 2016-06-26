@@ -43,6 +43,7 @@ public class HandingManager extends BaseManager{
             PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
                     .addEqualWhere("type", requestBean.handingType)
                     .addEqualWhere("souCityId", requestBean.souCityId)
+                    .addEqualWhere("userId", requestBean.sellerId)
                     .setOrderByRequest(requestBean);
             handingGetResponse.handingProducts = HandingDataHelper.getHandingDataHelper().getHandingProducts(pageBuilder);
             handingGetResponse.maxCount = HandingDataHelper.getHandingDataHelper().getMaxCount(pageBuilder);

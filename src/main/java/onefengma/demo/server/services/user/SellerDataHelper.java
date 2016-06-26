@@ -9,9 +9,10 @@ import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.Seller;
-import onefengma.demo.server.model.product.IronProduct;
-import onefengma.demo.server.model.product.Shop;
+import onefengma.demo.server.model.apibeans.product.ShopDetailRequest;
 import onefengma.demo.server.model.product.ShopBrief;
+import onefengma.demo.server.model.product.ShopDetail;
+import sun.rmi.runtime.Log;
 
 /**
  * Created by chufengma on 16/6/2.
@@ -154,6 +155,21 @@ public class SellerDataHelper extends BaseDataHelper {
                 "where userId = sellerId order by handingCount limit 0, 10";
         try(Connection conn = getConn()) {
             return conn.createQuery(sql).executeAndFetch(ShopBrief.class);
+        }
+    }
+
+    public ShopDetail getShopDetail(String userId) {
+        String sql = "select " + generateFiledString(ShopDetail.class)
+                + " from seller,shop_orders where userId = sellerId and userId=:userId";
+        LogUtils.i("---getShopDetail sql--" + sql);
+        try(Connection conn = getConn()) {
+            List<ShopDetail> shopDetails = conn.createQuery(sql)
+                    .addParameter("userId", userId).executeAndFetch(ShopDetail.class);
+            if (!shopDetails.isEmpty()) {
+                return shopDetails.get(0);
+            } else {
+                return null;
+            }
         }
     }
 
