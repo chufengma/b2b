@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import onefengma.demo.annotation.NotRequired;
+import onefengma.demo.common.DateHelper;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.config.Config;
 import onefengma.demo.server.config.Config.DataBaseModel;
@@ -123,5 +124,23 @@ public abstract class BaseDataHelper {
             }
         }
         return stringBuilder.toString();
+    }
+
+
+
+    protected void transaction(Func func) throws Exception {
+        try(Connection conn = getSql2o().beginTransaction()) {
+            try {
+                func.doIt(conn);
+                conn.commit();
+            } catch (Exception e) {
+                conn.rollback();
+                throw e;
+            }
+        }
+    }
+
+    public interface Func{
+        public void doIt(Connection conn) throws Exception;
     }
 }

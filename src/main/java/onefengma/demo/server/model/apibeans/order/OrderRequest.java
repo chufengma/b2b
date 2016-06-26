@@ -14,11 +14,13 @@ public class OrderRequest extends AuthSession {
 
     public Order generateOrder() {
         Order order = new Order();
-        order.buyerId = "";
+        order.buyerId = getUserId();
         order.count = count;
         order.productId = productId;
-//        order. = ;
-
+        order.productType = productType;
+        order.status = 0;
+        order.sellTime = System.currentTimeMillis();
+        order.timeLimit = order.sellTime + timeLimit;
         return order;
     }
 }

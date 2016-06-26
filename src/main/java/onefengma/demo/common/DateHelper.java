@@ -15,6 +15,11 @@ public class DateHelper {
         return dateFormat.format(new Date());
     }
 
+    public static String getDataStrWithOut() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        return dateFormat.format(new Date());
+    }
+
     public static String getDayStr() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd");
         return dateFormat.format(new Date());

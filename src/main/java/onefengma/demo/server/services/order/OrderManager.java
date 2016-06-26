@@ -4,6 +4,7 @@ import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.LastRecords;
 import onefengma.demo.server.model.apibeans.order.OrderRequest;
+import onefengma.demo.server.model.order.Order;
 
 /**
  * Created by chufengma on 16/6/18.
@@ -18,6 +19,7 @@ public class OrderManager extends BaseManager{
             LastRecords lastRecords = new LastRecords();
             lastRecords.weight = 12440889;
             lastRecords.count = 1231;
+            lastRecords.sellingMoney = 198823;
             return  success(lastRecords);
         }));
 
@@ -26,7 +28,7 @@ public class OrderManager extends BaseManager{
         }));
 
         post("translate", OrderRequest.class, ((request, response, requestBean) -> {
-
+            OrderDataHelper.instance().translate(requestBean.generateOrder());
             return success();
         }));
     }

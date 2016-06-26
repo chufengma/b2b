@@ -15,4 +15,6 @@ public class ShopBrief {
     public String handingTypeDesc;
     public float ironCount;
     public float handingCount;
+    public float ironMoney;
+    public float handingMoney;
 }

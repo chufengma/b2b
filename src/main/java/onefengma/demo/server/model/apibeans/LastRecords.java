@@ -6,4 +6,5 @@ package onefengma.demo.server.model.apibeans;
 public class LastRecords {
     public float count;
     public float weight;
+    public float sellingMoney;
 }
