@@ -2,10 +2,9 @@ package onefengma.demo.server.core;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import onefengma.demo.common.StringUtils;
+import onefengma.demo.server.model.apibeans.BasePageBean;
 
 /**
  * Created by chufengma on 16/6/5.
@@ -16,6 +15,8 @@ public class PageBuilder {
 
     public long startTime = -1;
     public long endTime = -1;
+
+    public String keyword;
 
     List<OrderBy> orderByList = new ArrayList();
     List<Where> wereList = new ArrayList<>();
@@ -70,14 +71,28 @@ public class PageBuilder {
         return this;
     }
 
+    public PageBuilder setOrderByRequest(BasePageBean basePageBean) {
+        if (!StringUtils.isEmpty(basePageBean.keyword)) {
+            this.keyword = basePageBean.keyword;
+        }
+        if (!StringUtils.isEmpty(basePageBean.monthSellCount)) {
+            return orderByMonthSales(Boolean.parseBoolean(basePageBean.monthSellCount));
+        } else if (!StringUtils.isEmpty(basePageBean.price)) {
+            return orderByPrice(Boolean.parseBoolean(basePageBean.price));
+        } else if (!StringUtils.isEmpty(basePageBean.score)) {
+            return orderByScore(Boolean.parseBoolean(basePageBean.score));
+        }
+        return this;
+    }
+
     public PageBuilder orderByTime(long start, long end) {
         this.startTime = start;
         this.endTime = end;
         return this;
     }
 
-    public PageBuilder orderBySales(boolean desc) {
-        orderByList.add(new OrderBy("salesCount", desc));
+    public PageBuilder orderByMonthSales(boolean desc) {
+        orderByList.add(new OrderBy("monthSellCount", desc));
         return this;
     }
 
@@ -86,8 +101,8 @@ public class PageBuilder {
         return this;
     }
 
-    public PageBuilder orderByUserRate(boolean desc) {
-        orderByList.add(new OrderBy("userRate", desc));
+    public PageBuilder orderByScore(boolean desc) {
+        orderByList.add(new OrderBy("score", desc));
         return this;
     }
 

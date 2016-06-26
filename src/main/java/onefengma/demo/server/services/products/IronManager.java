@@ -38,12 +38,16 @@ public class IronManager extends BaseManager {
             ironsGetResponse.currentPage = requestBean.currentPage;
             ironsGetResponse.maxCount = IronDataHelper.getIronDataHelper().getMaxCounts();
             ironsGetResponse.pageCount = requestBean.pageCount;
+
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
+                    .addEqualWhere("material", requestBean.material)
+                    .addEqualWhere("ironType", requestBean.ironType)
+                    .addEqualWhere("surface", requestBean.surface)
+                    .addEqualWhere("proPlace", requestBean.proPlace)
+                    .setOrderByRequest(requestBean);
+
             ironsGetResponse.irons = IronDataHelper.getIronDataHelper()
-                    .getIronProducts(new PageBuilder(requestBean.currentPage, requestBean.pageCount)
-                            .addEqualWhere("material", requestBean.material)
-                            .addEqualWhere("ironType", requestBean.ironType)
-                            .addEqualWhere("surface", requestBean.surface)
-                            .addEqualWhere("proPlace", requestBean.proPlace));
+                    .getIronProducts(pageBuilder);
             return success(ironsGetResponse);
         }));
 

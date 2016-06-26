@@ -6,7 +6,9 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
+import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.product.HandingBuy;
 import onefengma.demo.server.model.product.HandingProduct;
@@ -41,7 +43,11 @@ public class HandingDataHelper extends BaseDataHelper {
     }
 
     public List<HandingProductBrief> getHandingProducts(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
-        String sql = "select " + generateFiledString(HandingProductBrief.class) + " from handing_product " + (pageBuilder.hasWhere() ? " where " : "") + pageBuilder.generateSql();
+        String sql = "select " + generateFiledString(HandingProductBrief.class)
+                + " from handing_product " + generateWhereKey(pageBuilder);
+
+        LogUtils.i("-----" + sql);
+
         try (Connection conn = getConn()) {
             List<HandingProductBrief> briefs =  conn.createQuery(sql).executeAndFetch(HandingProductBrief.class);
             for(HandingProductBrief brief : briefs) {
@@ -49,6 +55,24 @@ public class HandingDataHelper extends BaseDataHelper {
             }
             return briefs;
         }
+    }
+
+
+    private String generateWhereKey(PageBuilder pageBuilder) {
+        StringBuilder whereBuilder = new StringBuilder();
+        if (StringUtils.isEmpty(pageBuilder.keyword)) {
+            whereBuilder.append(pageBuilder.hasWhere() ? " where " : "");
+        } else {
+            whereBuilder.append(generateKeyword(pageBuilder.keyword));
+            whereBuilder.append(pageBuilder.hasWhere() ? " and " : "");
+        }
+        whereBuilder.append(pageBuilder.generateSql());
+        return whereBuilder.toString();
+    }
+
+    public String generateKeyword(String keyword) {
+        return "where title like \"%" + keyword + "%\"" +
+                "or type like \"%" + keyword + "%\"";
     }
 
     public void pushHandingBuy(HandingBuy handingBuy) throws InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException, IllegalAccessException {

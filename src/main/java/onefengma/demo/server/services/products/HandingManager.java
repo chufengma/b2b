@@ -43,7 +43,8 @@ public class HandingManager extends BaseManager{
             handingGetResponse.maxCount = HandingDataHelper.getHandingDataHelper().getMaxCount();
             handingGetResponse.handingProducts = HandingDataHelper.getHandingDataHelper().getHandingProducts(new PageBuilder(requestBean.currentPage, requestBean.pageCount)
                 .addEqualWhere("type", requestBean.handingType)
-                .addEqualWhere("souCityId", requestBean.souCityId));
+                .addEqualWhere("souCityId", requestBean.souCityId)
+                    .setOrderByRequest(requestBean));
             return success(handingGetResponse);
         }));
 

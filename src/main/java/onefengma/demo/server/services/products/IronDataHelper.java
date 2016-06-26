@@ -37,7 +37,9 @@ public class IronDataHelper extends BaseDataHelper {
     }
 
     public List<IronProductBrief>  getIronProducts(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
-        String sql = "select " + generateFiledString(IronProductBrief.class) + " from iron_product " + (pageBuilder.hasWhere() ? " where " : "") + pageBuilder.generateSql();
+        String sql = "select " + generateFiledString(IronProductBrief.class) +
+                " from iron_product " + generateWhereKey(pageBuilder);
+
         try (Connection conn = getConn()){
             List<IronProductBrief> ironProductBriefs =  conn.createQuery(sql).executeAndFetch(IronProductBrief.class);
             for(IronProductBrief ironProductBrief : ironProductBriefs) {
@@ -47,6 +49,26 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
+    private String generateWhereKey(PageBuilder pageBuilder) {
+        StringBuilder whereBuilder = new StringBuilder();
+        if (StringUtils.isEmpty(pageBuilder.keyword)) {
+            whereBuilder.append(pageBuilder.hasWhere() ? " where " : "");
+        } else {
+            whereBuilder.append(generateKeyword(pageBuilder.keyword));
+            whereBuilder.append(pageBuilder.hasWhere() ? " and " : "");
+        }
+        whereBuilder.append(pageBuilder.generateSql());
+        return whereBuilder.toString();
+    }
+
+    private String generateKeyword(String keyword) {
+        return StringUtils.isEmpty(keyword) ? "" : ("where surface like \"%" + keyword + "%\" " +
+                "or ironType like \"%" + keyword + "%\" " +
+                "or proPlace like \"%" + keyword + "%\" " +
+                "or material like \"%" + keyword + "%\" " +
+                "or title like  \"%" + keyword + "%\" ");
+    }
+
     public List<IronProductBrief> searchIronProducts(String keyword, PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         keyword = "%" + keyword + "%";
         String sql = "select " + generateFiledString(IronProductBrief.class) + " from iron_product " +
@@ -54,7 +76,7 @@ public class IronDataHelper extends BaseDataHelper {
                 "or ironType like \"" + keyword + "\"" +
                 "or proPlace like \"" + keyword + "\"" +
                 "or material like \"" + keyword + "\"" +
-                "or title like  \"" + keyword + "\"" + pageBuilder.generateLimit();
+                "or title like  \"" + keyword + "\"" + pageBuilder.generateSql();
         try(Connection conn = getConn()) {
             List<IronProductBrief> ironProductBriefs =  conn.createQuery(sql).executeAndFetch(IronProductBrief.class);
             for(IronProductBrief ironProductBrief : ironProductBriefs) {
