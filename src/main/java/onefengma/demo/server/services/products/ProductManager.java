@@ -55,6 +55,7 @@ public class ProductManager extends BaseManager {
 
             PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
                     .addEqualWhere("cityId", requestBean.cityId)
+                    .addEqualWhere("productType", requestBean.productType)
                     .setOrderByRequest(requestBean);
             shopResponse.shops = SellerDataHelper.instance().getShops(pageBuilder);
             shopResponse.maxCount = SellerDataHelper.instance().getShopCount(pageBuilder);

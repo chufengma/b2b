@@ -9,4 +9,6 @@ import onefengma.demo.server.model.apibeans.BasePageBean;
 public class ShopRequest extends BasePageBean {
     @NotRequired
     public String cityId;
+    @NotRequired
+    public int productType = -1 ; // 0 iron, 1 handing
 }

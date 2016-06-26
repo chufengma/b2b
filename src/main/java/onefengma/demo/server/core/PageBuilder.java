@@ -5,6 +5,7 @@ import java.util.List;
 
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.model.apibeans.BasePageBean;
+import onefengma.demo.server.model.apibeans.product.ShopRequest;
 
 /**
  * Created by chufengma on 16/6/5.
@@ -65,6 +66,9 @@ public class PageBuilder {
             return this;
         }
         if (value instanceof String && StringUtils.isEmpty((String)value)) {
+            return this;
+        }
+        if (value instanceof Integer && (int)value == -1) {
             return this;
         }
         this.wereList.add(new Where(key, value));
