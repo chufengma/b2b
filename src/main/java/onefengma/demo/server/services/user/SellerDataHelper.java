@@ -6,6 +6,7 @@ import java.util.List;
 
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
+import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.product.IronProduct;
@@ -114,6 +115,39 @@ public class SellerDataHelper extends BaseDataHelper {
             return conn.createQuery(sql).executeAndFetch(ShopBrief.class);
         }
     }
+
+    public int getShopCount(PageBuilder pageBuilder) {
+        String sql = "select count(*)" + " from seller, shop_orders " +
+                "where userId = sellerId " + generateWhereKey(pageBuilder, false);
+        try (Connection connection = getConn()){
+            return connection.createQuery(sql).executeScalar(Integer.class);
+        }
+    }
+
+    public List<ShopBrief> getShops(PageBuilder pageBuilder) {
+        String sql = "select " + generateFiledString(ShopBrief.class) + " from seller, shop_orders " +
+                "where userId = sellerId " + generateWhereKey(pageBuilder, true);
+        try (Connection connection = getConn()){
+            return connection.createQuery(sql).executeAndFetch(ShopBrief.class);
+        }
+    }
+
+    private String generateWhereKey(PageBuilder pageBuilder, boolean withLimit) {
+        StringBuilder whereBuilder = new StringBuilder();
+        if (!StringUtils.isEmpty(pageBuilder.keyword)) {
+            whereBuilder.append(generateKeyword(pageBuilder.keyword));
+        }
+        whereBuilder.append(pageBuilder.hasWhere() ? " and " : "");
+        whereBuilder.append(pageBuilder.generateSql(withLimit));
+        return whereBuilder.toString();
+    }
+
+    private String generateKeyword(String keyword) {
+        return " and companyName like '%" + keyword + "%'" +
+        " or officeAddress like '%" + keyword + "%'" +
+                " or shopProfile like '%" + keyword + "%'";
+    }
+
 
     public List<ShopBrief> getRecommendShopsByHanding() {
         String sql = "select " + generateFiledString(ShopBrief.class) + " from seller, shop_orders " +

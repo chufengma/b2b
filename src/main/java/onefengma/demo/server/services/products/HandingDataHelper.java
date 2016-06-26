@@ -31,8 +31,12 @@ public class HandingDataHelper extends BaseDataHelper {
         return handingDataHelper;
     }
 
-    public int getMaxCount() {
-        return getMaxCounts("handing_product");
+    public int getMaxCount(PageBuilder pageBuilder) {
+        String sql = "select count(*)"
+            + " from handing_product " + generateWhereKey(pageBuilder, false);
+        try(Connection connection = getConn()){
+            return connection.createQuery(sql).executeScalar(Integer.class);
+        }
     }
 
     public void insertHandingProduct(HandingProduct handingProduct) throws InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException, IllegalAccessException {
@@ -44,9 +48,7 @@ public class HandingDataHelper extends BaseDataHelper {
 
     public List<HandingProductBrief> getHandingProducts(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(HandingProductBrief.class)
-                + " from handing_product " + generateWhereKey(pageBuilder);
-
-        LogUtils.i("-----" + sql);
+                + " from handing_product " + generateWhereKey(pageBuilder, true);
 
         try (Connection conn = getConn()) {
             List<HandingProductBrief> briefs =  conn.createQuery(sql).executeAndFetch(HandingProductBrief.class);
@@ -58,7 +60,7 @@ public class HandingDataHelper extends BaseDataHelper {
     }
 
 
-    private String generateWhereKey(PageBuilder pageBuilder) {
+    private String generateWhereKey(PageBuilder pageBuilder, boolean withLimit) {
         StringBuilder whereBuilder = new StringBuilder();
         if (StringUtils.isEmpty(pageBuilder.keyword)) {
             whereBuilder.append(pageBuilder.hasWhere() ? " where " : "");
@@ -66,7 +68,7 @@ public class HandingDataHelper extends BaseDataHelper {
             whereBuilder.append(generateKeyword(pageBuilder.keyword));
             whereBuilder.append(pageBuilder.hasWhere() ? " and " : "");
         }
-        whereBuilder.append(pageBuilder.generateSql());
+        whereBuilder.append(pageBuilder.generateSql(withLimit));
         return whereBuilder.toString();
     }
 

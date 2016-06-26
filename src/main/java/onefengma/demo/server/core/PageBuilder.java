@@ -81,6 +81,11 @@ public class PageBuilder {
             return orderByPrice(Boolean.parseBoolean(basePageBean.price));
         } else if (!StringUtils.isEmpty(basePageBean.score)) {
             return orderByScore(Boolean.parseBoolean(basePageBean.score));
+        } else if (!StringUtils.isEmpty(basePageBean.productCount)) {
+            return orderByProductCount(Boolean.parseBoolean(basePageBean.productCount));
+        } else if (!StringUtils.isEmpty(basePageBean.monthSellMoney)) {
+            orderByList.add(new OrderBy("ironMoney", Boolean.parseBoolean(basePageBean.monthSellMoney)));
+            return this;
         }
         return this;
     }
@@ -93,6 +98,11 @@ public class PageBuilder {
 
     public PageBuilder orderByMonthSales(boolean desc) {
         orderByList.add(new OrderBy("monthSellCount", desc));
+        return this;
+    }
+
+    public PageBuilder orderByProductCount(boolean desc) {
+        orderByList.add(new OrderBy("productCount", desc));
         return this;
     }
 
@@ -110,7 +120,7 @@ public class PageBuilder {
         return !wereList.isEmpty();
     }
 
-    public String generateSql() {
+    public String generateSql(boolean withLimit) {
         StringBuffer stringBuffer = new StringBuffer();
         for (Where where : wereList) {
             stringBuffer.append(where.generate());
@@ -133,7 +143,9 @@ public class PageBuilder {
         if (stringBuffer.toString().endsWith(",")) {
             stringBuffer.deleteCharAt(stringBuffer.length() - 1);
         }
-        stringBuffer.append(" limit " + currentPage * pageCount + ", " + pageCount);
+        if (withLimit) {
+            stringBuffer.append(" limit " + currentPage * pageCount + ", " + pageCount);
+        }
         return stringBuffer.toString();
     }
 

@@ -32,13 +32,17 @@ public class IronDataHelper extends BaseDataHelper {
         return ironDataHelper;
     }
 
-    public int getMaxCounts() {
-        return getMaxCounts("iron_product");
+    public int getMaxCounts(PageBuilder pageBuilder) {
+        String sql = "select count(*)" +
+                " from iron_product " + generateWhereKey(pageBuilder, true);
+        try (Connection conn = getConn()){
+            return conn.createQuery(sql).executeScalar(Integer.class);
+        }
     }
 
     public List<IronProductBrief>  getIronProducts(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(IronProductBrief.class) +
-                " from iron_product " + generateWhereKey(pageBuilder);
+                " from iron_product " + generateWhereKey(pageBuilder, false);
 
         try (Connection conn = getConn()){
             List<IronProductBrief> ironProductBriefs =  conn.createQuery(sql).executeAndFetch(IronProductBrief.class);
@@ -49,7 +53,7 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
-    private String generateWhereKey(PageBuilder pageBuilder) {
+    private String generateWhereKey(PageBuilder pageBuilder, boolean withLimit) {
         StringBuilder whereBuilder = new StringBuilder();
         if (StringUtils.isEmpty(pageBuilder.keyword)) {
             whereBuilder.append(pageBuilder.hasWhere() ? " where " : "");
@@ -57,7 +61,7 @@ public class IronDataHelper extends BaseDataHelper {
             whereBuilder.append(generateKeyword(pageBuilder.keyword));
             whereBuilder.append(pageBuilder.hasWhere() ? " and " : "");
         }
-        whereBuilder.append(pageBuilder.generateSql());
+        whereBuilder.append(pageBuilder.generateSql(withLimit));
         return whereBuilder.toString();
     }
 
@@ -76,7 +80,7 @@ public class IronDataHelper extends BaseDataHelper {
                 "or ironType like \"" + keyword + "\"" +
                 "or proPlace like \"" + keyword + "\"" +
                 "or material like \"" + keyword + "\"" +
-                "or title like  \"" + keyword + "\"" + pageBuilder.generateSql();
+                "or title like  \"" + keyword + "\"" + pageBuilder.generateSql(true);
         try(Connection conn = getConn()) {
             List<IronProductBrief> ironProductBriefs =  conn.createQuery(sql).executeAndFetch(IronProductBrief.class);
             for(IronProductBrief ironProductBrief : ironProductBriefs) {

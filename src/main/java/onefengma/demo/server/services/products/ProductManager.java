@@ -5,6 +5,8 @@ import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.core.request.PageRoute;
 import onefengma.demo.server.model.apibeans.product.SearchRequest;
 import onefengma.demo.server.model.apibeans.product.SearchResponse;
+import onefengma.demo.server.model.apibeans.product.ShopRequest;
+import onefengma.demo.server.model.apibeans.product.ShopResponse;
 import onefengma.demo.server.services.user.SellerDataHelper;
 import spark.Request;
 import spark.Response;
@@ -48,6 +50,16 @@ public class ProductManager extends BaseManager {
             return success(searchResponse);
         }));
 
+        get("shops", ShopRequest.class, ((request, response, requestBean) -> {
+            ShopResponse shopResponse = new ShopResponse(requestBean.currentPage, requestBean.pageCount);
+
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
+                    .addEqualWhere("cityId", requestBean.cityId)
+                    .setOrderByRequest(requestBean);
+            shopResponse.shops = SellerDataHelper.instance().getShops(pageBuilder);
+            shopResponse.maxCount = SellerDataHelper.instance().getShopCount(pageBuilder);
+            return success(shopResponse);
+        }));
     }
 
     @Override

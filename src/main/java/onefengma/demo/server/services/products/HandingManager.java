@@ -40,11 +40,12 @@ public class HandingManager extends BaseManager{
 
         get("handing", HandingGetRequest.class, ((request, response, requestBean) -> {
             HandingGetResponse handingGetResponse = new HandingGetResponse(requestBean.currentPage, requestBean.pageCount);
-            handingGetResponse.maxCount = HandingDataHelper.getHandingDataHelper().getMaxCount();
-            handingGetResponse.handingProducts = HandingDataHelper.getHandingDataHelper().getHandingProducts(new PageBuilder(requestBean.currentPage, requestBean.pageCount)
-                .addEqualWhere("type", requestBean.handingType)
-                .addEqualWhere("souCityId", requestBean.souCityId)
-                    .setOrderByRequest(requestBean));
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
+                    .addEqualWhere("type", requestBean.handingType)
+                    .addEqualWhere("souCityId", requestBean.souCityId)
+                    .setOrderByRequest(requestBean);
+            handingGetResponse.handingProducts = HandingDataHelper.getHandingDataHelper().getHandingProducts(pageBuilder);
+            handingGetResponse.maxCount = HandingDataHelper.getHandingDataHelper().getMaxCount(pageBuilder);
             return success(handingGetResponse);
         }));
 

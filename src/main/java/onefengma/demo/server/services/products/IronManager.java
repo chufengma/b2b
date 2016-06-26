@@ -36,7 +36,6 @@ public class IronManager extends BaseManager {
         get("irons", IronsGetRequest.class, ((request1, response1, requestBean) -> {
             IronsGetResponse ironsGetResponse = new IronsGetResponse(requestBean.currentPage, requestBean.pageCount);
             ironsGetResponse.currentPage = requestBean.currentPage;
-            ironsGetResponse.maxCount = IronDataHelper.getIronDataHelper().getMaxCounts();
             ironsGetResponse.pageCount = requestBean.pageCount;
 
             PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
@@ -46,6 +45,7 @@ public class IronManager extends BaseManager {
                     .addEqualWhere("proPlace", requestBean.proPlace)
                     .setOrderByRequest(requestBean);
 
+            ironsGetResponse.maxCount = IronDataHelper.getIronDataHelper().getMaxCounts(pageBuilder);
             ironsGetResponse.irons = IronDataHelper.getIronDataHelper()
                     .getIronProducts(pageBuilder);
             return success(ironsGetResponse);

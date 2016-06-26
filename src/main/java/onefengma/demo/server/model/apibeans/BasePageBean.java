@@ -17,4 +17,9 @@ public class BasePageBean extends BaseBean {
     public String monthSellCount;
     @NotRequired
     public String keyword;
+    @NotRequired
+    public String productCount;
+    @NotRequired
+    public String monthSellMoney;
+
 }
