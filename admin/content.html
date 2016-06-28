@@ -1,0 +1,36 @@
+<h3>This is Content</h3>
+<div>
+    <table class="table table-striped" id="content">
+        <thead>
+        <tr>
+            <template v-for="header in headers">
+                <th> {{ header.name }} </th>
+            </template>
+        </tr>
+        </thead>
+        <tbody  v-for="dataItem in dataItems">
+            <tr v-for="row in dataItem">
+                <td>{{ row.value }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    new Vue({
+      el: '#content',
+      data: {
+        headers: [
+          { name: 'Learn JavaScript' },
+          { name: 'Learn Vue.js' },
+          { name: 'Build Something Awesome' }
+        ],
+
+        dataItems: [
+          [{value:"狗屎"}, {value:"傻逼"}, {value:"天才"}],
+          [{value:"狗屎1"}, {value:"傻逼2"}, {value:"天才3"}],
+          [{value:"狗屎2"}, {value:"傻逼2"}, {value:"天才4"}]
+        ]
+      }
+    })
+</script>
