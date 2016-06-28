@@ -1,6 +1,6 @@
 <h3>This is Content</h3>
 <div>
-    <table class="table table-striped" id="content">
+    <table class="table table-striped" id="table">
         <thead>
         <tr>
             <template v-for="header in headers">
@@ -8,17 +8,21 @@
             </template>
         </tr>
         </thead>
-        <tbody  v-for="dataItem in dataItems">
-            <tr v-for="row in dataItem">
+        <tbody>
+          <template v-for="dataItem in dataItems">
+            <tr>
+              <template v-for="row in dataItem">
                 <td>{{ row.value }}</td>
+              </template>
             </tr>
+           </template>
         </tbody>
     </table>
 </div>
 
 <script>
     new Vue({
-      el: '#content',
+      el: '#table',
       data: {
         headers: [
           { name: 'Learn JavaScript' },
