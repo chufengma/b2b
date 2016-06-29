@@ -1,5 +1,6 @@
 package onefengma.demo.server.services.products;
 
+import onefengma.demo.server.model.product.*;
 import org.sql2o.Connection;
 
 import java.io.UnsupportedEncodingException;
@@ -10,11 +11,6 @@ import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
-import onefengma.demo.server.model.product.HandingBuy;
-import onefengma.demo.server.model.product.HandingProduct;
-import onefengma.demo.server.model.product.HandingProductBrief;
-import onefengma.demo.server.model.product.IronProduct;
-import onefengma.demo.server.model.product.IronProductBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 
 /**
@@ -59,6 +55,26 @@ public class HandingDataHelper extends BaseDataHelper {
         }
     }
 
+    public int getMaxBuyCount(PageBuilder pageBuilder) {
+        String sql = "select count(*)"
+                + " from handing_buy " + generateWhereKey(pageBuilder, false);
+        try(Connection connection = getConn()){
+            return connection.createQuery(sql).executeScalar(Integer.class);
+        }
+    }
+
+    public List<HandingBuyBrief> getHandingBuys(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "select " + generateFiledString(HandingBuyBrief.class)
+                + " from handing_buy " + generateWhereKey(pageBuilder, true);
+
+        try (Connection conn = getConn()) {
+            List<HandingBuyBrief> briefs =  conn.createQuery(sql).executeAndFetch(HandingBuyBrief.class);
+            for(HandingBuyBrief brief : briefs) {
+                brief.setSourceCity(CityDataHelper.instance().getCityDescById(brief.souCityId));
+            }
+            return briefs;
+        }
+    }
 
     private String generateWhereKey(PageBuilder pageBuilder, boolean withLimit) {
         StringBuilder whereBuilder = new StringBuilder();

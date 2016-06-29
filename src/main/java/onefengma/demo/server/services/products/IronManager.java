@@ -4,15 +4,13 @@ import onefengma.demo.server.config.Config;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.BaseBean;
-import onefengma.demo.server.model.apibeans.product.IronBuyRequest;
-import onefengma.demo.server.model.apibeans.product.IronDetailRequest;
-import onefengma.demo.server.model.apibeans.product.IronPushRequest;
-import onefengma.demo.server.model.apibeans.product.IronsGetRequest;
-import onefengma.demo.server.model.apibeans.product.IronsGetResponse;
+import onefengma.demo.server.model.apibeans.product.*;
 import onefengma.demo.server.model.metaData.IconDataCategory;
 import onefengma.demo.server.model.product.IronProduct;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
+
+import java.util.ArrayList;
 
 /**
  * @author yfchu
@@ -46,7 +44,7 @@ public class IronManager extends BaseManager {
                     .addEqualWhere("userId", requestBean.sellerId)
                     .setOrderByRequest(requestBean);
 
-            ironsGetResponse.maxCount = IronDataHelper.getIronDataHelper().getMaxCounts(pageBuilder);
+            ironsGetResponse.maxCount = IronDataHelper.getIronDataHelper().getMaxIronCounts(pageBuilder);
             ironsGetResponse.irons = IronDataHelper.getIronDataHelper()
                     .getIronProducts(pageBuilder);
             return success(ironsGetResponse);
@@ -114,6 +112,26 @@ public class IronManager extends BaseManager {
             }
             IronDataHelper.getIronDataHelper().pushIronBuy(requestBean.generateIronBug());
             return success();
+        }));
+
+        get("buy", IronsGetRequest.class, ((request, response, requestBean) -> {
+            IronBuyResponse ironBuyResponse = new IronBuyResponse(requestBean.currentPage, requestBean.pageCount);
+            ironBuyResponse.currentPage = requestBean.currentPage;
+            ironBuyResponse.pageCount = requestBean.pageCount;
+
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
+                    .addEqualWhere("material", requestBean.material)
+                    .addEqualWhere("ironType", requestBean.ironType)
+                    .addEqualWhere("surface", requestBean.surface)
+                    .addEqualWhere("proPlace", requestBean.proPlace)
+                    .addInWhere("locationCityId", CityDataHelper.instance().getCitiesById(new ArrayList<>(), requestBean.cityId))
+                    .addEqualWhere("userId", requestBean.userId)
+                    .addOrderBy("pushTime", true);
+
+            ironBuyResponse.maxCount = IronDataHelper.getIronDataHelper().getMaxIronBuyCounts(pageBuilder);
+            ironBuyResponse.buys = IronDataHelper.getIronDataHelper()
+                    .getIronsBuy(pageBuilder);
+            return success(ironBuyResponse);
         }));
 
         get("ironDetail", IronDetailRequest.class, ((request, response, requestBean) -> {

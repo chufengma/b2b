@@ -2,16 +2,14 @@ package onefengma.demo.server.services.products;
 
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
-import onefengma.demo.server.model.apibeans.product.HandingBuyRequest;
+import onefengma.demo.server.model.apibeans.product.*;
 import onefengma.demo.server.model.apibeans.BaseBean;
-import onefengma.demo.server.model.apibeans.product.HandingDetailRequest;
-import onefengma.demo.server.model.apibeans.product.HandingGetRequest;
-import onefengma.demo.server.model.apibeans.product.HandingGetResponse;
-import onefengma.demo.server.model.apibeans.product.HandingPushRequest;
 import onefengma.demo.server.model.metaData.HandingDataCategory;
 import onefengma.demo.server.model.product.HandingProduct;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
+
+import java.util.ArrayList;
 
 /**
  * Created by chufengma on 16/6/5.
@@ -59,6 +57,18 @@ public class HandingManager extends BaseManager{
             }
             HandingDataHelper.getHandingDataHelper().pushHandingBuy(requestBean.generateBuy());
             return success();
+        }));
+
+        get("buy", HandingGetRequest.class, ((request, response, requestBean) -> {
+            HandingBuysResponse handingGetResponse = new HandingBuysResponse(requestBean.currentPage, requestBean.pageCount);
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
+                    .addEqualWhere("handingType", requestBean.handingType)
+                    .addInWhere("souCityId", CityDataHelper.instance().getCitiesById(new ArrayList<>(), requestBean.souCityId))
+                    .addEqualWhere("userId", requestBean.userId)
+                    .addOrderBy("pushTime", true);
+            handingGetResponse.handings = HandingDataHelper.getHandingDataHelper().getHandingBuys(pageBuilder);
+            handingGetResponse.maxCount = HandingDataHelper.getHandingDataHelper().getMaxBuyCount(pageBuilder);
+            return success(handingGetResponse);
         }));
 
         get("handingDetail", HandingDetailRequest.class, ((request, response, requestBean) -> {

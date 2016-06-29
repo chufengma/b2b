@@ -2,6 +2,7 @@ package onefengma.demo.server.services.funcs;
 
 import org.sql2o.Connection;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -61,6 +62,28 @@ public class CityDataHelper extends BaseDataHelper {
             cityDescBuilder.append(stringStack.pop() + " ");
         }
         return cityDescBuilder.toString();
+    }
+
+    public List<String> getCitiesById(List<String> cities, String cityId) throws NoSuchFieldException, IllegalAccessException {
+        if (StringUtils.isEmpty(cityId)) {
+            return cities;
+        }
+        cities.add(cityId);
+        City city = getCityById(cityId);
+        List<City> subCityes = getSubCities(city.id);
+        if (city != null &&  subCityes != null) {
+            for(City subCity : subCityes) {
+                getCitiesById(cities, subCity.id);
+            }
+        }
+        return cities;
+    }
+
+    public List<City> getSubCities(String cityId) throws NoSuchFieldException, IllegalAccessException {
+        String sql = createSql("select * from city where fatherId=:id");
+        try(Connection connection = getConn()) {
+            return connection.createQuery(sql).addParameter("id", cityId).executeAndFetch(City.class);
+        }
     }
 
     public boolean isCityExist(String cityId) throws NoSuchFieldException, IllegalAccessException {

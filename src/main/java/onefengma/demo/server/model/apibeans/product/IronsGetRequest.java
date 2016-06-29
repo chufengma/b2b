@@ -19,4 +19,8 @@ public class IronsGetRequest extends BasePageBean {
     public String ironType;
     @NotRequired
     public String sellerId;
+    @NotRequired
+    public String userId;
+    @NotRequired
+    public String cityId;
 }

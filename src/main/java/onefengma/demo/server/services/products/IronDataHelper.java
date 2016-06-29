@@ -1,5 +1,8 @@
 package onefengma.demo.server.services.products;
 
+import onefengma.demo.server.core.LogUtils;
+import onefengma.demo.server.model.product.*;
+import org.apache.commons.logging.Log;
 import org.sql2o.Connection;
 import org.sql2o.Query;
 
@@ -11,10 +14,6 @@ import java.util.List;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
-import onefengma.demo.server.model.product.IronBuy;
-import onefengma.demo.server.model.product.IronProduct;
-import onefengma.demo.server.model.product.IronProductBrief;
-import onefengma.demo.server.model.product.IronRecommend;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 
 /**
@@ -32,9 +31,9 @@ public class IronDataHelper extends BaseDataHelper {
         return ironDataHelper;
     }
 
-    public int getMaxCounts(PageBuilder pageBuilder) {
+    public int getMaxIronCounts(PageBuilder pageBuilder) {
         String sql = "select count(*)" +
-                " from iron_product " + generateWhereKey(pageBuilder, true);
+                " from iron_product " + generateWhereKey(pageBuilder, false);
         try (Connection conn = getConn()){
             return conn.createQuery(sql).executeScalar(Integer.class);
         }
@@ -42,7 +41,7 @@ public class IronDataHelper extends BaseDataHelper {
 
     public List<IronProductBrief>  getIronProducts(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(IronProductBrief.class) +
-                " from iron_product " + generateWhereKey(pageBuilder, false);
+                " from iron_product " + generateWhereKey(pageBuilder, true);
 
         try (Connection conn = getConn()){
             List<IronProductBrief> ironProductBriefs =  conn.createQuery(sql).executeAndFetch(IronProductBrief.class);
@@ -50,6 +49,29 @@ public class IronDataHelper extends BaseDataHelper {
                 ironProductBrief.setSourceCity(CityDataHelper.instance().getCityDescById(ironProductBrief.sourceCityId));
             }
             return ironProductBriefs;
+        }
+    }
+
+    public int getMaxIronBuyCounts(PageBuilder pageBuilder) {
+        String sql = "select count(*)" +
+                " from iron_buy " + generateWhereKey(pageBuilder, false);
+
+        LogUtils.i("------" + sql);
+        try (Connection conn = getConn()){
+            return conn.createQuery(sql).executeScalar(Integer.class);
+        }
+    }
+
+    public List<IronBuyBrief> getIronsBuy(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "select " + generateFiledString(IronBuyBrief.class) +
+                " from iron_buy " + generateWhereKey(pageBuilder, true);
+
+        try (Connection conn = getConn()){
+            List<IronBuyBrief> ironBuyBriefs =  conn.createQuery(sql).executeAndFetch(IronBuyBrief.class);
+            for(IronBuyBrief ironBuyBrief : ironBuyBriefs) {
+                ironBuyBrief.setSourceCity(CityDataHelper.instance().getCityDescById(ironBuyBrief.locationCityId));
+            }
+            return ironBuyBriefs;
         }
     }
 

@@ -53,6 +53,28 @@ public class PageBuilder {
         }
     }
 
+    public static class InWhere extends Where{
+        public InWhere(String key, List<String> value) {
+            super(key, value);
+        }
+
+        @Override
+        public String generate() {
+            StringBuilder stringBuilder = new StringBuilder(" " + key + " in (");
+            List<String> vas = (List<String>)value;
+            for (int i = 0 ;i<vas.size();i++) {
+                String va = vas.get(i);
+                stringBuilder.append("'" + va + "'");
+                if (i != vas.size() - 1) {
+                    stringBuilder.append(",");
+                }
+
+            }
+            stringBuilder.append(")");
+            return stringBuilder.toString();
+        }
+    }
+
     public PageBuilder(int currentPage, int pageCount) {
         this.currentPage = currentPage;
         this.pageCount = pageCount;
@@ -75,6 +97,14 @@ public class PageBuilder {
         return this;
     }
 
+    public PageBuilder addInWhere(String key, List<String> value) {
+        if (value == null || value.isEmpty()) {
+            return this;
+        }
+        this.wereList.add(new InWhere(key, value));
+        return this;
+    }
+
     public PageBuilder setOrderByRequest(BasePageBean basePageBean) {
         if (!StringUtils.isEmpty(basePageBean.keyword)) {
             this.keyword = basePageBean.keyword;
@@ -91,6 +121,11 @@ public class PageBuilder {
             orderByList.add(new OrderBy("ironMoney", Boolean.parseBoolean(basePageBean.monthSellMoney)));
             return this;
         }
+        return this;
+    }
+
+    public PageBuilder addOrderBy(String key, boolean desc) {
+        orderByList.add(new OrderBy(key, desc));
         return this;
     }
 
