@@ -1,40 +1,82 @@
 <h3>This is Content</h3>
+
+    <!--专员手机号 <input type="text" class="form-control" placeholder="Search...">-->
+    <!--专员编号 <input type="text" class="form-control" placeholder="Search...">-->
+<form class="form-inline">
+    <div class="form-group">
+        <label for="exampleInputName2">专员手机号</label>
+        <input type="text" class="form-control" id="exampleInputName2" placeholder="Jane Doe">
+    </div>
+    <div class="form-group">
+        <label for="exampleInputEmail2">专员编号</label>
+        <input type="email" class="form-control" id="exampleInputEmail2" placeholder="jane.doe@example.com">
+    </div>
+
+</form>
+
+
 <div>
     <table class="table table-striped" id="table">
         <thead>
         <tr>
             <template v-for="header in headers">
-                <th> {{ header.name }} </th>
+                <th> {{ header.name }}</th>
             </template>
         </tr>
         </thead>
         <tbody>
-          <template v-for="dataItem in dataItems">
+        <template v-for="dataItem in dataItems">
             <tr>
-              <template v-for="row in dataItem">
-                <td>{{ row.value }}</td>
-              </template>
+                <template v-for="row in dataItem">
+                    <td>{{ row.value }}</td>
+                </template>
             </tr>
-           </template>
+        </template>
         </tbody>
     </table>
+
+    <nav>
+        <ul class="pagination">
+            <li>
+                <a href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li><a href="#">1</a></li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li class="active"><a href="#">4</a></li>
+            <li><a href="#">5</a></li>
+            <li>
+                <a href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
 </div>
 
 <script>
-    new Vue({
-      el: '#table',
-      data: {
-        headers: [
-          { name: 'Learn JavaScript' },
-          { name: 'Learn Vue.js' },
-          { name: 'Build Something Awesome' }
-        ],
+    var Table = new Vue({
+        el: '#table',
+        data: {
+            headers: [
+                {name: 'Learn JavaScript'},
+                {name: 'Learn Vue.js'},
+                {name: 'Build Something Awesome'}
+            ],
 
-        dataItems: [
-          [{value:"狗屎"}, {value:"傻逼"}, {value:"天才"}],
-          [{value:"狗屎1"}, {value:"傻逼2"}, {value:"天才3"}],
-          [{value:"狗屎2"}, {value:"傻逼2"}, {value:"天才4"}]
-        ]
-      }
-    })
+            dataItems: [
+                [{value: "狗屎"}, {value: "傻逼"}, {value: "天才"}],
+                [{value: "狗屎1"}, {value: "傻逼2"}, {value: "天才3"}],
+                [{value: "狗屎2"}, {value: "傻逼2"}, {value: "天才4"}]
+            ],
+        },
+        methods: {
+            say: function (msg) {
+                alert(msg);
+            }
+        }
+    });
+
 </script>

@@ -9,7 +9,7 @@
  {
      "title" : "用户管理2",
      "subMenus" : [
-     {"name":"管理2", "url":"content"}
+     {"name":"管理2", "url":"date"}
      ]
  }
 ]
