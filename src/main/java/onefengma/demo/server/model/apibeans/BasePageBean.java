@@ -22,4 +22,7 @@ public class BasePageBean extends BaseBean {
     @NotRequired
     public String monthSellMoney;
 
+    @NotRequired
+    public int productType = -2 ; // 0 iron, 1 handing
+
 }

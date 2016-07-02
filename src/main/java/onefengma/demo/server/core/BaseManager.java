@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.oreilly.servlet.MultipartRequest;
 
+import onefengma.demo.server.core.request.*;
 import org.sql2o.Connection;
 
 import java.io.File;
@@ -18,10 +19,6 @@ import onefengma.demo.common.DateHelper;
 import onefengma.demo.common.FileHelper;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.config.Config;
-import onefengma.demo.server.core.request.BaseResult;
-import onefengma.demo.server.core.request.PageRoute;
-import onefengma.demo.server.core.request.ParamsMissException;
-import onefengma.demo.server.core.request.TypedRoute;
 import onefengma.demo.server.model.apibeans.AuthSession;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import spark.ModelAndView;
@@ -341,6 +338,10 @@ public abstract class BaseManager {
                         // other pages
                         if (request.pathInfo().startsWith("/auth")) {
                             pageFile = FileHelper.getFileFromPath("notLogin.html");
+                        } else if (request.pathInfo().startsWith("/admin/auth")) {
+                            if(!AuthHelper.isAdminLogin(request)) {
+                                response.redirect("/admin/login.html");
+                            }
                         } else {
                             pageFile = FileHelper.getFileFromPath(pathInfo);
                         }

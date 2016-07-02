@@ -147,7 +147,11 @@ public class PageBuilder {
         } else if (!StringUtils.isEmpty(basePageBean.score)) {
             return orderByScore(Boolean.parseBoolean(basePageBean.score));
         } else if (!StringUtils.isEmpty(basePageBean.productCount)) {
-            return orderByProductCount(Boolean.parseBoolean(basePageBean.productCount));
+            if (basePageBean.productType == 0) {
+                addOrderBy("ironCount", Boolean.parseBoolean(basePageBean.productCount));
+            } else if (basePageBean.productType == 1) {
+                addOrderBy("handingCount", Boolean.parseBoolean(basePageBean.productCount));
+            }
         } else if (!StringUtils.isEmpty(basePageBean.monthSellMoney)) {
             orderByList.add(new OrderBy("ironMoney", Boolean.parseBoolean(basePageBean.monthSellMoney)));
             return this;
@@ -168,11 +172,6 @@ public class PageBuilder {
 
     public PageBuilder orderByMonthSales(boolean desc) {
         orderByList.add(new OrderBy("monthSellCount", desc));
-        return this;
-    }
-
-    public PageBuilder orderByProductCount(boolean desc) {
-        orderByList.add(new OrderBy("productCount", desc));
         return this;
     }
 

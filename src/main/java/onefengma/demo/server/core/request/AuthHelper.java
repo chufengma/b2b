@@ -2,6 +2,7 @@ package onefengma.demo.server.core.request;
 
 import java.util.UUID;
 
+import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.model.User;
 import onefengma.demo.server.config.Config;
 import spark.Request;
@@ -16,6 +17,10 @@ public class AuthHelper {
 
     public static final String TOKEN = "token";
     public static final String USER_ID = "userId";
+
+    public static boolean isAdminLogin(Request request) {
+        return StringUtils.equals(request.cookie("admin"), request.session().attribute("admin"));
+    }
 
     public static String getServerToken(Request request) {
         if (request == null) {
