@@ -111,7 +111,7 @@ public class SellerDataHelper extends BaseDataHelper {
 
     public List<ShopBrief> getRecommendShopsByIron() {
         String sql = "select " + generateFiledString(ShopBrief.class) + " from seller, shop_orders " +
-                "where userId = sellerId order by ironCount desc limit 0,10";
+                "where userId = sellerId  and passed = true order by ironCount desc limit 0,10";
         try(Connection conn = getConn()) {
             return conn.createQuery(sql).executeAndFetch(ShopBrief.class);
         }
@@ -119,7 +119,7 @@ public class SellerDataHelper extends BaseDataHelper {
 
     public int getShopCount(PageBuilder pageBuilder, int productType) {
         String sql = "select count(*)" + " from seller, shop_orders " +
-                "where userId = sellerId " + genereateProductTypeSql(productType) +  generateWhereKey(pageBuilder, false);
+                "where userId = sellerId  and passed = true " + genereateProductTypeSql(productType) +  generateWhereKey(pageBuilder, false);
         try (Connection connection = getConn()){
             return connection.createQuery(sql).executeScalar(Integer.class);
         }
@@ -128,7 +128,7 @@ public class SellerDataHelper extends BaseDataHelper {
     public List<ShopBrief> getShops(PageBuilder pageBuilder, int productType) {
 
         String sql = "select " + generateFiledString(ShopBrief.class) + " from seller, shop_orders " +
-                "where userId = sellerId " + genereateProductTypeSql(productType) + generateWhereKey(pageBuilder, true);
+                "where userId = sellerId and passed = true" + genereateProductTypeSql(productType) + generateWhereKey(pageBuilder, true);
         try (Connection connection = getConn()){
             return connection.createQuery(sql).executeAndFetch(ShopBrief.class);
         }
