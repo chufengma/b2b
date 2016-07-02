@@ -136,10 +136,10 @@ public class SellerDataHelper extends BaseDataHelper {
 
     public String genereateProductTypeSql(int productType) {
         if (productType == 0) {
-            return "and handingTypeDesc = '' ";
+            return " and ironTypeDesc <> '' ";
         }
         if (productType == 1) {
-            return "and handingTypeDesc = 'ironTypeDesc' ";
+            return " and handingTypeDesc <> '' ";
         }
         return "";
     }
@@ -166,6 +166,28 @@ public class SellerDataHelper extends BaseDataHelper {
                 "where userId = sellerId order by handingCount limit 0, 10";
         try(Connection conn = getConn()) {
             return conn.createQuery(sql).executeAndFetch(ShopBrief.class);
+        }
+    }
+
+    public ShopBrief getShopByProId(String proId, int proType) {
+        String sqlUser = "";
+        if (proType == 0) {
+            sqlUser = "select userId from iron_product where proId=:proId";
+        } else if (proType == 1) {
+            sqlUser = "select userId from handing_product where id=:proId";
+        } else {
+            return null;
+        }
+        String sqlShop = "select " + generateFiledString(ShopBrief.class) + " from seller, shop_orders " +
+                "where userId = sellerId and userId=:userId";
+        try(Connection conn = getConn()) {
+            String userId = conn.createQuery(sqlUser).addParameter("proId", proId).executeScalar(String.class);
+            List<ShopBrief> briefs = conn.createQuery(sqlShop).addParameter("userId", userId).executeAndFetch(ShopBrief.class);
+            if (briefs.isEmpty()) {
+                return null;
+            } else {
+                return briefs.get(0);
+            }
         }
     }
 

@@ -2,16 +2,13 @@ package onefengma.demo.server.services.products;
 
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
-import onefengma.demo.server.model.apibeans.product.SearchRequest;
-import onefengma.demo.server.model.apibeans.product.SearchResponse;
-import onefengma.demo.server.model.apibeans.product.ShopDetailRequest;
-import onefengma.demo.server.model.apibeans.product.ShopRequest;
-import onefengma.demo.server.model.apibeans.product.ShopResponse;
+import onefengma.demo.server.model.apibeans.product.*;
+import onefengma.demo.server.model.product.ShopBrief;
 import onefengma.demo.server.model.product.ShopDetail;
+import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author yfchu
@@ -56,7 +53,7 @@ public class ProductManager extends BaseManager {
             ShopResponse shopResponse = new ShopResponse(requestBean.currentPage, requestBean.pageCount);
 
             PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
-                    .addEqualWhere("cityId", requestBean.cityId)
+                    .addInWhere("cityId", CityDataHelper.instance().getCitiesById(new ArrayList<>(), requestBean.cityId))
                     .setOrderByRequest(requestBean);
 
             shopResponse.shops = SellerDataHelper.instance().getShops(pageBuilder, requestBean.productType);
@@ -70,6 +67,17 @@ public class ProductManager extends BaseManager {
                 return error("没找到相关店铺");
             }
             return success(shopDetail);
+        }));
+
+        get("productShop", ProShopRequest.class, ((request, response, requestBean) -> {
+            ShopBrief shopBrief = SellerDataHelper.instance().getShopByProId(requestBean.proId, requestBean.productType);
+            if (shopBrief == null) {
+                return error("未找到该商铺");
+            }
+            ProShopResponse shopResponse = new ProShopResponse();
+            shopResponse.productType = requestBean.productType;
+            shopResponse.shop = shopBrief;
+            return success(shopResponse);
         }));
     }
 

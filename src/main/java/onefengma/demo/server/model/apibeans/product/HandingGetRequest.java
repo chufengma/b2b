@@ -11,7 +11,7 @@ public class HandingGetRequest extends BasePageBean {
     @NotRequired
     public String handingType;
     @NotRequired
-    public String souCityId;
+    public String cityId;
     @NotRequired
     public String sellerId;
     @NotRequired

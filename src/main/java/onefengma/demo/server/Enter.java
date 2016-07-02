@@ -12,6 +12,7 @@ import onefengma.demo.server.services.order.OrderManager;
 import onefengma.demo.server.services.products.HandingManager;
 import onefengma.demo.server.services.products.IronManager;
 import onefengma.demo.server.services.products.ProductManager;
+import onefengma.demo.server.services.user.AdminManager;
 import onefengma.demo.server.services.user.UserManager;
 import spark.Spark;
 
@@ -27,7 +28,8 @@ public class Enter {
             new FuncManager(),
             new IronManager(),
             new HandingManager(),
-            new OrderManager()
+            new OrderManager(),
+            new AdminManager()
     );
 
     public static void main(String[] args) {

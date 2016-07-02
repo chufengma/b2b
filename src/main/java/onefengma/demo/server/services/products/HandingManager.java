@@ -40,7 +40,7 @@ public class HandingManager extends BaseManager{
             HandingGetResponse handingGetResponse = new HandingGetResponse(requestBean.currentPage, requestBean.pageCount);
             PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
                     .addEqualWhere("type", requestBean.handingType)
-                    .addEqualWhere("souCityId", requestBean.souCityId)
+                    .addEqualWhere("souCityId", requestBean.cityId)
                     .addEqualWhere("userId", requestBean.sellerId)
                     .setOrderByRequest(requestBean);
             handingGetResponse.handingProducts = HandingDataHelper.getHandingDataHelper().getHandingProducts(pageBuilder);
@@ -63,7 +63,7 @@ public class HandingManager extends BaseManager{
             HandingBuysResponse handingGetResponse = new HandingBuysResponse(requestBean.currentPage, requestBean.pageCount);
             PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
                     .addEqualWhere("handingType", requestBean.handingType)
-                    .addInWhere("souCityId", CityDataHelper.instance().getCitiesById(new ArrayList<>(), requestBean.souCityId))
+                    .addInWhere("souCityId", CityDataHelper.instance().getCitiesById(new ArrayList<>(), requestBean.cityId))
                     .addEqualWhere("userId", requestBean.userId)
                     .addOrderBy("pushTime", true);
             handingGetResponse.handings = HandingDataHelper.getHandingDataHelper().getHandingBuys(pageBuilder);
