@@ -75,6 +75,29 @@ public class PageBuilder {
         }
     }
 
+    public static class InWhereNumber extends Where {
+
+        public InWhereNumber(String key, List<Integer> value) {
+            super(key, value);
+        }
+
+        @Override
+        public String generate() {
+            StringBuilder stringBuilder = new StringBuilder(" " + key + " in (");
+            List<Integer> vas = (List<Integer>)value;
+            for (int i = 0 ;i<vas.size();i++) {
+                int va = vas.get(i);
+                stringBuilder.append(va + "");
+                if (i != vas.size() - 1) {
+                    stringBuilder.append(",");
+                }
+
+            }
+            stringBuilder.append(")");
+            return stringBuilder.toString();
+        }
+    }
+
     public PageBuilder(int currentPage, int pageCount) {
         this.currentPage = currentPage;
         this.pageCount = pageCount;
@@ -102,6 +125,14 @@ public class PageBuilder {
             return this;
         }
         this.wereList.add(new InWhere(key, value));
+        return this;
+    }
+
+    public PageBuilder addInWhereNumber(String key, List<Integer> value) {
+        if (value == null || value.isEmpty()) {
+            return this;
+        }
+        this.wereList.add(new InWhereNumber(key, value));
         return this;
     }
 

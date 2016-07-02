@@ -117,20 +117,31 @@ public class SellerDataHelper extends BaseDataHelper {
         }
     }
 
-    public int getShopCount(PageBuilder pageBuilder) {
+    public int getShopCount(PageBuilder pageBuilder, int productType) {
         String sql = "select count(*)" + " from seller, shop_orders " +
-                "where userId = sellerId " + generateWhereKey(pageBuilder, false);
+                "where userId = sellerId " + genereateProductTypeSql(productType) +  generateWhereKey(pageBuilder, false);
         try (Connection connection = getConn()){
             return connection.createQuery(sql).executeScalar(Integer.class);
         }
     }
 
-    public List<ShopBrief> getShops(PageBuilder pageBuilder) {
+    public List<ShopBrief> getShops(PageBuilder pageBuilder, int productType) {
+
         String sql = "select " + generateFiledString(ShopBrief.class) + " from seller, shop_orders " +
-                "where userId = sellerId " + generateWhereKey(pageBuilder, true);
+                "where userId = sellerId " + genereateProductTypeSql(productType) + generateWhereKey(pageBuilder, true);
         try (Connection connection = getConn()){
             return connection.createQuery(sql).executeAndFetch(ShopBrief.class);
         }
+    }
+
+    public String genereateProductTypeSql(int productType) {
+        if (productType == 0) {
+            return "and handingTypeDesc = '' ";
+        }
+        if (productType == 1) {
+            return "and handingTypeDesc = 'ironTypeDesc' ";
+        }
+        return "";
     }
 
     private String generateWhereKey(PageBuilder pageBuilder, boolean withLimit) {
