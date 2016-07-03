@@ -27,4 +27,15 @@ public class IronDetail {
     public boolean reviewed;
     public float monthSellCount;
     public float score;
+
+
+    private String cityName;
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
 }

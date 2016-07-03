@@ -140,6 +140,7 @@ public class IronManager extends BaseManager {
             if (ironProduct == null) {
                 return error("未找到相关不锈钢产品");
             }
+            ironProduct.setCityName(CityDataHelper.instance().getCityDescById(ironProduct.sourceCityId));
             return success(ironProduct);
         }));
 

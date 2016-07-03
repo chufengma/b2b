@@ -1,9 +1,12 @@
 package onefengma.demo.server.services.order;
 
+import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.model.order.OrderBrief;
 import org.sql2o.Connection;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 import onefengma.demo.common.DateHelper;
@@ -11,6 +14,8 @@ import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.model.apibeans.LastRecords;
 import onefengma.demo.server.model.order.Order;
 import onefengma.demo.server.model.order.OrderDynamic;
+import org.sql2o.data.Row;
+import org.sql2o.data.Table;
 
 /**
  * Created by chufengma on 16/6/18.
@@ -59,6 +64,18 @@ public class OrderDataHelper extends BaseDataHelper {
 
         lastGetTime = System.currentTimeMillis();
         return lastRecords;
+    }
+
+    public List<OrderBrief> getMyOrders(PageBuilder pageBuilder, String userId) {
+        String dataSql = "select * from product_orders where buyerId=:userId order by status asc " + pageBuilder.generateLimit();
+        String countSql = "select count(*) from product_orders where buyerId=:userId order by status asc ";
+        try(Connection conn = getConn()) {
+            Table table = conn.createQuery(dataSql).addParameter("userId", userId).executeAndFetchTable();
+            List<OrderBrief> orderBriefs = new ArrayList<>();
+            for(Row row : table.rows()) {
+            }
+        }
+        return null;
     }
 
     public List<OrderDynamic> getOrdersDynamic() {
