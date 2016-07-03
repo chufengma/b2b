@@ -10,6 +10,8 @@ import java.util.TreeSet;
 
 import onefengma.demo.annotation.NotRequired;
 import onefengma.demo.server.core.request.ParamsMissException;
+import spark.Request;
+import spark.Response;
 import spark.Session;
 
 /**
@@ -25,6 +27,10 @@ public class BaseBean {
     public Session session;
     @NotRequired
     public Object extra;
+    @NotRequired
+    public Request request;
+    @NotRequired
+    public Response response;
 
     public boolean checkParams(JSONObject jsonObject) throws ParamsMissException {
         for(String key : getRequiredParams()) {

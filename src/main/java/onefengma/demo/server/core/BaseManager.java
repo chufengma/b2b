@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.oreilly.servlet.MultipartRequest;
 
 import onefengma.demo.server.core.request.*;
+import onefengma.demo.server.model.apibeans.AdminAuthSession;
 import org.sql2o.Connection;
 
 import java.io.File;
@@ -38,6 +39,7 @@ public abstract class BaseManager {
     public static final int STATUS_ERROR = 1;
     public static final int STATUS_SUCCESS = 0;
     public static final int STATUS_NOT_LOGIN = 2;
+    public static final int STATUS_NOT_ADMIN = 3;
 
     public static String parentRoutePath;
 
@@ -102,12 +104,15 @@ public abstract class BaseManager {
                 setupAuth(requestBean, request);
                 addHeaders(response);
                 response.raw().setCharacterEncoding("UTF-8");
-                if (loginSessionCheck(requestBean)) {
-                    return route.handle(request, response, requestBean);
-                } else {
+                if (!adminSessionCheck(requestBean)) {
+                    cleanTmpFiles(requestBean.extra);
+                    return error(STATUS_NOT_ADMIN, "not admin", null);
+                }
+                if (!loginSessionCheck(requestBean)) {
                     cleanTmpFiles(requestBean.extra);
                     return error(STATUS_NOT_LOGIN, "not login", null);
                 }
+                return route.handle(request, response, requestBean);
             } catch (Exception e) {
                 if (requestBean != null) {
                     cleanTmpFiles(requestBean.extra);
@@ -125,11 +130,15 @@ public abstract class BaseManager {
                 T reqBean = getRequest(request, tClass);
                 addHeaders(response);
                 response.raw().setCharacterEncoding("UTF-8");
-                if (loginSessionCheck(reqBean)) {
-                    return route.handle(request, response, reqBean);
-                } else {
+                if (!adminSessionCheck(reqBean)) {
+                    cleanTmpFiles(reqBean.extra);
+                    return error(STATUS_NOT_ADMIN, "not admin", null);
+                }
+                if (!loginSessionCheck(reqBean)) {
+                    cleanTmpFiles(reqBean.extra);
                     return error(STATUS_NOT_LOGIN, "not login", null);
                 }
+                return route.handle(request, response, reqBean);
             } catch (Exception e) {
                 return exception(e);
             }
@@ -306,7 +315,8 @@ public abstract class BaseManager {
         return baseBean;
     }
 
-    private static void setupAuth(Object authSession, Request request) {
+    private static void setupAuth(BaseBean authSession, Request request) {
+        authSession.request = request;
         if (authSession instanceof AuthSession) {
             ((AuthSession) authSession).setAuthData(request);
         }
@@ -321,6 +331,10 @@ public abstract class BaseManager {
     /*------------------------login handler-----------------------------------*/
     private static boolean loginSessionCheck(Object object) {
         return object instanceof AuthSession ? !((AuthSession) object).isNotValid() : true;
+    }
+
+    private static boolean adminSessionCheck(Object object) {
+        return object instanceof AdminAuthSession ? !((AdminAuthSession) object).isNotValid() : true;
     }
 
     private static void gotoPage(String page) {

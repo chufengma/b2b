@@ -22,6 +22,12 @@ public class PageBuilder {
     List<OrderBy> orderByList = new ArrayList();
     List<Where> wereList = new ArrayList<>();
 
+    public PageBuilder setTime(long startTime, long endTime) {
+        this.startTime = startTime;
+        this.endTime = endTime;
+        return this;
+    }
+
     public static class OrderBy {
         String name;
         String order;
@@ -30,6 +36,7 @@ public class PageBuilder {
             this.name = name;
             this.order = ((desc) ? "desc" : "asc");
         }
+
         public String generate() {
             return name + " " + order;
         }
@@ -53,7 +60,7 @@ public class PageBuilder {
         }
     }
 
-    public static class InWhere extends Where{
+    public static class InWhere extends Where {
         public InWhere(String key, List<String> value) {
             super(key, value);
         }
@@ -61,8 +68,8 @@ public class PageBuilder {
         @Override
         public String generate() {
             StringBuilder stringBuilder = new StringBuilder(" " + key + " in (");
-            List<String> vas = (List<String>)value;
-            for (int i = 0 ;i<vas.size();i++) {
+            List<String> vas = (List<String>) value;
+            for (int i = 0; i < vas.size(); i++) {
                 String va = vas.get(i);
                 stringBuilder.append("'" + va + "'");
                 if (i != vas.size() - 1) {
@@ -84,8 +91,8 @@ public class PageBuilder {
         @Override
         public String generate() {
             StringBuilder stringBuilder = new StringBuilder(" " + key + " in (");
-            List<Integer> vas = (List<Integer>)value;
-            for (int i = 0 ;i<vas.size();i++) {
+            List<Integer> vas = (List<Integer>) value;
+            for (int i = 0; i < vas.size(); i++) {
                 int va = vas.get(i);
                 stringBuilder.append(va + "");
                 if (i != vas.size() - 1) {
@@ -101,7 +108,7 @@ public class PageBuilder {
     public PageBuilder(int currentPage, int pageCount) {
         this.currentPage = currentPage;
         this.pageCount = pageCount;
-        if (pageCount <=0 || pageCount >= 300) {
+        if (pageCount <= 0 || pageCount >= 300) {
             this.pageCount = 300;
         }
     }
@@ -110,10 +117,10 @@ public class PageBuilder {
         if (value == null) {
             return this;
         }
-        if (value instanceof String && StringUtils.isEmpty((String)value)) {
+        if (value instanceof String && StringUtils.isEmpty((String) value)) {
             return this;
         }
-        if (value instanceof Integer && (int)value == -1) {
+        if (value instanceof Integer && (int) value == -1) {
             return this;
         }
         this.wereList.add(new Where(key, value));
@@ -196,7 +203,7 @@ public class PageBuilder {
             stringBuffer.append(" and");
         }
         if (startTime != -1 && endTime != -1) {
-            stringBuffer.append(" pushTime <=" + endTime +" and pushTime >=" + startTime);
+            stringBuffer.append(" pushTime <=" + endTime + " and pushTime >=" + startTime);
         } else {
             if (!wereList.isEmpty()) {
                 stringBuffer.delete(stringBuffer.length() - 3, stringBuffer.length());
@@ -216,6 +223,21 @@ public class PageBuilder {
             stringBuffer.append(" limit " + currentPage * pageCount + ", " + pageCount);
         }
         return stringBuffer.toString();
+    }
+
+    public String generateWhere() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < wereList.size(); i++) {
+            Where where = wereList.get(i);
+            if (StringUtils.isEmpty((String) where.value)) {
+                continue;
+            }
+            stringBuilder.append(where.generate());
+            if (i != wereList.size() - 1) {
+                stringBuilder.append(" and");
+            }
+        }
+        return stringBuilder.toString();
     }
 
     public String generateLimit() {

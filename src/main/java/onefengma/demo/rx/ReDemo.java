@@ -3,6 +3,7 @@ package onefengma.demo.rx;
 import com.alibaba.fastjson.JSON;
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 
+import onefengma.demo.common.DateHelper.TimeRange;
 import org.sql2o.Connection;
 import org.sql2o.Query;
 
@@ -11,6 +12,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,7 +37,8 @@ public class ReDemo {
     private String ccc = "fengma2";
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException, UnsupportedEncodingException {
-        System.out.println("-----" + DateHelper.getNextDayTimestamp());
+        TimeRange timeRange = DateHelper.getMonthTimeRange(1466915035889l);
+        System.out.println("-----" + timeRange.startTime + ":" + timeRange.endTime);
     }
 
     protected  static  String createInsertSql(String table, Class clazz) {

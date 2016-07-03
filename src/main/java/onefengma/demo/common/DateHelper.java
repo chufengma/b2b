@@ -53,4 +53,21 @@ public class DateHelper {
         return Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
     }
 
+    public static TimeRange getMonthTimeRange(long time) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(time);
+        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), 1, 0, 0, 0);
+        TimeRange timeRange = new TimeRange();
+        timeRange.startTime = calendar.getTimeInMillis();
+        calendar.set(calendar.get(Calendar.YEAR), (calendar.get(Calendar.MONTH) + 1) % 12, 1, 0, 0, 0);
+        timeRange.endTime = calendar.getTimeInMillis();
+        return timeRange;
+    }
+
+    public static class TimeRange {
+        public long startTime;
+        public long endTime;
+    }
+
+
 }

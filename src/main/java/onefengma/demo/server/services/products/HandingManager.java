@@ -29,7 +29,7 @@ public class HandingManager extends BaseManager{
                 return errorAndClear(requestBean, "加工所在城市选择有误");
             }
             if (!HandingDataCategory.get().units.contains(requestBean.unit)) {
-                return errorAndClear(requestBean, "单位选择有误");
+                return errorAndClear(requestBean, "单位选整卷油磨择有误");
             }
             HandingDataHelper.getHandingDataHelper().insertHandingProduct(requestBean.generateHandingProduct());
             SellerDataHelper.instance().addHandingType(requestBean.getUserId(), requestBean.type);
