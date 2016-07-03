@@ -6,6 +6,7 @@ import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.product.*;
 import onefengma.demo.server.model.metaData.IconDataCategory;
+import onefengma.demo.server.model.product.IronDetail;
 import onefengma.demo.server.model.product.IronProduct;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
@@ -135,7 +136,7 @@ public class IronManager extends BaseManager {
         }));
 
         get("ironDetail", IronDetailRequest.class, ((request, response, requestBean) -> {
-            IronProduct ironProduct = getIronDataHelper().getIronProductById(requestBean.ironId);
+            IronDetail ironProduct = getIronDataHelper().getIronProductById(requestBean.ironId);
             if (ironProduct == null) {
                 return error("未找到相关不锈钢产品");
             }
@@ -150,7 +151,7 @@ public class IronManager extends BaseManager {
             return success(IronDataHelper.getIronDataHelper().getIronProductRecommend());
         }));
 
-        get("bugRecommend", BaseBean.class, ((request, response, requestBean) -> {
+        get("buyRecommend", BaseBean.class, ((request, response, requestBean) -> {
             return success(IronDataHelper.getIronDataHelper().getIronBuyRecommend());
         }));
     }

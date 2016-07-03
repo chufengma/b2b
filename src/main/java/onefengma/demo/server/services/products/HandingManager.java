@@ -5,6 +5,7 @@ import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.product.*;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.metaData.HandingDataCategory;
+import onefengma.demo.server.model.product.HandingDetail;
 import onefengma.demo.server.model.product.HandingProduct;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
@@ -72,7 +73,7 @@ public class HandingManager extends BaseManager{
         }));
 
         get("handingDetail", HandingDetailRequest.class, ((request, response, requestBean) -> {
-            HandingProduct handingProduct = HandingDataHelper.getHandingDataHelper().getHandingProductById(requestBean.handingId);
+            HandingDetail handingProduct = HandingDataHelper.getHandingDataHelper().getHandingProductById(requestBean.handingId);
             if (handingProduct == null) {
                 return error("未找到相关加工信息");
             }
