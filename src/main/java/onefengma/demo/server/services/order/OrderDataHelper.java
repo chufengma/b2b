@@ -1,7 +1,9 @@
 package onefengma.demo.server.services.order;
 
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.model.apibeans.order.MyOrdersResponse;
 import onefengma.demo.server.model.order.OrderBrief;
+import onefengma.demo.server.services.funcs.CityDataHelper;
 import org.sql2o.Connection;
 
 import java.io.UnsupportedEncodingException;
@@ -66,16 +68,98 @@ public class OrderDataHelper extends BaseDataHelper {
         return lastRecords;
     }
 
-    public List<OrderBrief> getMyOrders(PageBuilder pageBuilder, String userId) {
+    public int getOrderStatus(String orderId) {
+        String sql = "select status from product_orders where id=:id";
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql).addParameter("id", orderId).executeScalar(Integer.class);
+        }
+    }
+
+    public String getBuyerId(String orderId) {
+        String sql = "select buyerId from product_orders where id=:id";
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql).addParameter("id", orderId).executeScalar(String.class);
+        }
+    }
+
+    public void deleteOrder(String orderId) {
+        String sql = "delete from product_orders where id=:id";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("id", orderId).executeUpdate();
+        }
+    }
+
+    public void voteOrder(String orderId, float vote) {
+        String sql = "update product_orders set singleScore=:score,status=2 where id=:id";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("score", vote).addParameter("id", orderId).executeUpdate();
+        }
+    }
+
+    public MyOrdersResponse getMyOrders(PageBuilder pageBuilder, String userId) throws NoSuchFieldException, IllegalAccessException {
+        MyOrdersResponse myOrdersResponse = new MyOrdersResponse(pageBuilder.currentPage, pageBuilder.pageCount);
         String dataSql = "select * from product_orders where buyerId=:userId order by status asc " + pageBuilder.generateLimit();
+        String waitForConfirmSql = "select count(*) from product_orders where buyerId=:userId and status = 1";
+        String waitForVoteSql = "select count(*) from product_orders where buyerId=:userId and status = 2";
         String countSql = "select count(*) from product_orders where buyerId=:userId order by status asc ";
         try(Connection conn = getConn()) {
             Table table = conn.createQuery(dataSql).addParameter("userId", userId).executeAndFetchTable();
             List<OrderBrief> orderBriefs = new ArrayList<>();
             for(Row row : table.rows()) {
+                orderBriefs.add(getOrderBrief(conn, row));
+            }
+            myOrdersResponse.orders = orderBriefs;
+            myOrdersResponse.maxCount = conn.createQuery(countSql).addParameter("userId", userId).executeScalar(Integer.class);
+            myOrdersResponse.waitForConfirm = conn.createQuery(waitForConfirmSql).addParameter("userId", userId).executeScalar(Integer.class);
+            myOrdersResponse.waitForVote = conn.createQuery(waitForVoteSql).addParameter("userId", userId).executeScalar(Integer.class);
+        }
+        return myOrdersResponse;
+    }
+
+    private OrderBrief getOrderBrief(Connection conn, Row row) throws NoSuchFieldException, IllegalAccessException {
+        String ironSql = "select * from iron_product where proId=:proId";
+        String handingSql = "select * from handing_product where id=:proId";
+
+        OrderBrief orderBrief = new OrderBrief();
+        orderBrief.id = row.getString("id");
+        orderBrief.status = row.getInteger("status");
+        int productType = row.getInteger("productType");
+        orderBrief.sellMoney = row.getFloat("totalMoney");
+        orderBrief.sellTime = row.getLong("sellTime");
+        orderBrief.timeLimit = row.getLong("timeLimit");
+        orderBrief.productType = productType;
+        String proId = row.getString("productId");
+
+        if (orderBrief.status != 0) {
+            String sellerId = row.getString("sellerId");
+            orderBrief.sellerMobile = getSellerMobile(conn, sellerId);
+        }
+
+        if (productType == 0) {
+            orderBrief.price = row.getFloat("ironPrice");
+            Table ironTable = conn.createQuery(ironSql).addParameter("proId", proId).executeAndFetchTable();
+            if (ironTable.rows().size() >= 1) {
+                Row ironRow = ironTable.rows().get(0);
+                orderBrief.cover = ironRow.getString("cover");
+                orderBrief.desc = ironRow.getString("material") + " " + ironRow.getString("ironType");
+                orderBrief.city = CityDataHelper.instance().getCityDescById(ironRow.getString("sourceCityId"));
+            }
+        } else {
+            Table handingTable = conn.createQuery(handingSql).addParameter("proId", proId).executeAndFetchTable();
+            if (handingTable.rows().size() >= 1) {
+                Row ironRow = handingTable.rows().get(0);
+                orderBrief.price = ironRow.getFloat("price");
+                orderBrief.cover = ironRow.getString("cover");
+                orderBrief.desc = ironRow.getString("type");
+                orderBrief.city = CityDataHelper.instance().getCityDescById(ironRow.getString("souCityId"));
             }
         }
-        return null;
+        return orderBrief;
+    }
+
+    public String getSellerMobile(Connection conn, String sellerId) {
+        String mobileSql = "select mobile from user where userId=:userId";
+        return conn.createQuery(mobileSql).addParameter("userId", sellerId).executeScalar(String.class);
     }
 
     public List<OrderDynamic> getOrdersDynamic() {

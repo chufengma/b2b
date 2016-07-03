@@ -23,7 +23,7 @@ public class UserDataHelper extends BaseDataHelper {
     private static final String IS_SELLER = "isSeller";
 
     public User findUserByMobile(String mobile) throws NoSuchFieldException, IllegalAccessException {
-        String sql = createSql("select * from @USER_TABLE where @MOBILE=:mobile");
+        String sql = createSql("select " + generateFiledString(User.class) + " from @USER_TABLE where @MOBILE=:mobile");
         List<User> users;
         try (Connection con = getConn()) {
             users = con.createQuery(sql)

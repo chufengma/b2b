@@ -5,12 +5,12 @@ package onefengma.demo.server.model;
  * @date 2016/5/23
  */
 public class User {
-    private String userId;
-    private String id;
-    private String name;
-    private String password;
-    private String mobile;
-    private boolean isSeller;
+    public String userId;
+    public String id;
+    public String name;
+    public String password;
+    public String mobile;
+    public boolean isSeller;
 
     public boolean isSeller() {
         return isSeller;

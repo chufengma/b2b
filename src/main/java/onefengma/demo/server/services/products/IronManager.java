@@ -43,6 +43,7 @@ public class IronManager extends BaseManager {
                     .addEqualWhere("surface", requestBean.surface)
                     .addEqualWhere("proPlace", requestBean.proPlace)
                     .addEqualWhere("userId", requestBean.sellerId)
+                    .addInWhere("sourceCityId", CityDataHelper.instance().getCitiesById(new ArrayList<>(), requestBean.cityId))
                     .setOrderByRequest(requestBean);
 
             ironsGetResponse.maxCount = IronDataHelper.getIronDataHelper().getMaxIronCounts(pageBuilder);
