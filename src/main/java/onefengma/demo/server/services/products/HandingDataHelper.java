@@ -5,6 +5,7 @@ import org.sql2o.Connection;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 import onefengma.demo.common.StringUtils;
@@ -12,6 +13,7 @@ import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.services.funcs.CityDataHelper;
+import org.sql2o.data.Row;
 
 /**
  * Created by chufengma on 16/6/5.
@@ -63,10 +65,30 @@ public class HandingDataHelper extends BaseDataHelper {
         }
     }
 
+    public int getCancledCount(PageBuilder pageBuilder, String userId) {
+        // update status
+        updateCancledStatis(userId);
+        pageBuilder.addEqualWhere("status", 2);
+        String sql = "select count(*)"
+                + " from handing_buy " + generateWhereKey(pageBuilder, false);
+        try(Connection connection = getConn()){
+            return connection.createQuery(sql).executeScalar(Integer.class);
+        }
+    }
+
+    public void updateCancledStatis(String userId) {
+        String sql = "update handing_buy " +
+                "set status = 2 where (pushTime+timeLimit) < :currentTime and status = 0 " +
+                "and userId=:userId";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("currentTime", System.currentTimeMillis())
+                    .addParameter("userId", userId).executeUpdate();
+        }
+    }
+
     public List<HandingBuyBrief> getHandingBuys(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(HandingBuyBrief.class)
                 + " from handing_buy " + generateWhereKey(pageBuilder, true);
-
         try (Connection conn = getConn()) {
             List<HandingBuyBrief> briefs =  conn.createQuery(sql).executeAndFetch(HandingBuyBrief.class);
             for(HandingBuyBrief brief : briefs) {
@@ -143,6 +165,82 @@ public class HandingDataHelper extends BaseDataHelper {
                 brief.setSourceCity(CityDataHelper.instance().getCityDescById(brief.souCityId));
             }
             return briefs;
+        }
+    }
+
+    public HandingBuyBrief getHandingBrief(String handingId) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "select " + generateFiledString(HandingBuyBrief.class)
+                + " from handing_buy where id=:handingId";
+        try (Connection conn = getConn()) {
+            List<HandingBuyBrief> briefs =  conn.createQuery(sql)
+                    .addParameter("handingId", handingId)
+                    .executeAndFetch(HandingBuyBrief.class);
+            for(HandingBuyBrief brief : briefs) {
+                brief.setSourceCity(CityDataHelper.instance().getCityDescById(brief.souCityId));
+            }
+            if (briefs.isEmpty()) {
+                return null;
+            }
+            return briefs.get(0);
+        }
+    }
+
+    public List<SupplyBrief> getHandingBuySupplies(String handignId) {
+        String sql = "select * from handing_buy_supply,seller where handingId=:handingId and sellerId=userId";
+        try (Connection conn = getConn()) {
+            List<Row> rows =  conn.createQuery(sql)
+                    .addParameter("handingId", handignId).executeAndFetchTable().rows();
+            List<SupplyBrief> supplyBriefs = new ArrayList<>();
+            for(Row row : rows) {
+                SupplyBrief supplyBrief = new SupplyBrief();
+                supplyBrief.companyName = row.getString("companyName");
+                supplyBrief.score = row.getFloat("score");
+                supplyBrief.sellerId = row.getString("userId");
+                supplyBrief.status = row.getInteger("status");
+                supplyBrief.supplyMsg = row.getString("supplyMsg");
+                supplyBrief.winningTimes = row.getInteger("winningTimes");
+                supplyBrief.supplyPrice = row.getFloat("supplyPrice");
+                supplyBriefs.add(supplyBrief);
+            }
+            return supplyBriefs;
+        }
+    }
+
+    public String getSupplyUserId(String handingId) {
+        String sql = "select supplyUserId from handing_buy where id=:handingId";
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql)
+                    .addParameter("handingId", handingId)
+                    .executeScalar(String.class);
+        }
+    }
+
+    public boolean isUserIdInSupplyList(String handingId, String userId) {
+        String sql = "select sellerId from handing_buy_supply where handingId=:handingId and sellerId=:userId";
+        try(Connection conn = getConn()) {
+            String sellerId =  conn.createQuery(sql)
+                    .addParameter("handingId", handingId)
+                    .addParameter("userId", userId)
+                    .executeScalar(String.class);
+            return !StringUtils.isEmpty(sellerId);
+        }
+    }
+
+    public void selectHandingBuySupply(String handingId, String supplyUserId) {
+        String sql = "update handing_buy set supplyUserId=:userId, status=1 where id=:handingId";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql)
+                    .addParameter("handingId", handingId)
+                    .addParameter("userId", supplyUserId).executeUpdate();
+        }
+    }
+
+    public int getHandingBuyStatus(String handingId) {
+        String sql = "select status from handing_buy where id=:handingId";
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql)
+                    .addParameter("handingId", handingId)
+                    .executeScalar(Integer.class);
         }
     }
 

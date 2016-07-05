@@ -1,5 +1,6 @@
 package onefengma.demo.server.services.order;
 
+import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.order.MyOrdersResponse;
 import onefengma.demo.server.model.order.OrderBrief;
@@ -197,6 +198,14 @@ public class OrderDataHelper extends BaseDataHelper {
         });
     }
 
+
+    public boolean isOrderUserRight(String userId, String orderId) {
+        String sql = "select buyerId from product_orders where id=:orderId";
+        try(Connection conn = getConn()) {
+            String buyerId = conn.createQuery(sql).addParameter("orderId", orderId).executeScalar(String.class);
+            return StringUtils.equals(buyerId, userId);
+        }
+    }
 
     public static class OrderSeller {
         public String sellerId;

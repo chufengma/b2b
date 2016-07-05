@@ -20,6 +20,7 @@ public class IronBuyBrief {
     public String tolerance;
     public long numbers;
     public long timeLimit;
+    public int status;
 
 
     private String sourceCity;

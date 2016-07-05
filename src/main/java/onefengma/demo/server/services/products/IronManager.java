@@ -1,8 +1,10 @@
 package onefengma.demo.server.services.products;
 
+import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.config.Config;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.model.apibeans.BaseAuthPageBean;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.product.*;
 import onefengma.demo.server.model.metaData.IconDataCategory;
@@ -156,6 +158,44 @@ public class IronManager extends BaseManager {
         get("buyRecommend", BaseBean.class, ((request, response, requestBean) -> {
             return success(IronDataHelper.getIronDataHelper().getIronBuyRecommend());
         }));
+
+        get("myBuy", BaseAuthPageBean.class, ((request, response, requestBean) -> {
+            MyIronBuysResponse handingGetResponse = new MyIronBuysResponse(requestBean.currentPage, requestBean.pageCount);
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
+                    .addEqualWhere("userId", requestBean.getUserId())
+                    .addOrderBy("pushTime", true);
+            handingGetResponse.canceledCount = IronDataHelper.getIronDataHelper().getCancledCount(pageBuilder, requestBean.getUserId());
+            handingGetResponse.buys = IronDataHelper.getIronDataHelper().getIronsBuy(pageBuilder);
+            handingGetResponse.maxCount = IronDataHelper.getIronDataHelper().getMaxIronBuyCounts(pageBuilder);
+            handingGetResponse.lossRate = (float) handingGetResponse.canceledCount / (float) handingGetResponse.maxCount;
+            return success(handingGetResponse);
+        }));
+
+        get("myBuyDetail", MyIronBuyDetail.class, ((request, response, requestBean) -> {
+            IronDataHelper.getIronDataHelper().updateCancledStatis(requestBean.getUserId());
+
+            MyIronBuyDetailResponse myIronBuyDetailResponse = new MyIronBuyDetailResponse();
+            myIronBuyDetailResponse.buy = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.ironId);
+            myIronBuyDetailResponse.supplies = IronDataHelper.getIronDataHelper().getIronBuySupplies(requestBean.ironId);
+            return success(myIronBuyDetailResponse);
+        }));
+
+        post("selectSupply", SelectIronSupply.class, ((request, response, requestBean) -> {
+            IronDataHelper.getIronDataHelper().updateCancledStatis(requestBean.getUserId());
+
+            if (IronDataHelper.getIronDataHelper().getIronBuyStatus(requestBean.ironBuyId) != 0) {
+                return error("此次求购已经结束");
+            }
+            if (!IronDataHelper.getIronDataHelper().isUserIdInSupplyList(requestBean.ironBuyId, requestBean.supplyId)) {
+                return error("该商家未参与报价");
+            }
+            if (!StringUtils.isEmpty(IronDataHelper.getIronDataHelper().getSupplyUserId(requestBean.ironBuyId))) {
+                return error("此次求购已经结束");
+            }
+            IronDataHelper.getIronDataHelper().selectIronBuySupply(requestBean.ironBuyId, requestBean.supplyId);
+            return success();
+        }));
+
     }
 
     @Override

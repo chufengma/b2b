@@ -1,7 +1,9 @@
 package onefengma.demo.server.services.products;
 
+import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.model.apibeans.BaseAuthPageBean;
 import onefengma.demo.server.model.apibeans.product.*;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.metaData.HandingDataCategory;
@@ -72,6 +74,27 @@ public class HandingManager extends BaseManager{
             return success(handingGetResponse);
         }));
 
+        get("myBuy", BaseAuthPageBean.class, ((request, response, requestBean) -> {
+            MyHandingBuysResponse handingGetResponse = new MyHandingBuysResponse(requestBean.currentPage, requestBean.pageCount);
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
+                    .addEqualWhere("userId", requestBean.getUserId())
+                    .addOrderBy("pushTime", true);
+            handingGetResponse.canceledCount = HandingDataHelper.getHandingDataHelper().getCancledCount(pageBuilder, requestBean.getUserId());
+            handingGetResponse.handings = HandingDataHelper.getHandingDataHelper().getHandingBuys(pageBuilder);
+            handingGetResponse.maxCount = HandingDataHelper.getHandingDataHelper().getMaxBuyCount(pageBuilder);
+            handingGetResponse.lossRate = (float) handingGetResponse.canceledCount / (float) handingGetResponse.maxCount;
+            return success(handingGetResponse);
+        }));
+
+        get("myBuyDetail", MyHandingBuyDetail.class, ((request, response, requestBean) -> {
+            HandingDataHelper.getHandingDataHelper().updateCancledStatis(requestBean.getUserId());
+
+            MyHandingDetailResponse myHandingDetailResponse = new MyHandingDetailResponse();
+            myHandingDetailResponse.buy = HandingDataHelper.getHandingDataHelper().getHandingBrief(requestBean.handingId);
+            myHandingDetailResponse.supplies = HandingDataHelper.getHandingDataHelper().getHandingBuySupplies(requestBean.handingId);
+            return success(myHandingDetailResponse);
+        }));
+
         get("handingDetail", HandingDetailRequest.class, ((request, response, requestBean) -> {
             HandingDetail handingProduct = HandingDataHelper.getHandingDataHelper().getHandingProductById(requestBean.handingId);
             handingProduct.setCityName(CityDataHelper.instance().getCityDescById(handingProduct.souCityId));
@@ -79,6 +102,22 @@ public class HandingManager extends BaseManager{
                 return error("未找到相关加工信息");
             }
             return success(handingProduct);
+        }));
+
+        post("selectSupply", SelectHandingSupply.class, ((request, response, requestBean) -> {
+            HandingDataHelper.getHandingDataHelper().updateCancledStatis(requestBean.getUserId());
+
+            if (HandingDataHelper.getHandingDataHelper().getHandingBuyStatus(requestBean.handingBuyId) != 0) {
+                return error("此次求购已经结束");
+            }
+            if (!HandingDataHelper.getHandingDataHelper().isUserIdInSupplyList(requestBean.handingBuyId, requestBean.supplyId)) {
+                return error("该商家未参与报价");
+            }
+            if (!StringUtils.isEmpty(HandingDataHelper.getHandingDataHelper().getSupplyUserId(requestBean.handingBuyId))) {
+                return error("此次求购已经结束");
+            }
+            HandingDataHelper.getHandingDataHelper().selectHandingBuySupply(requestBean.handingBuyId, requestBean.supplyId);
+            return success();
         }));
 
         get("shopRecommend", BaseBean.class, ((request, response, requestBean) -> {

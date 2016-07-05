@@ -43,6 +43,9 @@ public class OrderManager extends BaseManager{
         }));
 
         post("vote", VoteOrderRequest.class, ((request, response, requestBean) -> {
+            if (!OrderDataHelper.instance().isOrderUserRight(requestBean.getUserId(), requestBean.orderId)) {
+                return error("无权限操作");
+            }
             int status = OrderDataHelper.instance().getOrderStatus(requestBean.orderId);
             if (status == 0) {
                 return error("未确认, 无法评价");
@@ -57,6 +60,9 @@ public class OrderManager extends BaseManager{
         }));
 
         post("delete", OrderDeleteRequest.class, ((request, response, requestBean) -> {
+            if (!OrderDataHelper.instance().isOrderUserRight(requestBean.getUserId(), requestBean.orderId)) {
+                return error("无权限操作");
+            }
             int status = OrderDataHelper.instance().getOrderStatus(requestBean.orderId);
             if (status == 0) {
                 return error("未确认, 无法删除");

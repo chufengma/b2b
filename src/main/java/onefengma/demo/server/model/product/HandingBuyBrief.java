@@ -11,6 +11,7 @@ public class HandingBuyBrief {
     public String userId;
     public long pushTime;
     public long timeLimit;
+    public int status;   // 0 正常状态, 1 交易完成,  2 过期
 
     private String sourceCity;
 

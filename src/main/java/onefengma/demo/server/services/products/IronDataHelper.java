@@ -15,6 +15,7 @@ import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.services.funcs.CityDataHelper;
+import org.sql2o.data.Row;
 
 /**
  * @author yfchu
@@ -175,5 +176,105 @@ public class IronDataHelper extends BaseDataHelper {
             return ironRecommends;
         }
     }
+
+    public int getCancledCount(PageBuilder pageBuilder, String userId) {
+        // update status
+        updateCancledStatis(userId);
+        pageBuilder.addEqualWhere("status", 2);
+        String sql = "select count(*)"
+                + " from iron_buy where userId=:userId and status=2 ";
+        try(Connection connection = getConn()){
+            return connection.createQuery(sql).addParameter("userId", userId).executeScalar(Integer.class);
+        }
+    }
+
+    public void updateCancledStatis(String userId) {
+        String sql = "update iron_buy " +
+                "set status = 2 where (pushTime+timeLimit) < :currentTime and status = 0 " +
+                "and userId=:userId";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("currentTime", System.currentTimeMillis())
+                    .addParameter("userId", userId).executeUpdate();
+        }
+    }
+
+    public IronBuyBrief getIronBuyBrief(String ironId) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "select " + generateFiledString(IronBuyBrief.class) +
+                " from iron_buy where id=:ironId";
+
+        try (Connection conn = getConn()){
+            List<IronBuyBrief> ironBuyBriefs =  conn.createQuery(sql)
+                    .addParameter("ironId", ironId)
+                    .executeAndFetch(IronBuyBrief.class);
+            for(IronBuyBrief ironBuyBrief : ironBuyBriefs) {
+                ironBuyBrief.setSourceCity(CityDataHelper.instance().getCityDescById(ironBuyBrief.locationCityId));
+            }
+            if (ironBuyBriefs.isEmpty()) {
+                return null;
+            }
+            return ironBuyBriefs.get(0);
+        }
+    }
+
+    public List<SupplyBrief> getIronBuySupplies(String ironId) {
+        String sql = "select * from iron_buy_supply,seller where ironId=:ironId and sellerId=userId";
+        try (Connection conn = getConn()) {
+            List<Row> rows =  conn.createQuery(sql)
+                    .addParameter("ironId", ironId).executeAndFetchTable().rows();
+            List<SupplyBrief> supplyBriefs = new ArrayList<>();
+            for(Row row : rows) {
+                SupplyBrief supplyBrief = new SupplyBrief();
+                supplyBrief.companyName = row.getString("companyName");
+                supplyBrief.score = row.getFloat("score");
+                supplyBrief.sellerId = row.getString("userId");
+                supplyBrief.status = row.getInteger("status");
+                supplyBrief.supplyMsg = row.getString("supplyMsg");
+                supplyBrief.winningTimes = row.getInteger("winningTimes");
+                supplyBrief.supplyPrice = row.getFloat("supplyPrice");
+                supplyBriefs.add(supplyBrief);
+            }
+            return supplyBriefs;
+        }
+    }
+
+
+    public String getSupplyUserId(String ironId) {
+        String sql = "select supplyUserId from iron_buy where id=:ironId";
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql)
+                    .addParameter("ironId", ironId)
+                    .executeScalar(String.class);
+        }
+    }
+
+    public boolean isUserIdInSupplyList(String ironId, String userId) {
+        String sql = "select sellerId from iron_buy_supply where ironId=:ironId and sellerId=:userId";
+        try(Connection conn = getConn()) {
+            String sellerId =  conn.createQuery(sql)
+                    .addParameter("ironId", ironId)
+                    .addParameter("userId", userId)
+                    .executeScalar(String.class);
+            return !StringUtils.isEmpty(sellerId);
+        }
+    }
+
+    public void selectIronBuySupply(String ironId, String supplyUserId) {
+        String sql = "update iron_buy set supplyUserId=:userId, status=1 where id=:ironId";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql)
+                    .addParameter("ironId", ironId)
+                    .addParameter("userId", supplyUserId).executeUpdate();
+        }
+    }
+
+    public int getIronBuyStatus(String ironId) {
+        String sql = "select status from iron_buy where id=:ironId";
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql)
+                    .addParameter("ironId", ironId)
+                    .executeScalar(Integer.class);
+        }
+    }
+
 
 }
