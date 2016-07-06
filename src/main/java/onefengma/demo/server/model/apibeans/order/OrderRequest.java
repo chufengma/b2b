@@ -1,5 +1,6 @@
 package onefengma.demo.server.model.apibeans.order;
 
+import onefengma.demo.annotation.NotRequired;
 import onefengma.demo.server.model.apibeans.AuthSession;
 import onefengma.demo.server.model.order.Order;
 
@@ -11,6 +12,9 @@ public class OrderRequest extends AuthSession {
     public String productId;
     public float count;
     public long timeLimit;
+
+    @NotRequired
+    public boolean isFromCar = false;
 
     public Order generateOrder() {
         Order order = new Order();

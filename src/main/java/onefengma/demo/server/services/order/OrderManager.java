@@ -1,16 +1,17 @@
 package onefengma.demo.server.services.order;
 
+import com.alibaba.fastjson.JSON;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.AuthSession;
+import onefengma.demo.server.model.apibeans.BaseAuthPageBean;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.LastRecords;
-import onefengma.demo.server.model.apibeans.order.MyOrderRequest;
-import onefengma.demo.server.model.apibeans.order.OrderDeleteRequest;
-import onefengma.demo.server.model.apibeans.order.OrderRequest;
-import onefengma.demo.server.model.apibeans.order.VoteOrderRequest;
+import onefengma.demo.server.model.apibeans.order.*;
 import onefengma.demo.server.model.order.Order;
+
+import java.util.List;
 
 /**
  * Created by chufengma on 16/6/18.
@@ -34,7 +35,23 @@ public class OrderManager extends BaseManager{
         }));
 
         post("translate", OrderRequest.class, ((request, response, requestBean) -> {
-            OrderDataHelper.instance().translate(requestBean.generateOrder());
+            OrderDataHelper.instance().translate(requestBean.generateOrder(), requestBean.isFromCar);
+            return success();
+        }));
+
+        post("translateALl", OrderAllRequest.class, ((request, response, requestBean) -> {
+            List<Order> orders = requestBean.generateOrders();
+            for(Order order : orders) {
+                OrderDataHelper.instance().translate(order, true);
+            }
+            return success();
+        }));
+
+        post("deleteCar", CarDeleteRequest.class, ((request, response, requestBean) -> {
+            if (!OrderDataHelper.instance().isCarIsUser(requestBean.carId, requestBean.getUserId())) {
+                 return error("非法操作");
+            }
+            OrderDataHelper.instance().deleteCar(requestBean.carId, requestBean.getUserId());
             return success();
         }));
 
@@ -73,6 +90,18 @@ public class OrderManager extends BaseManager{
             OrderDataHelper.instance().deleteOrder(requestBean.orderId);
             return success();
         }));
+
+        post("addToCar", OrderCarAddRequest.class, ((request, response, requestBean) -> {
+            OrderDataHelper.instance().addToCar(requestBean.getUserId(), requestBean.proId, requestBean.productType);
+            return success();
+        }));
+
+        get("myCars", BaseAuthPageBean.class, ((request, response, requestBean) -> {
+            return success(OrderDataHelper.instance()
+                    .getMyCars(new PageBuilder(requestBean.currentPage, requestBean.pageCount).addEqualWhere("userId", requestBean.getUserId())));
+        }));
+
+
     }
 
     @Override

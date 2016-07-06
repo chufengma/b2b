@@ -3,12 +3,14 @@ package onefengma.demo.server.services.order;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.order.MyOrdersResponse;
+import onefengma.demo.server.model.apibeans.product.MyCarsResponse;
+import onefengma.demo.server.model.apibeans.product.CarProductBrief;
 import onefengma.demo.server.model.order.OrderBrief;
+import onefengma.demo.server.model.product.HandingProductBrief;
+import onefengma.demo.server.model.product.IronProductBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import org.sql2o.Connection;
 
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -173,14 +175,33 @@ public class OrderDataHelper extends BaseDataHelper {
         }
     }
 
-    public void translate(Order order) throws Exception {
+    public void translate(Order order, boolean isFromCar) throws Exception {
         String idSql = "select count(id) from product_orders where sellTime >= :lastTime and sellTime < :nextTime";
         String tableName = ((order.productType == 0) ? "iron_product" : "handing_product");
         String proId = ((order.productType == 0) ? tableName + ".proId" : tableName + ".id");
         String sellerIdSql = "select (seller.userId) as sellerId ,salesmanId from " + tableName + ",seller where seller.userId=" + tableName +".userId and " + proId + "=:proId";
+
+        String deleteCarSql = "delete from order_car where userId=:userId and proId=:proId and productType=:productType";
+        String selectCarSql = "select count(*) from order_car where userId=:userId and proId=:proId and productType=:productType";
+
         transaction(new Func() {
             @Override
             public void doIt(Connection conn) throws Exception {
+                if (isFromCar) {
+                    Integer count = conn.createQuery(selectCarSql).addParameter("userId", order.buyerId)
+                            .addParameter("proId", order.productId)
+                            .addParameter("productType", order.productType).executeScalar(Integer.class);
+
+                    if (count == null || count == 0) {
+                        return;
+                    }
+
+                    conn.createQuery(deleteCarSql).addParameter("userId", order.buyerId)
+                            .addParameter("proId", order.productId)
+                            .addParameter("productType", order.productType).executeUpdate();
+                }
+
+
                 List<OrderSeller> orderSellers = conn.createQuery(sellerIdSql)
                         .addParameter("proId", order.productId)
                         .executeAndFetch(OrderSeller.class);
@@ -204,6 +225,76 @@ public class OrderDataHelper extends BaseDataHelper {
         try(Connection conn = getConn()) {
             String buyerId = conn.createQuery(sql).addParameter("orderId", orderId).executeScalar(String.class);
             return StringUtils.equals(buyerId, userId);
+        }
+    }
+
+
+    public void addToCar(String userId, String proId, int productType) {
+        String sql = "insert into order_car set userId=:userId,proId=:proId,productType=:productType";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("userId", userId)
+                    .addParameter("proId", proId)
+                    .addParameter("productType", productType)
+                    .executeUpdate();
+        }
+    }
+
+    public MyCarsResponse getMyCars(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "select * from order_car where " + pageBuilder.generateSql(true);
+        String countSql = "select count(*) from order_car where " + pageBuilder.generateSql(false);
+        String ironSql = "select " + generateFiledString(IronProductBrief.class) + " from iron_product where proId=:id";
+        String handingSql = "select " + generateFiledString(HandingProductBrief.class) + " from handing_product where id=:id";
+
+        MyCarsResponse myCarsResponse = new MyCarsResponse(pageBuilder.currentPage, pageBuilder.pageCount);
+        try(Connection conn = getConn()) {
+            List<Row> rows = conn.createQuery(sql).executeAndFetchTable().rows();
+            List<CarProductBrief> productBriefs = new ArrayList<>();
+            for(Row row : rows) {
+                CarProductBrief brief = new CarProductBrief();
+                brief.proId = row.getString("proId");
+                brief.productType = row.getInteger("productType");
+                brief.carId = row.getInteger("id");
+                if (brief.productType == 0) {
+                    IronProductBrief ironProductBrief = conn.createQuery(ironSql).addParameter("id", brief.proId).executeAndFetchFirst(IronProductBrief.class);
+                    if (ironProductBrief != null) {
+                        brief.cover = ironProductBrief.cover;
+                        brief.price = ironProductBrief.price;
+                        brief.sourceCity = CityDataHelper.instance().getCityDescById(ironProductBrief.sourceCityId);
+                        brief.desc = ironProductBrief.material + " " + ironProductBrief.ironType;
+                    }
+                } else if (brief.productType == 1) {
+                    HandingProductBrief handingProductBrief = conn.createQuery(handingSql).addParameter("id", brief.proId).executeAndFetchFirst(HandingProductBrief.class);
+                    if (handingProductBrief != null) {
+                        brief.cover = handingProductBrief.cover;
+                        brief.price = handingProductBrief.price;
+                        brief.sourceCity = CityDataHelper.instance().getCityDescById(handingProductBrief.souCityId);
+                        brief.desc = handingProductBrief.type;
+                    }
+                }
+                productBriefs.add(brief);
+            }
+
+            myCarsResponse.cars = productBriefs;
+            Integer count = conn.createQuery(countSql).executeScalar(Integer.class);
+            count = count == null ? 0 : count;
+            myCarsResponse.maxCount = count;
+
+            return myCarsResponse;
+        }
+    }
+
+    public void deleteCar(int carId, String userId) {
+        String sql = "delete from order_car where id=:id";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("id", carId).executeUpdate();
+        }
+    }
+
+    public boolean isCarIsUser(int carId, String userId) {
+        String sql = "select userId from order_car where id=:id";
+        try(Connection conn = getConn()) {
+            String userIdQuery = conn.createQuery(sql).addParameter("id", carId).executeScalar(String.class);
+            return StringUtils.equals(userIdQuery, userId);
         }
     }
 

@@ -1,6 +1,7 @@
 package onefengma.demo.server.core;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.oreilly.servlet.MultipartRequest;
 
@@ -295,7 +296,16 @@ public abstract class BaseManager {
                 if (realParams.length != 2) {
                     continue;
                 }
-                beanJson.put(realParams[0], StringUtils.urlDecodeStr(realParams[1]));
+                String value = StringUtils.urlDecodeStr(realParams[1]);
+                Object keyValue = value;
+                try {
+                    keyValue = JSON.parseObject(value);
+                } catch (Exception e) {
+                    try {
+                        keyValue = JSON.parseArray(value);
+                    } catch (Exception e2) {}
+                }
+                beanJson.put(realParams[0], keyValue);
             }
         }
 
