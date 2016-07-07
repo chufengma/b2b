@@ -2,6 +2,7 @@ package onefengma.demo.server.services.order;
 
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.model.apibeans.order.MyCommingOrdersResponse;
 import onefengma.demo.server.model.apibeans.order.MyOrdersResponse;
 import onefengma.demo.server.model.apibeans.product.MyCarsResponse;
 import onefengma.demo.server.model.apibeans.product.CarProductBrief;
@@ -85,13 +86,6 @@ public class OrderDataHelper extends BaseDataHelper {
         }
     }
 
-    public void deleteOrder(String orderId) {
-        String sql = "delete from product_orders where id=:id";
-        try(Connection conn = getConn()) {
-            conn.createQuery(sql).addParameter("id", orderId).executeUpdate();
-        }
-    }
-
     public void voteOrder(String orderId, float vote) {
         String sql = "update product_orders set singleScore=:score,status=2 where id=:id";
         try(Connection conn = getConn()) {
@@ -101,15 +95,15 @@ public class OrderDataHelper extends BaseDataHelper {
 
     public MyOrdersResponse getMyOrders(PageBuilder pageBuilder, String userId) throws NoSuchFieldException, IllegalAccessException {
         MyOrdersResponse myOrdersResponse = new MyOrdersResponse(pageBuilder.currentPage, pageBuilder.pageCount);
-        String dataSql = "select * from product_orders where buyerId=:userId order by status asc " + pageBuilder.generateLimit();
-        String waitForConfirmSql = "select count(*) from product_orders where buyerId=:userId and status = 1";
-        String waitForVoteSql = "select count(*) from product_orders where buyerId=:userId and status = 2";
-        String countSql = "select count(*) from product_orders where buyerId=:userId order by status asc ";
+        String dataSql = "select * from product_orders where buyerId=:userId and status <> 4 order by status asc " + pageBuilder.generateLimit();
+        String waitForConfirmSql = "select count(*) from product_orders where buyerId=:userId and status = 0";
+        String waitForVoteSql = "select count(*) from product_orders where buyerId=:userId and status = 1";
+        String countSql = "select count(*) from product_orders where buyerId=:userId and and status <> 4 order by status asc ";
         try(Connection conn = getConn()) {
             Table table = conn.createQuery(dataSql).addParameter("userId", userId).executeAndFetchTable();
             List<OrderBrief> orderBriefs = new ArrayList<>();
             for(Row row : table.rows()) {
-                orderBriefs.add(getOrderBrief(conn, row));
+                orderBriefs.add(getOrderBrief(conn, row, false));
             }
             myOrdersResponse.orders = orderBriefs;
             myOrdersResponse.maxCount = conn.createQuery(countSql).addParameter("userId", userId).executeScalar(Integer.class);
@@ -119,7 +113,7 @@ public class OrderDataHelper extends BaseDataHelper {
         return myOrdersResponse;
     }
 
-    private OrderBrief getOrderBrief(Connection conn, Row row) throws NoSuchFieldException, IllegalAccessException {
+    private OrderBrief getOrderBrief(Connection conn, Row row, boolean isSeller) throws NoSuchFieldException, IllegalAccessException {
         String ironSql = "select * from iron_product where proId=:proId";
         String handingSql = "select * from handing_product where id=:proId";
 
@@ -133,9 +127,16 @@ public class OrderDataHelper extends BaseDataHelper {
         orderBrief.productType = productType;
         String proId = row.getString("productId");
 
-        if (orderBrief.status != 0) {
-            String sellerId = row.getString("sellerId");
-            orderBrief.sellerMobile = getSellerMobile(conn, sellerId);
+        if (isSeller) {
+            if (orderBrief.status != 0) {
+                String sellerId = row.getString("buyerId");
+                orderBrief.buyerMobile = getSellerMobile(conn, sellerId);
+            }
+        } else {
+            if (orderBrief.status != 0) {
+                String sellerId = row.getString("sellerId");
+                orderBrief.sellerMobile = getSellerMobile(conn, sellerId);
+            }
         }
 
         if (productType == 0) {
@@ -295,6 +296,63 @@ public class OrderDataHelper extends BaseDataHelper {
         try(Connection conn = getConn()) {
             String userIdQuery = conn.createQuery(sql).addParameter("id", carId).executeScalar(String.class);
             return StringUtils.equals(userIdQuery, userId);
+        }
+    }
+
+    public int getCarCount(String userId) {
+        String sql = "select count(*) from order_car where userId=:userId";
+        try(Connection conn = getConn()) {
+            Integer integer = conn.createQuery(sql).addParameter("userId", userId).executeScalar(Integer.class);
+            return integer == null ? 0 : integer;
+        }
+    }
+
+    public MyCommingOrdersResponse getCommingOrders(PageBuilder pageBuilder, String userId) throws NoSuchFieldException, IllegalAccessException {
+        MyCommingOrdersResponse myOrdersResponse = new MyCommingOrdersResponse(pageBuilder.currentPage, pageBuilder.pageCount);
+        String dataSql = "select * from product_orders where sellerId=:userId and status <> 4 order by status asc " + pageBuilder.generateLimit();
+        String waitForConfirmSql = "select count(*) from product_orders where sellerId=:userId and status = 0";
+        String countSql = "select count(*) from product_orders where sellerId=:userId and status <> 4 order by status asc ";
+        try(Connection conn = getConn()) {
+            Table table = conn.createQuery(dataSql).addParameter("userId", userId).executeAndFetchTable();
+            List<OrderBrief> orderBriefs = new ArrayList<>();
+            for(Row row : table.rows()) {
+                orderBriefs.add(getOrderBrief(conn, row, true));
+            }
+            myOrdersResponse.orders = orderBriefs;
+            myOrdersResponse.maxCount = conn.createQuery(countSql).addParameter("userId", userId).executeScalar(Integer.class);
+            myOrdersResponse.waitForConfirm = conn.createQuery(waitForConfirmSql).addParameter("userId", userId).executeScalar(Integer.class);
+        }
+        return myOrdersResponse;
+    }
+
+    public boolean isOrderSellerRight(String orderId, String sellerId) {
+        String sql = "select sellerId from product_orders where id=:orderId";
+        try(Connection conn = getConn()) {
+            String querySeller = conn.createQuery(sql).addParameter("orderId", orderId).executeScalar(String.class);
+            return StringUtils.equals(querySeller, sellerId);
+        }
+    }
+
+    public void confirmOrder(String orderId) {
+        String sql = "update product_orders set status = 1 where id=:orderId and status=0";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("orderId", orderId).executeUpdate();
+        }
+    }
+
+    public void concelOrder(String orderId) {
+        String sql = "update product_orders set status=3,cancelBy=2 where id=:orderId and status=0";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("orderId", orderId).executeUpdate();
+        }
+    }
+
+    public void deleteOrder(String orderId, boolean isFromSeller) {
+        String sellerSql = "update product_orders set status=4,deleteBy=2 where id=:orderId and (status=1 or status=2)";
+        String buyerSql = "update product_orders set status=4,deleteBy=1 where id=:orderId and (status=1 or status=2)";
+        String sql = isFromSeller ? sellerSql : buyerSql;
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("orderId", orderId).executeUpdate();
         }
     }
 

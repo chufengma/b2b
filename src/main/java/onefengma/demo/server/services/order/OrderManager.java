@@ -56,7 +56,8 @@ public class OrderManager extends BaseManager{
         }));
 
         get("myOrders", MyOrderRequest.class, ((request, response, requestBean) -> {
-            return success(OrderDataHelper.instance().getMyOrders(new PageBuilder(requestBean.currentPage, requestBean.pageCount), requestBean.getUserId()));
+            return success(OrderDataHelper.instance()
+                    .getMyOrders(new PageBuilder(requestBean.currentPage, requestBean.pageCount), requestBean.getUserId()));
         }));
 
         post("vote", VoteOrderRequest.class, ((request, response, requestBean) -> {
@@ -81,13 +82,13 @@ public class OrderManager extends BaseManager{
                 return error("无权限操作");
             }
             int status = OrderDataHelper.instance().getOrderStatus(requestBean.orderId);
-            if (status == 0) {
-                return error("未确认, 无法删除");
+            if (status != 1 && status != 2) {
+                return error("该订单无法删除");
             }
             if (!StringUtils.equals(requestBean.getUserId(), OrderDataHelper.instance().getBuyerId(requestBean.orderId))) {
                 return error("用户错误, 无法删除");
             }
-            OrderDataHelper.instance().deleteOrder(requestBean.orderId);
+            OrderDataHelper.instance().deleteOrder(requestBean.orderId, false);
             return success();
         }));
 
@@ -101,7 +102,9 @@ public class OrderManager extends BaseManager{
                     .getMyCars(new PageBuilder(requestBean.currentPage, requestBean.pageCount).addEqualWhere("userId", requestBean.getUserId())));
         }));
 
-
+        get("myCarsCount", AuthSession.class, ((request, response, requestBean) -> {
+            return success(OrderDataHelper.instance().getCarCount(requestBean.getUserId()));
+        }));
     }
 
     @Override

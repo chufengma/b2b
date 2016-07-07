@@ -13,7 +13,10 @@ public class OrderBrief {
     public String city;
     public float price;
     public float sellMoney;
-    public int status; // 0 待确认, 1 已确认 未评价 2 已评价
+    public int status; // 0 待确认, 1 已确认 未评价 2 已评价  3 已取消  4 已删除
+    public int deleteBy; // 0 没有被删除 1 被买家删除 2 被卖家删除
+    public int cancelBy; // 0 没有被取消 1 被买家取消 2 被卖家取消
 
     public String sellerMobile;
+    public String buyerMobile;
 }
