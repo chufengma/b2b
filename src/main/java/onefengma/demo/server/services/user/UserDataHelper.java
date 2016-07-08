@@ -1,5 +1,6 @@
 package onefengma.demo.server.services.user;
 
+import onefengma.demo.server.model.SalesMan;
 import org.sql2o.Connection;
 
 import java.util.ArrayList;
@@ -21,6 +22,15 @@ public class UserDataHelper extends BaseDataHelper {
     private static final String PASSWORD = "password";
     private static final String MOBILE = "mobile";
     private static final String IS_SELLER = "isSeller";
+
+    private static UserDataHelper userDataHelper;
+
+    public static UserDataHelper instance() {
+        if (userDataHelper == null) {
+            userDataHelper = new UserDataHelper();
+        }
+        return userDataHelper;
+    }
 
     public User findUserByMobile(String mobile) throws NoSuchFieldException, IllegalAccessException {
         String sql = createSql("select " + generateFiledString(User.class) + " from @USER_TABLE where @MOBILE=:mobile");
@@ -85,5 +95,19 @@ public class UserDataHelper extends BaseDataHelper {
             userList.addAll(users);
         }
         return userList;
+    }
+
+    public SalesMan getSalesMan(String userId) {
+        String sql = "select salesman.id, salesman.name, salesman.tel from salesman,user " +
+                "where user.salesManId=salesman.id and userId=:userId";
+        try(Connection conn = getConn()) {
+            SalesMan salesMan = conn.createQuery(sql).addParameter("userId", userId).executeScalar(SalesMan.class);
+            return salesMan;
+        }
+    }
+
+    public String getSalesManTel(String userId) {
+        SalesMan salesMan = getSalesMan(userId);
+        return salesMan == null ? "" : salesMan.tel;
     }
 }

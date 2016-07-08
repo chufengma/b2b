@@ -12,6 +12,7 @@ import onefengma.demo.server.model.product.IronDetail;
 import onefengma.demo.server.model.product.IronProduct;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
+import onefengma.demo.server.services.user.UserDataHelper;
 
 import java.util.ArrayList;
 
@@ -177,6 +178,7 @@ public class IronManager extends BaseManager {
             MyIronBuyDetailResponse myIronBuyDetailResponse = new MyIronBuyDetailResponse();
             myIronBuyDetailResponse.buy = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.ironId);
             myIronBuyDetailResponse.supplies = IronDataHelper.getIronDataHelper().getIronBuySupplies(requestBean.ironId);
+            myIronBuyDetailResponse.salesManPhone = UserDataHelper.instance().getSalesManTel(requestBean.getUserId());
             return success(myIronBuyDetailResponse);
         }));
 

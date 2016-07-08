@@ -98,7 +98,7 @@ public class OrderDataHelper extends BaseDataHelper {
         String dataSql = "select * from product_orders where buyerId=:userId and status <> 4 order by status asc " + pageBuilder.generateLimit();
         String waitForConfirmSql = "select count(*) from product_orders where buyerId=:userId and status = 0";
         String waitForVoteSql = "select count(*) from product_orders where buyerId=:userId and status = 1";
-        String countSql = "select count(*) from product_orders where buyerId=:userId and and status <> 4 order by status asc ";
+        String countSql = "select count(*) from product_orders where buyerId=:userId and status <> 4 order by status asc ";
         try(Connection conn = getConn()) {
             Table table = conn.createQuery(dataSql).addParameter("userId", userId).executeAndFetchTable();
             List<OrderBrief> orderBriefs = new ArrayList<>();

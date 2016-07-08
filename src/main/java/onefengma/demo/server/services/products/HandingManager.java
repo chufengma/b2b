@@ -11,6 +11,7 @@ import onefengma.demo.server.model.product.HandingDetail;
 import onefengma.demo.server.model.product.HandingProduct;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
+import onefengma.demo.server.services.user.UserDataHelper;
 
 import java.util.ArrayList;
 
@@ -92,6 +93,7 @@ public class HandingManager extends BaseManager{
             MyHandingDetailResponse myHandingDetailResponse = new MyHandingDetailResponse();
             myHandingDetailResponse.buy = HandingDataHelper.getHandingDataHelper().getHandingBrief(requestBean.handingId);
             myHandingDetailResponse.supplies = HandingDataHelper.getHandingDataHelper().getHandingBuySupplies(requestBean.handingId);
+            myHandingDetailResponse.salesManPhone = UserDataHelper.instance().getSalesManTel(requestBean.getUserId());
             return success(myHandingDetailResponse);
         }));
 
