@@ -59,7 +59,7 @@ public class AdminDataManager extends BaseDataHelper {
 
     public AdminUsersResponse getBuyer(PageBuilder pageBuilder) {
         String whereSql = pageBuilder.generateWhere();
-        String maxCountSql = "select count(*) from user,salesman where salesman.id=buySellerId and isSeller=false " + ((StringUtils.isEmpty(whereSql)) ? "" : " and " + whereSql);
+        String maxCountSql = "select count(*) from user,salesman where salesman.id=buySellerId " + ((StringUtils.isEmpty(whereSql)) ? "" : " and " + whereSql);
         String userSalesMoneySql = "select userId, mobile,registerTime, sum(ironMoney + handingMoney)  as buyMoney , tel as salesTel, salesmanId as salesId " +
                 "from (select userId, mobile,registerTime,salesmanId,tel from user,salesman where salesmanId=salesman.id) as userComplete" +
                 " left join buyer_amount on (userId=buyerId and day <=:endTime and day>:startTime ) "
