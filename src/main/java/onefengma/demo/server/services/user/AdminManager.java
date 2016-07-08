@@ -7,6 +7,8 @@ import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.Admin;
+import onefengma.demo.server.model.admin.AdminSellersRequest;
+import onefengma.demo.server.model.admin.AdminSellersResponse;
 import onefengma.demo.server.model.admin.AdminUsersRequest;
 import onefengma.demo.server.model.admin.AdminUsersResponse;
 import onefengma.demo.server.model.apibeans.AdminAuthSession;
@@ -50,7 +52,7 @@ public class AdminManager extends BaseManager {
                     .getBuyer(new PageBuilder(requestBean.currentPage, requestBean.pageCount)
                             .setTime(timeRange.startTime, timeRange.endTime)
                             .addEqualWhere("mobile", requestBean.userTel)
-                            .addEqualWhere("tel", requestBean.salesTel));
+                            .addEqualWhere("salesTel", requestBean.salesTel));
             adminUsersResponse.currentPage = requestBean.currentPage;
             adminUsersResponse.pageCount = requestBean.pageCount;
             return success(adminUsersResponse);
@@ -67,6 +69,29 @@ public class AdminManager extends BaseManager {
             }
             AdminDataManager.instance().updateUser(requestBean.userId, requestBean.salesmanId);
             return success("修改成功");
+        }));
+
+        get("sellers", AdminSellersRequest.class, ((request, response, requestBean) -> {
+            boolean isBuyerStart = false;
+            long dateStartTime;
+            long dateEndTime;
+            if (requestBean.buyTimeEnd != -1 && requestBean.buyTimeStart != -1) {
+                isBuyerStart = true;
+                dateStartTime = requestBean.buyTimeStart;
+                dateEndTime = requestBean.buyTimeEnd;
+            } else {
+                isBuyerStart = false;
+                dateStartTime = requestBean.sellTimeStart;
+                dateEndTime = requestBean.sellTimeEnd;
+            }
+
+            AdminSellersResponse adminSellersResponse = AdminDataManager.instance()
+                    .getSellers(new PageBuilder(requestBean.currentPage, requestBean.pageCount)
+                            .addEqualWhere("mobile", requestBean.salesMobile)
+                            .addEqualWhere("salesMobile", requestBean.salesMobile)
+                            , dateStartTime, dateEndTime, isBuyerStart, requestBean.companyName);
+
+            return success(adminSellersResponse);
         }));
     }
 
