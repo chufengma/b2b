@@ -161,6 +161,7 @@ public class IronManager extends BaseManager {
         }));
 
         get("myBuy", BaseAuthPageBean.class, ((request, response, requestBean) -> {
+            IronDataHelper.getIronDataHelper().updateCancledStatis(requestBean.getUserId());
             MyIronBuysResponse handingGetResponse = new MyIronBuysResponse(requestBean.currentPage, requestBean.pageCount);
             PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
                     .addEqualWhere("userId", requestBean.getUserId())

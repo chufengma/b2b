@@ -66,8 +66,6 @@ public class HandingDataHelper extends BaseDataHelper {
     }
 
     public int getCancledCount(PageBuilder pageBuilder, String userId) {
-        // update status
-        updateCancledStatis(userId);
         pageBuilder.addEqualWhere("status", 2);
         String sql = "select count(*)"
                 + " from handing_buy " + generateWhereKey(pageBuilder, false);

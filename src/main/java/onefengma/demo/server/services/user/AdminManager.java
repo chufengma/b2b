@@ -89,6 +89,7 @@ public class AdminManager extends BaseManager {
                     .getSellers(new PageBuilder(requestBean.currentPage, requestBean.pageCount)
                             .addEqualWhere("mobile", requestBean.salesMobile)
                             .addEqualWhere("salesMobile", requestBean.salesMobile)
+                            .setTime(requestBean.becomeSellerTimeStart, requestBean.becomeSellerTimeEnd)
                             , dateStartTime, dateEndTime, isBuyerStart, requestBean.companyName);
 
             return success(adminSellersResponse);

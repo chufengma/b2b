@@ -76,6 +76,7 @@ public class HandingManager extends BaseManager{
         }));
 
         get("myBuy", BaseAuthPageBean.class, ((request, response, requestBean) -> {
+            HandingDataHelper.getHandingDataHelper().updateCancledStatis(requestBean.getUserId());
             MyHandingBuysResponse handingGetResponse = new MyHandingBuysResponse(requestBean.currentPage, requestBean.pageCount);
             PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
                     .addEqualWhere("userId", requestBean.getUserId())

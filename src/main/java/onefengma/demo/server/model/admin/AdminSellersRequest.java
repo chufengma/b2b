@@ -7,8 +7,11 @@ import onefengma.demo.server.core.BaseAdminPageBean;
  * Created by chufengma on 16/7/9.
  */
 public class AdminSellersRequest extends BaseAdminPageBean {
+    @NotRequired
     public String userMobile;
+    @NotRequired
     public String salesMobile;
+    @NotRequired
     public String companyName = "";
     public long becomeSellerTimeStart;
     public long becomeSellerTimeEnd;

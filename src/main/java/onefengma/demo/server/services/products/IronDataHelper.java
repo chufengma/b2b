@@ -178,8 +178,6 @@ public class IronDataHelper extends BaseDataHelper {
     }
 
     public int getCancledCount(PageBuilder pageBuilder, String userId) {
-        // update status
-        updateCancledStatis(userId);
         pageBuilder.addEqualWhere("status", 2);
         String sql = "select count(*)"
                 + " from iron_buy where userId=:userId and status=2 ";

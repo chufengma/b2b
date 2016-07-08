@@ -92,16 +92,18 @@ public class AdminDataManager extends BaseDataHelper {
 
         String companySql = StringUtils.isEmpty(companyName) ? "" :  "and companyName like '%" + companyName +"%' ";
 
-        String maxCountSql = "select count(*) from user,seller,salesman where user.userId=seller.userId and salesManId=salesman.id " + ((StringUtils.isEmpty(whereSql)) ? "" : " and " + whereSql);
-        String sellerSql = "select userId,companyName,passTime,contact,productCount,score, mobile,registerTime, sum(ironMoney + handingMoney)  as " + totalMoneyKeyName + " , tel as salesMobile,salesId " +
+        String maxCountSql = "select count(*) from user,seller,salesman where user.userId=seller.userId and user.salesManId=salesman.id "
+                + " and registerTime<:registerEndTime and registerTime>=:registerStartTime "
+                + ((StringUtils.isEmpty(whereSql)) ? "" : " and " + whereSql);
+        String sellerSql = "select userId,companyName,passTime as becomeSellerTime,contact as contactName,productCount,score, mobile,registerTime, sum(ironMoney + handingMoney)  as " + totalMoneyKeyName + " , tel as salesMobile,salesId " +
                 "from (select companyName,user.userId,passTime,contact, productCount,score,mobile,registerTime,user.salesManId as salesId, tel " +
                 "from user,salesman,seller where user.salesManId=salesman.id and user.userId=seller.userId) " +
                 "as userComplete left join " + amountTable + " " +
                 "on (userId=sellerId and day>=:dataStartTime and day<:dataEndTime) " +
-                " where registerTime<:registerEndTime and registerTime>=:registerStartTime" + companySql +
+                " where registerTime<:registerEndTime and registerTime>=:registerStartTime " + companySql +
                 (StringUtils.isEmpty(pageBuilder.generateWhere()) ? "" : " where " + whereSql) +
                 "group by userId " +
-                "order by totalMoney desc " + pageBuilder.generateLimit();
+                "order by " + totalMoneyKeyName + " desc " + pageBuilder.generateLimit();
 
         AdminSellersResponse adminSellersResponse = new AdminSellersResponse();
         adminSellersResponse.pageCount = pageBuilder.pageCount;
@@ -110,11 +112,15 @@ public class AdminDataManager extends BaseDataHelper {
             adminSellersResponse.sellers = conn.createQuery(sellerSql)
                     .addParameter("dataStartTime", dataStartTime)
                     .addParameter("dataEndTime", dateEndTime)
-                    .addParameter("registerEndTime", pageBuilder.startTime)
+                    .addParameter("registerStartTime", pageBuilder.startTime)
                     .addParameter("registerEndTime", pageBuilder.endTime)
-                    .addParameter("companyName", companyName)
                     .executeAndFetch(SellerBrief.class);
-            Integer maxCount = conn.createQuery(maxCountSql).executeScalar(Integer.class);
+
+            Integer maxCount = conn.createQuery(maxCountSql)
+                    .addParameter("registerStartTime", pageBuilder.startTime)
+                    .addParameter("registerEndTime", pageBuilder.endTime)
+                    .executeScalar(Integer.class);
+
             adminSellersResponse.maxCount = maxCount == null ? 0 : maxCount;
         }
         return adminSellersResponse;
@@ -122,6 +128,7 @@ public class AdminDataManager extends BaseDataHelper {
 
 
     public static class SellerBrief {
+        public String userId;
         public String mobile;
         public String companyName;
         public long registerTime;
@@ -131,7 +138,6 @@ public class AdminDataManager extends BaseDataHelper {
         public float score;
         public int salesId;
         public String salesMobile;
-
 
         private float sellerTotalMoney;
         private float buyerTotalMoney;
