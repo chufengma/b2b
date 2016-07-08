@@ -12,6 +12,7 @@ import onefengma.demo.server.model.admin.AdminUsersResponse;
 import onefengma.demo.server.model.apibeans.AdminAuthSession;
 import onefengma.demo.server.model.apibeans.admin.AdminLoginRequest;
 import onefengma.demo.server.model.apibeans.admin.DeleteUserRequest;
+import onefengma.demo.server.model.apibeans.admin.UpdateUserRequest;
 import onefengma.demo.server.services.user.AdminDataManager.BuyerBrief;
 import spark.Session;
 
@@ -58,6 +59,14 @@ public class AdminManager extends BaseManager {
         post("deleteUser", DeleteUserRequest.class, ((request, response, requestBean) -> {
             AdminDataManager.instance().deleteUser(requestBean.userId);
             return success("删除成功");
+        }));
+
+        post("updateUser", UpdateUserRequest.class, ((request, response, requestBean) -> {
+            if (!UserDataHelper.instance().isSalesManExited(requestBean.salesmanId)) {
+                return error("该顾问不存在");
+            }
+            AdminDataManager.instance().updateUser(requestBean.userId, requestBean.salesmanId);
+            return success("修改成功");
         }));
     }
 

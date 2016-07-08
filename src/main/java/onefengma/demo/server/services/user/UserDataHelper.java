@@ -101,9 +101,20 @@ public class UserDataHelper extends BaseDataHelper {
         String sql = "select salesman.id, salesman.name, salesman.tel from salesman,user " +
                 "where user.salesManId=salesman.id and userId=:userId";
         try(Connection conn = getConn()) {
-            SalesMan salesMan = conn.createQuery(sql).addParameter("userId", userId).executeScalar(SalesMan.class);
+            SalesMan salesMan = conn.createQuery(sql).addParameter("userId", userId).executeAndFetchFirst(SalesMan.class);
             return salesMan;
         }
+    }
+
+    public SalesMan getSalesManById(int salesId) {
+        String sql = "select " + generateFiledString(SalesMan.class) + " from salesman where id=:id";
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql).addParameter("id", salesId).executeAndFetchFirst(SalesMan.class);
+        }
+    }
+
+    public boolean isSalesManExited(int salesId) {
+        return getSalesManById(salesId) != null;
     }
 
     public String getSalesManTel(String userId) {

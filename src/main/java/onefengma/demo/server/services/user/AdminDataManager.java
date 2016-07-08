@@ -48,33 +48,28 @@ public class AdminDataManager extends BaseDataHelper {
         }
     }
 
+    public void updateUser(String userId, int salesmanId) {
+        String sql = "update user set salesManId=:salesManId where userId=:userId";
+
+        try (Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("userId", userId).addParameter("salesManId", salesmanId).executeUpdate();
+        }
+    }
+
     public AdminUsersResponse getBuyer(PageBuilder pageBuilder) {
         String whereSql = pageBuilder.generateWhere();
-        whereSql = StringUtils.isEmpty(whereSql) ? "" : " and " + whereSql;
-        String sql = "select userId, mobile,registerTime,salesman.id as salesId,tel from user,salesman where salesman.id=buySellerId " + whereSql + " order by registerTime" + pageBuilder.generateLimit();
-        String maxCountSql = "select count(*) from user,salesman where salesman.id=buySellerId " + whereSql;
-        String moneySql = "select sum(totalMoney) as totalMoney from product_orders where buyerId=:buyerId and sellTime<:endTime and sellTime>=:startTime";
+        String maxCountSql = "select count(*) from user,salesman where salesman.id=buySellerId " + ((StringUtils.isEmpty(whereSql)) ? "" : " and " + whereSql);
+        String userSalesMoneySql = "select userId, mobile,registerTime, sum(ironMoney + handingMoney)  as buyMoney , tel as salesTel, salesmanId as salesId " +
+                "from (select userId, mobile,registerTime,salesmanId,tel from user,salesman where salesmanId=salesman.id) as userComplete" +
+                " left join seller_amount on (userId=sellerId and day <=:endTime and day>:startTime ) "
+                + (StringUtils.isEmpty(pageBuilder.generateWhere()) ? "" : " where " + whereSql)
+                + " group by userId  order by buyMoney desc" + pageBuilder.generateLimit();
         try (Connection conn = getConn()) {
-            Table table = conn.createQuery(sql).executeAndFetchTable();
-            List<Row> rows = table.rows();
-            List<BuyerBrief> buyerBriefs = new ArrayList<>();
-            for (Row row : rows) {
-                BuyerBrief buyerBrief = new BuyerBrief();
-                buyerBrief.mobile = row.getString("mobile");
-                buyerBrief.registerTime = row.getLong("registerTime");
-                buyerBrief.salesId = row.getInteger("salesId");
-                buyerBrief.salesTel = row.getString("tel");
-                buyerBrief.userId = row.getString("userId");
-                Float money = conn.createQuery(moneySql)
-                        .addParameter("buyerId", buyerBrief.userId)
-                        .addParameter("startTime", pageBuilder.startTime)
-                        .addParameter("endTime", pageBuilder.endTime)
-                        .executeScalar(Float.class);
-                buyerBrief.buyMoney = money == null ? 0 : money;
-                buyerBriefs.add(buyerBrief);
-            }
             AdminUsersResponse usersResponse = new AdminUsersResponse();
-            usersResponse.buyers = buyerBriefs;
+            usersResponse.buyers = conn.createQuery(userSalesMoneySql)
+                    .addParameter("startTime", pageBuilder.startTime)
+                    .addParameter("endTime", pageBuilder.endTime)
+                    .executeAndFetch(BuyerBrief.class);
             Long maxCount = conn.createQuery(maxCountSql).executeScalar(Long.class);
             usersResponse.maxCount = (maxCount == null ? 0 : maxCount);
             return usersResponse;
