@@ -52,7 +52,7 @@ public class HandingManager extends BaseManager{
             return success(handingGetResponse);
         }));
 
-        post("buy", HandingBuyRequest.class, ((request, response, requestBean) -> {
+        multiPost("buy", HandingBuyRequest.class, ((request, response, requestBean) -> {
             if (!HandingDataCategory.get().handingTypes.contains(requestBean.handingType)) {
                 return errorAndClear(requestBean, "加工种类选择有误");
             }
