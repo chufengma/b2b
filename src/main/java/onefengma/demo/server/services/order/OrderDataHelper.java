@@ -122,6 +122,7 @@ public class OrderDataHelper extends BaseDataHelper {
         orderBrief.status = row.getInteger("status");
         int productType = row.getInteger("productType");
         orderBrief.sellMoney = row.getFloat("totalMoney");
+        orderBrief.count = row.getFloat("count");
         orderBrief.sellTime = row.getLong("sellTime");
         orderBrief.timeLimit = row.getLong("timeLimit");
         orderBrief.productType = productType;
