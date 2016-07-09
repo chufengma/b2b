@@ -65,12 +65,12 @@ public class HandingDataHelper extends BaseDataHelper {
         }
     }
 
-    public int getCancledCount(PageBuilder pageBuilder, String userId) {
-        pageBuilder.addEqualWhere("status", 2);
-        String sql = "select count(*)"
-                + " from handing_buy " + generateWhereKey(pageBuilder, false);
+    public int getCancledCount(String userId) {
+        String sql = " select count(*)"
+                + " from handing_buy where userId=:userId and status=2" ;
         try(Connection connection = getConn()){
-            return connection.createQuery(sql).executeScalar(Integer.class);
+            Integer count = connection.createQuery(sql).addParameter("userId", userId).executeScalar(Integer.class);
+            return count == null ? 0 : count;
         }
     }
 
@@ -87,9 +87,15 @@ public class HandingDataHelper extends BaseDataHelper {
     public List<HandingBuyBrief> getHandingBuys(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(HandingBuyBrief.class)
                 + " from handing_buy " + generateWhereKey(pageBuilder, true);
+
+        String supplyCountSql = "select count(*) from handing_buy_supply where handingId=:handingId";
+
         try (Connection conn = getConn()) {
             List<HandingBuyBrief> briefs =  conn.createQuery(sql).executeAndFetch(HandingBuyBrief.class);
             for(HandingBuyBrief brief : briefs) {
+                Integer count = conn.createQuery(supplyCountSql).addParameter("handingId", brief.id).executeScalar(Integer.class);
+                count = count == null ? 0 : count;
+                brief.setSupplyCount(count);
                 brief.setSourceCity(CityDataHelper.instance().getCityDescById(brief.souCityId));
             }
             return briefs;

@@ -22,6 +22,16 @@ public class IronBuyBrief {
     public long timeLimit;
     public int status;
 
+    private int supplyCount;
+
+    public int getSupplyCount() {
+        return supplyCount;
+    }
+
+    public void setSupplyCount(int supplyCount) {
+        this.supplyCount = supplyCount;
+    }
+
 
     private String sourceCity;
 

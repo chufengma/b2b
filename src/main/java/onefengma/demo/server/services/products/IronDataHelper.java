@@ -66,10 +66,14 @@ public class IronDataHelper extends BaseDataHelper {
     public List<IronBuyBrief> getIronsBuy(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(IronBuyBrief.class) +
                 " from iron_buy " + generateWhereKey(pageBuilder, true);
+        String supplyCountSql = "select count(*) from iron_buy_supply where ironId=:ironId";
 
         try (Connection conn = getConn()){
             List<IronBuyBrief> ironBuyBriefs =  conn.createQuery(sql).executeAndFetch(IronBuyBrief.class);
             for(IronBuyBrief ironBuyBrief : ironBuyBriefs) {
+                Integer count = conn.createQuery(supplyCountSql).addParameter("ironId", ironBuyBrief.id).executeScalar(Integer.class);
+                count = count == null ? 0 : count;
+                ironBuyBrief.setSupplyCount(count);
                 ironBuyBrief.setSourceCity(CityDataHelper.instance().getCityDescById(ironBuyBrief.locationCityId));
             }
             return ironBuyBriefs;
@@ -177,12 +181,12 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
-    public int getCancledCount(PageBuilder pageBuilder, String userId) {
-        pageBuilder.addEqualWhere("status", 2);
+    public int getCancledCount(String userId) {
         String sql = "select count(*)"
                 + " from iron_buy where userId=:userId and status=2 ";
         try(Connection connection = getConn()){
-            return connection.createQuery(sql).addParameter("userId", userId).executeScalar(Integer.class);
+            Integer count = connection.createQuery(sql).addParameter("userId", userId).executeScalar(Integer.class);
+            return count == null ? 0 : count;
         }
     }
 

@@ -13,7 +13,16 @@ public class HandingBuyBrief {
     public long timeLimit;
     public int status;   // 0 正常状态, 1 交易完成,  2 过期
 
+    private int supplyCount;
     private String sourceCity;
+
+    public int getSupplyCount() {
+        return supplyCount;
+    }
+
+    public void setSupplyCount(int supplyCount) {
+        this.supplyCount = supplyCount;
+    }
 
     public String getSourceCity() {
         return sourceCity;

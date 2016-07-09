@@ -81,7 +81,7 @@ public class HandingManager extends BaseManager{
             PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
                     .addEqualWhere("userId", requestBean.getUserId())
                     .addOrderBy("pushTime", true);
-            handingGetResponse.canceledCount = HandingDataHelper.getHandingDataHelper().getCancledCount(pageBuilder, requestBean.getUserId());
+            handingGetResponse.canceledCount = HandingDataHelper.getHandingDataHelper().getCancledCount(requestBean.getUserId());
             handingGetResponse.handings = HandingDataHelper.getHandingDataHelper().getHandingBuys(pageBuilder);
             handingGetResponse.maxCount = HandingDataHelper.getHandingDataHelper().getMaxBuyCount(pageBuilder);
             handingGetResponse.lossRate = (float) handingGetResponse.canceledCount / (float) handingGetResponse.maxCount;

@@ -166,7 +166,7 @@ public class IronManager extends BaseManager {
             PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
                     .addEqualWhere("userId", requestBean.getUserId())
                     .addOrderBy("pushTime", true);
-            handingGetResponse.canceledCount = IronDataHelper.getIronDataHelper().getCancledCount(pageBuilder, requestBean.getUserId());
+            handingGetResponse.canceledCount = IronDataHelper.getIronDataHelper().getCancledCount(requestBean.getUserId());
             handingGetResponse.buys = IronDataHelper.getIronDataHelper().getIronsBuy(pageBuilder);
             handingGetResponse.maxCount = IronDataHelper.getIronDataHelper().getMaxIronBuyCounts(pageBuilder);
             handingGetResponse.lossRate = (float) handingGetResponse.canceledCount / (float) handingGetResponse.maxCount;
