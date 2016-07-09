@@ -13,6 +13,9 @@ public class HandingBuyBrief {
     public long timeLimit;
     public int status;   // 0 正常状态, 1 交易完成,  2 过期,  3 已报价候选中
 
+    public String supplyUserId;
+    public long supplyWinTime;
+
     private int supplyCount;
     private String sourceCity;
 

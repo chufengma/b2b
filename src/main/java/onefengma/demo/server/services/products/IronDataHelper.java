@@ -365,6 +365,14 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
+    public boolean isOffered(String sellerId, String ironId) {
+        String sql = "select count(*) from iron_buy_supply where ironId=:ironId";
+        try(Connection conn = getConn()) {
+            Integer count = conn.createQuery(sql).addParameter("ironId", ironId).executeScalar(Integer.class);
+            return count != null && count != 0;
+        }
+    }
+
     public static class SellerOffer {
         public float price;
         public String supplyMsg;

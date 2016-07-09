@@ -247,4 +247,13 @@ public class SellerDataHelper extends BaseDataHelper {
                     .executeUpdate();
         }
     }
+
+    public String getBuyUserId(String proId, int productType) {
+        String sql = "select userId from " + (productType == 0 ? "iron_buy" : "handing_buy") + " where id=:id";
+        try(Connection conn =getConn()) {
+            return conn.createQuery(sql)
+                    .addParameter("id", proId)
+                    .executeScalar(String.class);
+        }
+    }
 }

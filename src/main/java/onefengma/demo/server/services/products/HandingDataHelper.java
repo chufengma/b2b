@@ -1,6 +1,9 @@
 package onefengma.demo.server.services.products;
 
+import onefengma.demo.server.model.apibeans.product.SellerHandingBuysResponse;
+import onefengma.demo.server.model.apibeans.product.SellerIronBuysResponse;
 import onefengma.demo.server.model.product.*;
+import onefengma.demo.server.services.products.IronDataHelper.SellerOffer;
 import org.sql2o.Connection;
 
 import java.io.UnsupportedEncodingException;
@@ -246,6 +249,98 @@ public class HandingDataHelper extends BaseDataHelper {
             return conn.createQuery(sql)
                     .addParameter("handingId", handingId)
                     .executeScalar(Integer.class);
+        }
+    }
+
+
+    public SellerHandingBuysResponse getSellerHandingBuys(PageBuilder pageBuilder, String sellerId) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "select handing_buy.id as id, handingType, souCityId, message, userId, pushTime, timeLimit, status, supplyUserId, supplyWinTime" +
+                " from handing_buy,handing_buy_seller where handing_buy_seller.handingId = handing_buy.id and sellerId=:sellerId" + pageBuilder.generateLimit();
+
+        String supplyCountSql = "select count(*) from handing_buy_supply where handingId=:ironId";
+
+        String maxCountSql = "select count(*) from handing_buy_seller where sellerId=:sellerId";
+
+        String winTimesSql = "select winningTimes from seller where userId=:sellerId";
+        String offerTimesSql = "select count(*) from handing_buy_supply where sellerId=:sellerId";
+
+        SellerHandingBuysResponse response = new SellerHandingBuysResponse(pageBuilder.currentPage, pageBuilder.pageCount);
+        try (Connection conn = getConn()){
+            List<HandingBuyBrief> ironBuyBriefs =  conn.createQuery(sql)
+                    .addParameter("sellerId", sellerId)
+                    .executeAndFetch(HandingBuyBrief.class);
+            for(HandingBuyBrief ironBuyBrief : ironBuyBriefs) {
+                Integer count = conn.createQuery(supplyCountSql)
+                        .addParameter("ironId", ironBuyBrief.id)
+                        .executeScalar(Integer.class);
+                count = count == null ? 0 : count;
+                ironBuyBrief.setSupplyCount(count);
+
+                if (ironBuyBrief.status == 1 && StringUtils.equals(ironBuyBrief.supplyUserId, sellerId)) {
+                    ironBuyBrief.status = 4;
+                }
+
+                ironBuyBrief.setSourceCity(CityDataHelper.instance().getCityDescById(ironBuyBrief.souCityId));
+            }
+            response.handings = ironBuyBriefs;
+
+            Integer maxCount = conn.createQuery(maxCountSql).addParameter("sellerId", sellerId).executeScalar(Integer.class);
+            maxCount = maxCount == null ? 0 : maxCount;
+            response.maxCount = maxCount;
+
+            Integer winTimes = conn.createQuery(winTimesSql).addParameter("sellerId", sellerId).executeScalar(Integer.class);
+            winTimes = winTimes == null ? 0 : winTimes;
+
+            Integer offerTimes = conn.createQuery(offerTimesSql).addParameter("sellerId", sellerId).executeScalar(Integer.class);
+            offerTimes = offerTimes == null ? 0 : offerTimes;
+
+            response.offerTimes = offerTimes;
+            response.offerWinRate = (float)winTimes / (float)offerTimes;
+
+            return response;
+        }
+    }
+
+    public SellerOffer getSellerOffer(String userId, String handingId) {
+        String sql = "select * from handing_buy_supply where sellerId=:sellerId and handingId=:handingId";
+        try(Connection conn = getConn()) {
+            List<Row> rows = conn.createQuery(sql).addParameter("sellerId", userId).addParameter("handingId", handingId).executeAndFetchTable().rows();
+            if (rows.isEmpty()) {
+                return null;
+            } else {
+                SellerOffer sellerOffer = new SellerOffer();
+                sellerOffer.price = rows.get(0).getFloat("supplyPrice");
+                sellerOffer.supplyMsg = rows.get(0).getString("supplyMsg");
+                return sellerOffer;
+            }
+        }
+    }
+
+    public boolean isHandingBuyExisted(String handingId) {
+        String sql = "select count(*) from handing_buy where id=:handingId";
+        try(Connection conn = getConn()) {
+            Integer count = conn.createQuery(sql).addParameter("handingId", handingId).executeScalar(Integer.class);
+            return count != null && count != 0;
+        }
+    }
+
+    public void offerHandingBuy(String sellerId, String handingId, float price, String msg) {
+        String sql = "insert into handing_buy_supply set handingId=:handingId, sellerId=:sellerId, supplyPrice=:price, supplyMsg=:msg, salesmanId=0";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql)
+                    .addParameter("handingId", handingId)
+                    .addParameter("sellerId", sellerId)
+                    .addParameter("price", price)
+                    .addParameter("msg", msg)
+                    .executeUpdate();
+        }
+    }
+
+    public boolean isOffered(String sellerId, String handingId) {
+        String sql = "select count(*) from handing_buy_supply where handingId=:handingId";
+        try(Connection conn = getConn()) {
+            Integer count = conn.createQuery(sql).addParameter("handingId", handingId).executeScalar(Integer.class);
+            return count != null && count != 0;
         }
     }
 

@@ -39,7 +39,7 @@ public class OrderManager extends BaseManager{
             return success();
         }));
 
-        post("translateALl", OrderAllRequest.class, ((request, response, requestBean) -> {
+        post("translateAll", OrderAllRequest.class, ((request, response, requestBean) -> {
             List<Order> orders = requestBean.generateOrders();
             for(Order order : orders) {
                 OrderDataHelper.instance().translate(order, true);
