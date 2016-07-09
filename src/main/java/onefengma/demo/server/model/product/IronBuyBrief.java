@@ -20,7 +20,9 @@ public class IronBuyBrief {
     public String tolerance;
     public long numbers;
     public long timeLimit;
-    public int status;
+    public int status; // 0 待报价, 1 交易完成 , 2 过期, 3 已报价候选中, 4 我已中标
+    public String supplyUserId;
+    public long supplyWinTime;
 
     private int supplyCount;
 

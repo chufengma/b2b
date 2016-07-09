@@ -72,7 +72,7 @@ public class SellerDataHelper extends BaseDataHelper {
     }
 
     public Seller getSellerByUserId(String userId) throws NoSuchFieldException, IllegalAccessException {
-        String sql = createSql("select * from @TABLE where @USER_ID = :userId;");
+        String sql = createSql("select " + generateFiledString(Seller.class) +  " from @TABLE where @USER_ID = :userId;");
         try (Connection conn = getConn()){
             List<Seller> sellerList = conn.createQuery(sql).addParameter("userId", userId).executeAndFetch(Seller.class);
             if (sellerList.isEmpty()) {

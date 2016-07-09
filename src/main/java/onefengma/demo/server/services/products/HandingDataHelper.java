@@ -231,10 +231,11 @@ public class HandingDataHelper extends BaseDataHelper {
     }
 
     public void selectHandingBuySupply(String handingId, String supplyUserId) {
-        String sql = "update handing_buy set supplyUserId=:userId, status=1 where id=:handingId";
+        String sql = "update handing_buy set supplyUserId=:userId, status=1,supplyWinTime=:time where id=:handingId";
         try(Connection conn = getConn()) {
             conn.createQuery(sql)
                     .addParameter("handingId", handingId)
+                    .addParameter("time", System.currentTimeMillis())
                     .addParameter("userId", supplyUserId).executeUpdate();
         }
     }

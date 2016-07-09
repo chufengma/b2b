@@ -1,7 +1,9 @@
 package onefengma.demo.server.services.products;
 
 import onefengma.demo.server.core.LogUtils;
+import onefengma.demo.server.model.apibeans.product.SellerIronBuysResponse;
 import onefengma.demo.server.model.product.*;
+import onefengma.demo.server.services.user.UserDataHelper;
 import org.apache.commons.logging.Log;
 import org.sql2o.Connection;
 import org.sql2o.Query;
@@ -261,10 +263,11 @@ public class IronDataHelper extends BaseDataHelper {
     }
 
     public void selectIronBuySupply(String ironId, String supplyUserId) {
-        String sql = "update iron_buy set supplyUserId=:userId, status=1 where id=:ironId";
+        String sql = "update iron_buy set supplyUserId=:userId, status=1,supplyWinTime=:time where id=:ironId";
         try(Connection conn = getConn()) {
             conn.createQuery(sql)
                     .addParameter("ironId", ironId)
+                    .addParameter("time", System.currentTimeMillis())
                     .addParameter("userId", supplyUserId).executeUpdate();
         }
     }
@@ -276,6 +279,95 @@ public class IronDataHelper extends BaseDataHelper {
                     .addParameter("ironId", ironId)
                     .executeScalar(Integer.class);
         }
+    }
+
+    public SellerIronBuysResponse getSellerIronBuys(PageBuilder pageBuilder, String sellerId) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "select iron_buy.id as id,supplyUserId,supplyWinTime, ironType, material, surface, proPlace, locationCityId, userId, message, pushTime, length, width, height, tolerance, numbers, timeLimit, status " +
+                " from iron_buy,iron_buy_seller where iron_buy_seller.ironId = iron_buy.id and sellerId=:sellerId" + pageBuilder.generateLimit();
+
+        String supplyCountSql = "select count(*) from iron_buy_supply where ironId=:ironId";
+
+        String maxCountSql = "select count(*) from iron_buy_seller where sellerId=:sellerId";
+
+        String winTimesSql = "select winningTimes from seller where userId=:sellerId";
+        String offerTimesSql = "select count(*) from iron_buy_supply where sellerId=:sellerId";
+
+        SellerIronBuysResponse response = new SellerIronBuysResponse(pageBuilder.currentPage, pageBuilder.pageCount);
+        try (Connection conn = getConn()){
+            List<IronBuyBrief> ironBuyBriefs =  conn.createQuery(sql)
+                    .addColumnMapping("iron_buy.id", "id")
+                    .addParameter("sellerId", sellerId)
+                    .executeAndFetch(IronBuyBrief.class);
+            for(IronBuyBrief ironBuyBrief : ironBuyBriefs) {
+                Integer count = conn.createQuery(supplyCountSql)
+                        .addParameter("ironId", ironBuyBrief.id)
+                        .executeScalar(Integer.class);
+                count = count == null ? 0 : count;
+                ironBuyBrief.setSupplyCount(count);
+
+                if (ironBuyBrief.status == 1 && StringUtils.equals(ironBuyBrief.supplyUserId, sellerId)) {
+                    ironBuyBrief.status = 4;
+                }
+
+                ironBuyBrief.setSourceCity(CityDataHelper.instance().getCityDescById(ironBuyBrief.locationCityId));
+            }
+            response.buys = ironBuyBriefs;
+
+            Integer maxCount = conn.createQuery(maxCountSql).addParameter("sellerId", sellerId).executeScalar(Integer.class);
+            maxCount = maxCount == null ? 0 : maxCount;
+            response.maxCount = maxCount;
+
+            Integer winTimes = conn.createQuery(winTimesSql).addParameter("sellerId", sellerId).executeScalar(Integer.class);
+            winTimes = winTimes == null ? 0 : winTimes;
+
+            Integer offerTimes = conn.createQuery(offerTimesSql).addParameter("sellerId", sellerId).executeScalar(Integer.class);
+            offerTimes = offerTimes == null ? 0 : offerTimes;
+
+            response.offerTimes = offerTimes;
+            response.offerWinRate = (float)winTimes / (float)offerTimes;
+
+            return response;
+        }
+    }
+
+    public SellerOffer getSellerOffer(String userId, String buyId) {
+        String sql = "select * from iron_buy_supply where sellerId=:sellerId and ironId=:ironId";
+        try(Connection conn = getConn()) {
+            List<Row> rows = conn.createQuery(sql).addParameter("sellerId", userId).addParameter("ironId", buyId).executeAndFetchTable().rows();
+            if (rows.isEmpty()) {
+                return null;
+            } else {
+                SellerOffer sellerOffer = new SellerOffer();
+                sellerOffer.price = rows.get(0).getFloat("supplyPrice");
+                sellerOffer.supplyMsg = rows.get(0).getString("supplyMsg");
+                return sellerOffer;
+            }
+        }
+    }
+
+    public boolean isIronBuyExisted(String ironId) {
+        String sql = "select count(*) from iron_buy where id=:ironId";
+        try(Connection conn = getConn()) {
+            Integer count = conn.createQuery(sql).addParameter("ironId", ironId).executeScalar(Integer.class);
+            return count != null && count != 0;
+        }
+    }
+
+    public void offerIronBuy(String sellerId, String ironId, float price, String msg) {
+        String sql = "insert into iron_buy_supply set ironId=:ironId, sellerId=:sellerId, supplyPrice=:price, supplyMsg=:msg, salesmanId=0";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql)
+                    .addParameter("ironId", ironId)
+                    .addParameter("sellerId", sellerId)
+                    .addParameter("price", price)
+                    .addParameter("msg", msg)
+                    .executeUpdate();
+        }
+    }
+
+    public static class SellerOffer {
+        public float price;
+        public String supplyMsg;
     }
 
 
