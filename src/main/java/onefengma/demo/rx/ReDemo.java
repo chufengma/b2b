@@ -37,8 +37,7 @@ public class ReDemo {
     private String ccc = "fengma2";
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException, UnsupportedEncodingException {
-        TimeRange timeRange = DateHelper.getMonthTimeRange(1466915035889l);
-        System.out.println("-----" + timeRange.startTime + ":" + timeRange.endTime);
+        System.out.println("----" + (long)((long)1908 / 1000) * 0.3f);
     }
 
     protected  static  String createInsertSql(String table, Class clazz) {

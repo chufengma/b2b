@@ -49,7 +49,7 @@ public class UserDataHelper extends BaseDataHelper {
     }
 
     public User findUserByUserId(String userId) throws NoSuchFieldException, IllegalAccessException {
-        String sql = createSql("select * from @USER_TABLE where @USER_ID=:userId");
+        String sql = createSql("select " + generateFiledString(User.class) + "from @USER_TABLE where @USER_ID=:userId");
         List<User> users;
         try (Connection con = getConn()) {
             users = con.createQuery(sql)
@@ -90,7 +90,7 @@ public class UserDataHelper extends BaseDataHelper {
     }
 
     public List<User> getUserList() throws NoSuchFieldException, IllegalAccessException {
-        String sql = createSql("select * from @USER_TABLE");
+        String sql = createSql("select  " + generateFiledString(User.class) + " from @USER_TABLE");
         List<User> userList = new ArrayList<>();
         try (Connection con = getConn()) {
             List<User> users = con.createQuery(sql).executeAndFetch(User.class);

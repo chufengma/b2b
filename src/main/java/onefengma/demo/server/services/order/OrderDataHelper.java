@@ -344,6 +344,35 @@ public class OrderDataHelper extends BaseDataHelper {
         try(Connection conn = getConn()) {
             conn.createQuery(sql).addParameter("orderId", orderId).executeUpdate();
         }
+        addBuyerIntegral(orderId);
+    }
+
+    private void addBuyerIntegral(String orderId) {
+        String sql = "select * from product_orders where id=:orderId";
+        String buyerIntegralSql = "update user set integral = (integral + :add) where userId=:userId";
+        String sellerIntegralSql = "update seller set integral = (integral + :add) where userId=:userId";
+        try(Connection conn = getConn()) {
+            List<Row> rows = conn.createQuery(sql).addParameter("orderId", orderId).executeAndFetchTable().rows();
+            if (!rows.isEmpty()) {
+                Row row = rows.get(0);
+                String buyerId = row.getString("buyerId");
+                String sellerId = row.getString("sellerId");
+                float totalMoney = row.getFloat("totalMoney");
+
+                float buyerIntegral = (long)((long)totalMoney / 1000) * 0.5f;
+                float sellerIntegral = (long)((long)totalMoney / 1000) * 0.1f;
+
+                conn.createQuery(buyerIntegralSql)
+                        .addParameter("userId", buyerId)
+                        .addParameter("add", buyerIntegral)
+                        .executeUpdate();
+
+                conn.createQuery(sellerIntegralSql)
+                        .addParameter("userId", buyerId)
+                        .addParameter("add", sellerIntegral)
+                        .executeUpdate();
+            }
+        }
     }
 
     public void concelOrder(String orderId) {
