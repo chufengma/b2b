@@ -18,6 +18,8 @@ public class OrderBrief {
     public int deleteBy; // 0 没有被删除 1 被买家删除 2 被卖家删除
     public int cancelBy; // 0 没有被取消 1 被买家取消 2 被卖家取消
 
+    public float score;
+
     public String sellerMobile;
     public String buyerMobile;
 }

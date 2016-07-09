@@ -373,6 +373,14 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
+    public List<IronProductBrief> getMyIronProduct(PageBuilder pageBuilder, String userId) {
+        String sql = "select " + generateFiledString(IronProductBrief.class) + " from iron_product where userId=:userId " + pageBuilder.generateLimit();
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql)
+                    .addParameter("userId", userId).executeAndFetch(IronProductBrief.class);
+        }
+    }
+
     public static class SellerOffer {
         public float price;
         public String supplyMsg;

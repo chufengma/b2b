@@ -10,6 +10,7 @@ import onefengma.demo.server.model.order.OrderBrief;
 import onefengma.demo.server.model.product.HandingProductBrief;
 import onefengma.demo.server.model.product.IronProductBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
+import onefengma.demo.server.services.user.UserDataHelper;
 import org.sql2o.Connection;
 
 import java.util.ArrayList;
@@ -99,11 +100,13 @@ public class OrderDataHelper extends BaseDataHelper {
         String waitForConfirmSql = "select count(*) from product_orders where buyerId=:userId and status = 0";
         String waitForVoteSql = "select count(*) from product_orders where buyerId=:userId and status = 1";
         String countSql = "select count(*) from product_orders where buyerId=:userId and status <> 4 order by status asc ";
+
         try(Connection conn = getConn()) {
             Table table = conn.createQuery(dataSql).addParameter("userId", userId).executeAndFetchTable();
             List<OrderBrief> orderBriefs = new ArrayList<>();
             for(Row row : table.rows()) {
-                orderBriefs.add(getOrderBrief(conn, row, false));
+                OrderBrief orderBrief = getOrderBrief(conn, row, false);
+                orderBriefs.add(orderBrief);
             }
             myOrdersResponse.orders = orderBriefs;
             myOrdersResponse.maxCount = conn.createQuery(countSql).addParameter("userId", userId).executeScalar(Integer.class);
@@ -317,7 +320,9 @@ public class OrderDataHelper extends BaseDataHelper {
             Table table = conn.createQuery(dataSql).addParameter("userId", userId).executeAndFetchTable();
             List<OrderBrief> orderBriefs = new ArrayList<>();
             for(Row row : table.rows()) {
-                orderBriefs.add(getOrderBrief(conn, row, true));
+                OrderBrief orderBrief = getOrderBrief(conn, row, true);
+                orderBrief.score = row.getFloat("singleScore");
+                orderBriefs.add(orderBrief);
             }
             myOrdersResponse.orders = orderBriefs;
             myOrdersResponse.maxCount = conn.createQuery(countSql).addParameter("userId", userId).executeScalar(Integer.class);
