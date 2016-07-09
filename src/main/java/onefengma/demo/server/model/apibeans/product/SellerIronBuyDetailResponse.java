@@ -9,6 +9,7 @@ import onefengma.demo.server.services.products.IronDataHelper.SellerOffer;
  */
 public class SellerIronBuyDetailResponse {
     public String salesManPhone;
+    public String buyerMobile;
     public IronBuyBrief buy;
     public SellerOffer myOffer;
 }

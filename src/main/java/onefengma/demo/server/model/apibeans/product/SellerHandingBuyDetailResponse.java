@@ -11,4 +11,5 @@ public class SellerHandingBuyDetailResponse {
     public String salesManPhone;
     public HandingBuyBrief buy;
     public SellerOffer myOffer;
+    public String buyerMobile;
 }

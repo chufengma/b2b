@@ -124,6 +124,13 @@ public class UserDataHelper extends BaseDataHelper {
         return salesMan == null ? "" : salesMan.tel;
     }
 
+    public String getUserMobile(String userId) {
+        String sql = "select mobile from user where userId=:userId";
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql).addParameter("userId", userId).executeScalar(String.class);
+        }
+    }
+
     public void updateUserProfile(UpdateBuilder updateBuilder, String userId) {
         String updateSql = updateBuilder.generateSql();
         if (StringUtils.isEmpty(updateSql)) {

@@ -93,6 +93,7 @@ public class SellerManager extends BaseManager {
             // 我已中标
             if (ironBuyBrief != null && ironBuyBrief.status == 1 && StringUtils.equals(ironBuyBrief.supplyUserId, requestBean.getUserId())) {
                 ironBuyBrief.status = 4;
+                sellerIronBuyDetailResponse.buyerMobile = UserDataHelper.instance().getUserMobile(ironBuyBrief.userId);
             }
 
             // 候选中
@@ -143,6 +144,7 @@ public class SellerManager extends BaseManager {
             // 我已中标
             if (buyBrief != null && buyBrief.status == 1 && StringUtils.equals(buyBrief.supplyUserId, requestBean.getUserId())) {
                 buyBrief.status = 4;
+                sellerHandingBuyDetailResponse.buyerMobile = UserDataHelper.instance().getUserMobile(buyBrief.userId);
             }
 
             // 候选中
