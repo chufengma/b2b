@@ -24,7 +24,9 @@ public class UpdateBuilder {
                 stringBuilder.append(key + "='" + value + "',");
             }
         }
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        if (stringBuilder.length() > 1) {
+            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        }
         return stringBuilder.toString();
     }
 

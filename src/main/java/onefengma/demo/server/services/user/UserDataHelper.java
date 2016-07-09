@@ -1,5 +1,7 @@
 package onefengma.demo.server.services.user;
 
+import onefengma.demo.common.StringUtils;
+import onefengma.demo.server.core.UpdateBuilder;
 import onefengma.demo.server.model.SalesMan;
 import org.sql2o.Connection;
 
@@ -120,5 +122,16 @@ public class UserDataHelper extends BaseDataHelper {
     public String getSalesManTel(String userId) {
         SalesMan salesMan = getSalesMan(userId);
         return salesMan == null ? "" : salesMan.tel;
+    }
+
+    public void updateUserProfile(UpdateBuilder updateBuilder, String userId) {
+        String updateSql = updateBuilder.generateSql();
+        if (StringUtils.isEmpty(updateSql)) {
+            return;
+        }
+        String sql = "update user set " + updateSql  + " where userId=:userId";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("userId", userId).executeUpdate();
+        }
     }
 }

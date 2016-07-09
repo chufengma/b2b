@@ -80,9 +80,6 @@ public class SellerManager extends BaseManager {
         get("myIronBuyDetail", SellerIronBuyDetailRequest.class, ((request, response, requestBean) -> {
             SellerIronBuyDetailResponse sellerIronBuyDetailResponse = new SellerIronBuyDetailResponse();
             IronBuyBrief ironBuyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.ironId);
-            if (ironBuyBrief != null && ironBuyBrief.status == 1 && StringUtils.equals(ironBuyBrief.supplyUserId, requestBean.getUserId())) {
-                ironBuyBrief.status = 4;
-            }
             sellerIronBuyDetailResponse.buy = ironBuyBrief;
 
             String owerUserId = SellerDataHelper.instance().getBuyUserId(ironBuyBrief.id, 0);
@@ -92,6 +89,16 @@ public class SellerManager extends BaseManager {
             }
 
             sellerIronBuyDetailResponse.myOffer = IronDataHelper.getIronDataHelper().getSellerOffer(requestBean.getUserId(), requestBean.ironId);
+
+            // 我已中标
+            if (ironBuyBrief != null && ironBuyBrief.status == 1 && StringUtils.equals(ironBuyBrief.supplyUserId, requestBean.getUserId())) {
+                ironBuyBrief.status = 4;
+            }
+
+            // 候选中
+            if (ironBuyBrief != null && ironBuyBrief.status == 0 && sellerIronBuyDetailResponse.myOffer != null) {
+                ironBuyBrief.status = 3;
+            }
 
             return success(sellerIronBuyDetailResponse);
         }));
@@ -123,9 +130,6 @@ public class SellerManager extends BaseManager {
         get("myHandingBuyDetail", SellerHandingBuyDetailRequest.class, ((request, response, requestBean) -> {
             SellerHandingBuyDetailResponse sellerHandingBuyDetailResponse = new SellerHandingBuyDetailResponse();
             HandingBuyBrief buyBrief = HandingDataHelper.getHandingDataHelper().getHandingBrief(requestBean.handingId);
-            if (buyBrief != null && buyBrief.status == 1 && StringUtils.equals(buyBrief.supplyUserId, requestBean.getUserId())) {
-                buyBrief.status = 4;
-            }
             sellerHandingBuyDetailResponse.buy = buyBrief;
 
             String owerUserId = SellerDataHelper.instance().getBuyUserId(buyBrief.id, 1);
@@ -135,6 +139,16 @@ public class SellerManager extends BaseManager {
             }
 
             sellerHandingBuyDetailResponse.myOffer = HandingDataHelper.getHandingDataHelper().getSellerOffer(requestBean.getUserId(), requestBean.handingId);
+
+            // 我已中标
+            if (buyBrief != null && buyBrief.status == 1 && StringUtils.equals(buyBrief.supplyUserId, requestBean.getUserId())) {
+                buyBrief.status = 4;
+            }
+
+            // 候选中
+            if (buyBrief != null && buyBrief.status == 0 && sellerHandingBuyDetailResponse.myOffer != null) {
+                buyBrief.status = 3;
+            }
 
             return success(sellerHandingBuyDetailResponse);
         }));

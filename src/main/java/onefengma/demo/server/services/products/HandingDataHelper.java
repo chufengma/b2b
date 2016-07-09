@@ -276,9 +276,16 @@ public class HandingDataHelper extends BaseDataHelper {
                 count = count == null ? 0 : count;
                 ironBuyBrief.setSupplyCount(count);
 
+                // 我已中标
                 if (ironBuyBrief.status == 1 && StringUtils.equals(ironBuyBrief.supplyUserId, sellerId)) {
                     ironBuyBrief.status = 4;
                 }
+                SellerOffer sellerOffer = HandingDataHelper.getHandingDataHelper().getSellerOffer(sellerId, ironBuyBrief.id);
+                // 候选中
+                if (ironBuyBrief != null && ironBuyBrief.status == 0 && sellerOffer != null) {
+                    ironBuyBrief.status = 3;
+                }
+
 
                 ironBuyBrief.setSourceCity(CityDataHelper.instance().getCityDescById(ironBuyBrief.souCityId));
             }

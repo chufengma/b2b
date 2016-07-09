@@ -3,10 +3,8 @@ package onefengma.demo.server.services.user;
 import java.util.HashMap;
 import java.util.Map;
 
-import onefengma.demo.common.IdUtils;
-import onefengma.demo.common.StringUtils;
-import onefengma.demo.common.ValidateCode;
-import onefengma.demo.common.VerifyUtils;
+import onefengma.demo.common.*;
+import onefengma.demo.server.core.UpdateBuilder;
 import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.UploadDemo;
 import onefengma.demo.server.model.User;
@@ -18,6 +16,7 @@ import onefengma.demo.server.model.apibeans.AuthSession;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.SellerRequest;
 import onefengma.demo.server.model.apibeans.login.ChangePassword;
+import onefengma.demo.server.model.apibeans.login.ChangeUserProfile;
 import onefengma.demo.server.model.apibeans.login.Login;
 import onefengma.demo.server.model.apibeans.login.Register;
 import onefengma.demo.server.model.metaData.City;
@@ -144,6 +143,14 @@ public class UserManager extends BaseManager {
                 return error("旧密码不正确");
             }
             getUserDataHelper().changeUserPassword(requestBean.getUserId(), IdUtils.md5(requestBean.newPassword));
+            return success();
+        }));
+
+        multiPost("updateProfile", ChangeUserProfile.class, ((request, response, requestBean) -> {
+            UpdateBuilder updateBuilder = new UpdateBuilder();
+            updateBuilder.addStringMap("name", requestBean.name);
+            updateBuilder.addStringMap("avator",  requestBean.avator == null ? "" : FileHelper.generateRelativeInternetUri(requestBean.avator));
+            UserDataHelper.instance().updateUserProfile(updateBuilder, requestBean.getUserId());
             return success();
         }));
 
