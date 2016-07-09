@@ -1,15 +1,21 @@
 package onefengma.demo.server.services.order;
 
+import onefengma.demo.common.FileHelper;
 import onefengma.demo.common.StringUtils;
+import onefengma.demo.common.VerifyUtils;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.core.UpdateBuilder;
 import onefengma.demo.server.model.SalesMan;
 import onefengma.demo.server.model.apibeans.AuthSession;
 import onefengma.demo.server.model.apibeans.BaseAuthPageBean;
+import onefengma.demo.server.model.apibeans.UpdateSellerRequest;
 import onefengma.demo.server.model.apibeans.order.ConfirmSellerOrder;
 import onefengma.demo.server.model.apibeans.product.*;
+import onefengma.demo.server.model.metaData.City;
 import onefengma.demo.server.model.product.HandingBuyBrief;
 import onefengma.demo.server.model.product.IronBuyBrief;
+import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper;
 import onefengma.demo.server.services.products.IronManager;
@@ -147,6 +153,44 @@ public class SellerManager extends BaseManager {
             }
 
             HandingDataHelper.getHandingDataHelper().offerHandingBuy(requestBean.getUserId(), requestBean.handingId, requestBean.price, requestBean.msg);
+            return success();
+        }));
+
+        get("profile", AuthSession.class, ((request, response, requestBean) -> {
+            if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
+                return error("无权限操作");
+            }
+            return success(SellerDataHelper.instance().getSeller(requestBean.getUserId()));
+        }));
+
+        multiPost("updateProfile", UpdateSellerRequest.class, ((request, response, requestBean) -> {
+            if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
+                return error("无权限操作");
+            }
+
+            if (!StringUtils.isEmpty(requestBean.cantactTel)) {
+                if (!VerifyUtils.isMobile(requestBean.cantactTel)) {
+                    return errorAndClear(requestBean, "手机号码输入不正确");
+                }
+            }
+
+            if (!StringUtils.isEmpty(requestBean.cityId)) {
+                City city = CityDataHelper.instance().getCityById(requestBean.cityId);
+                if (city == null) {
+                    return errorAndClear(requestBean, "城市选择有误");
+                }
+            }
+
+            UpdateBuilder updateBuilder = new UpdateBuilder();
+            updateBuilder.addStringMap("cantactTel", requestBean.cantactTel);
+            updateBuilder.addStringMap("cityId", requestBean.cityId);
+            updateBuilder.addStringMap("contact", requestBean.contact);
+            updateBuilder.addStringMap("fax", requestBean.fax);
+            updateBuilder.addStringMap("officeAddress", requestBean.officeAddress);
+            updateBuilder.addStringMap("qq", requestBean.qq);
+            updateBuilder.addStringMap("shopProfile", requestBean.shopProfile);
+            updateBuilder.addStringMap("cover", requestBean.cover == null ? "" : FileHelper.generateRelativeInternetUri(requestBean.cover));
+            SellerDataHelper.instance().updateSeller(updateBuilder, requestBean.getUserId());
             return success();
         }));
     }

@@ -1,5 +1,6 @@
 package onefengma.demo.server.services.user;
 
+import onefengma.demo.server.core.UpdateBuilder;
 import org.sql2o.Connection;
 
 import java.util.List;
@@ -254,6 +255,26 @@ public class SellerDataHelper extends BaseDataHelper {
             return conn.createQuery(sql)
                     .addParameter("id", proId)
                     .executeScalar(String.class);
+        }
+    }
+
+    public Seller getSeller(String sellerId) {
+        String sql = "select " + generateFiledString(Seller.class) + " from seller where userId=:userId";
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql).addParameter("userId", sellerId).executeAndFetchFirst(Seller.class);
+        }
+    }
+
+    public void updateSeller(UpdateBuilder updateBuilder, String userId) {
+        String updateSql = updateBuilder.generateSql();
+
+        if (StringUtils.isEmpty(updateSql)) {
+            return;
+        }
+
+        String sql = "update seller set " + updateSql + "where userId=:userId";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("userId", userId).executeUpdate();
         }
     }
 }
