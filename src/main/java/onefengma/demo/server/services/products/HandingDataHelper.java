@@ -344,4 +344,51 @@ public class HandingDataHelper extends BaseDataHelper {
         }
     }
 
+    public List<HandingProduct> getMyHandingProduct(PageBuilder pageBuilder, String userId) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "select " + generateFiledString(HandingProduct.class) + " from handing_product where userId=:userId order by pushTime desc" + pageBuilder.generateLimit();
+        try (Connection conn = getConn()) {
+            List<HandingProduct> handingProducts = conn.createQuery(sql)
+                    .addParameter("userId", userId).executeAndFetch(HandingProduct.class);
+            for (HandingProduct handingProduct : handingProducts) {
+                handingProduct.setSourceCity(CityDataHelper.instance().getCityDescById(handingProduct.souCityId));
+            }
+            return handingProducts;
+        }
+    }
+
+    public int getMyHandingProductCount(String userId) {
+        String sql = "select count(*) from handing_product where userId=:userId";
+        try (Connection conn = getConn()) {
+            Integer count = conn.createQuery(sql)
+                    .addParameter("userId", userId).executeScalar(Integer.class);
+            return count == null ? 0 : count;
+        }
+    }
+
+    public boolean isUserHandingRight(String userId, String handingId) {
+        String sql = "select userId from handing_product where id=:id";
+        try (Connection conn = getConn()) {
+            String userQuery = conn.createQuery(sql).addParameter("id", handingId).executeScalar(String.class);
+            return StringUtils.equals(userId, userQuery);
+        }
+    }
+
+    public void updateHandingProduct(String handingId, float price) {
+        String sql = "update handing_product set price=:price where id=:proId";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql)
+                    .addParameter("price", price)
+                    .addParameter("proId", handingId).executeUpdate();
+        }
+    }
+
+    public void deleteHandingProduct(String ironId) {
+        String sql = "delete from handing_product where id=:proId";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql)
+                    .addParameter("proId", ironId).executeUpdate();
+        }
+    }
+
+
 }

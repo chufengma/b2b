@@ -37,18 +37,18 @@ public class IronDataHelper extends BaseDataHelper {
     public int getMaxIronCounts(PageBuilder pageBuilder) {
         String sql = "select count(*)" +
                 " from iron_product " + generateWhereKey(pageBuilder, false);
-        try (Connection conn = getConn()){
+        try (Connection conn = getConn()) {
             return conn.createQuery(sql).executeScalar(Integer.class);
         }
     }
 
-    public List<IronProductBrief>  getIronProducts(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
+    public List<IronProductBrief> getIronProducts(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(IronProductBrief.class) +
                 " from iron_product " + generateWhereKey(pageBuilder, true);
 
-        try (Connection conn = getConn()){
-            List<IronProductBrief> ironProductBriefs =  conn.createQuery(sql).executeAndFetch(IronProductBrief.class);
-            for(IronProductBrief ironProductBrief : ironProductBriefs) {
+        try (Connection conn = getConn()) {
+            List<IronProductBrief> ironProductBriefs = conn.createQuery(sql).executeAndFetch(IronProductBrief.class);
+            for (IronProductBrief ironProductBrief : ironProductBriefs) {
                 ironProductBrief.setSourceCity(CityDataHelper.instance().getCityDescById(ironProductBrief.sourceCityId));
             }
             return ironProductBriefs;
@@ -60,7 +60,7 @@ public class IronDataHelper extends BaseDataHelper {
                 " from iron_buy " + generateWhereKey(pageBuilder, false);
 
         LogUtils.i("------" + sql);
-        try (Connection conn = getConn()){
+        try (Connection conn = getConn()) {
             return conn.createQuery(sql).executeScalar(Integer.class);
         }
     }
@@ -70,9 +70,9 @@ public class IronDataHelper extends BaseDataHelper {
                 " from iron_buy " + generateWhereKey(pageBuilder, true);
         String supplyCountSql = "select count(*) from iron_buy_supply where ironId=:ironId";
 
-        try (Connection conn = getConn()){
-            List<IronBuyBrief> ironBuyBriefs =  conn.createQuery(sql).executeAndFetch(IronBuyBrief.class);
-            for(IronBuyBrief ironBuyBrief : ironBuyBriefs) {
+        try (Connection conn = getConn()) {
+            List<IronBuyBrief> ironBuyBriefs = conn.createQuery(sql).executeAndFetch(IronBuyBrief.class);
+            for (IronBuyBrief ironBuyBrief : ironBuyBriefs) {
                 Integer count = conn.createQuery(supplyCountSql).addParameter("ironId", ironBuyBrief.id).executeScalar(Integer.class);
                 count = count == null ? 0 : count;
                 ironBuyBrief.setSupplyCount(count);
@@ -110,9 +110,9 @@ public class IronDataHelper extends BaseDataHelper {
                 "or proPlace like \"" + keyword + "\"" +
                 "or material like \"" + keyword + "\"" +
                 "or title like  \"" + keyword + "\"" + pageBuilder.generateSql(true);
-        try(Connection conn = getConn()) {
-            List<IronProductBrief> ironProductBriefs =  conn.createQuery(sql).executeAndFetch(IronProductBrief.class);
-            for(IronProductBrief ironProductBrief : ironProductBriefs) {
+        try (Connection conn = getConn()) {
+            List<IronProductBrief> ironProductBriefs = conn.createQuery(sql).executeAndFetch(IronProductBrief.class);
+            for (IronProductBrief ironProductBrief : ironProductBriefs) {
                 ironProductBrief.setSourceCity(CityDataHelper.instance().getCityDescById(ironProductBrief.sourceCityId));
             }
             return ironProductBriefs;
@@ -127,40 +127,40 @@ public class IronDataHelper extends BaseDataHelper {
                 "or proPlace like \"" + keyword + "\"" +
                 "or material like \"" + keyword + "\"" +
                 "or title like  \"" + keyword + "\"";
-        try(Connection conn = getConn()) {
+        try (Connection conn = getConn()) {
             return conn.createQuery(sql).executeScalar(Integer.class);
         }
     }
 
     public void pushIronBuy(IronBuy ironBuy) throws InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException, IllegalAccessException {
-        try (Connection conn = getConn()){
+        try (Connection conn = getConn()) {
             createInsertQuery(conn, "iron_buy", ironBuy).executeUpdate();
         }
     }
 
     public void pushIronProduct(IronProduct ironProduct) throws IllegalAccessException, UnsupportedEncodingException, NoSuchMethodException, InvocationTargetException {
-        try (Connection conn = getConn()){
+        try (Connection conn = getConn()) {
             createInsertQuery(conn, "iron_product", ironProduct).executeUpdate();
         }
     }
 
     public IronDetail getIronProductById(String proId) {
         String sql = "select * from iron_product where proId=:proId";
-        try(Connection conn = getConn()) {
-           List<IronDetail> ironProducts = conn.createQuery(sql).addParameter("proId", proId).executeAndFetch(IronDetail.class);
-           if (ironProducts.isEmpty()) {
-               return null;
-           } else {
-               return ironProducts.get(0);
-           }
+        try (Connection conn = getConn()) {
+            List<IronDetail> ironProducts = conn.createQuery(sql).addParameter("proId", proId).executeAndFetch(IronDetail.class);
+            if (ironProducts.isEmpty()) {
+                return null;
+            } else {
+                return ironProducts.get(0);
+            }
         }
     }
 
     public List<IronProductBrief> getIronProductRecommend() throws NoSuchFieldException, IllegalAccessException {
-        String sql =  "select " + generateFiledString(IronProductBrief.class) + " from iron_product order by monthSellCount desc limit 0, 6";
-        try(Connection conn = getConn()) {
-            List<IronProductBrief> ironProductBriefs =  conn.createQuery(sql).executeAndFetch(IronProductBrief.class);
-            for(IronProductBrief ironProductBrief : ironProductBriefs) {
+        String sql = "select " + generateFiledString(IronProductBrief.class) + " from iron_product order by monthSellCount desc limit 0, 6";
+        try (Connection conn = getConn()) {
+            List<IronProductBrief> ironProductBriefs = conn.createQuery(sql).executeAndFetch(IronProductBrief.class);
+            for (IronProductBrief ironProductBrief : ironProductBriefs) {
                 ironProductBrief.setSourceCity(CityDataHelper.instance().getCityDescById(ironProductBrief.sourceCityId));
             }
             return ironProductBriefs;
@@ -169,10 +169,10 @@ public class IronDataHelper extends BaseDataHelper {
 
     public List<IronRecommend> getIronBuyRecommend() {
         String sql = "select * from iron_buy order by pushTime limit 0,10";
-        try(Connection conn = getConn()) {
+        try (Connection conn = getConn()) {
             List<IronRecommend> ironRecommends = new ArrayList<>();
             List<IronBuy> ironBuys = conn.createQuery(sql).executeAndFetch(IronBuy.class);
-            for(IronBuy ironBuy : ironBuys) {
+            for (IronBuy ironBuy : ironBuys) {
                 IronRecommend ironRecommend = new IronRecommend();
                 ironRecommend.id = ironBuy.id;
                 ironRecommend.time = ironBuy.pushTime;
@@ -186,7 +186,7 @@ public class IronDataHelper extends BaseDataHelper {
     public int getCancledCount(String userId) {
         String sql = "select count(*)"
                 + " from iron_buy where userId=:userId and status=2 ";
-        try(Connection connection = getConn()){
+        try (Connection connection = getConn()) {
             Integer count = connection.createQuery(sql).addParameter("userId", userId).executeScalar(Integer.class);
             return count == null ? 0 : count;
         }
@@ -196,7 +196,7 @@ public class IronDataHelper extends BaseDataHelper {
         String sql = "update iron_buy " +
                 "set status = 2 where (pushTime+timeLimit) < :currentTime and status = 0 " +
                 "and userId=:userId";
-        try(Connection conn = getConn()) {
+        try (Connection conn = getConn()) {
             conn.createQuery(sql).addParameter("currentTime", System.currentTimeMillis())
                     .addParameter("userId", userId).executeUpdate();
         }
@@ -206,11 +206,11 @@ public class IronDataHelper extends BaseDataHelper {
         String sql = "select " + generateFiledString(IronBuyBrief.class) +
                 " from iron_buy where id=:ironId";
 
-        try (Connection conn = getConn()){
-            List<IronBuyBrief> ironBuyBriefs =  conn.createQuery(sql)
+        try (Connection conn = getConn()) {
+            List<IronBuyBrief> ironBuyBriefs = conn.createQuery(sql)
                     .addParameter("ironId", ironId)
                     .executeAndFetch(IronBuyBrief.class);
-            for(IronBuyBrief ironBuyBrief : ironBuyBriefs) {
+            for (IronBuyBrief ironBuyBrief : ironBuyBriefs) {
                 ironBuyBrief.setSourceCity(CityDataHelper.instance().getCityDescById(ironBuyBrief.locationCityId));
             }
             if (ironBuyBriefs.isEmpty()) {
@@ -223,10 +223,10 @@ public class IronDataHelper extends BaseDataHelper {
     public List<SupplyBrief> getIronBuySupplies(String ironId) {
         String sql = "select * from iron_buy_supply,seller where ironId=:ironId and sellerId=userId";
         try (Connection conn = getConn()) {
-            List<Row> rows =  conn.createQuery(sql)
+            List<Row> rows = conn.createQuery(sql)
                     .addParameter("ironId", ironId).executeAndFetchTable().rows();
             List<SupplyBrief> supplyBriefs = new ArrayList<>();
-            for(Row row : rows) {
+            for (Row row : rows) {
                 SupplyBrief supplyBrief = new SupplyBrief();
                 supplyBrief.companyName = row.getString("companyName");
                 supplyBrief.score = row.getFloat("score");
@@ -244,7 +244,7 @@ public class IronDataHelper extends BaseDataHelper {
 
     public String getSupplyUserId(String ironId) {
         String sql = "select supplyUserId from iron_buy where id=:ironId";
-        try(Connection conn = getConn()) {
+        try (Connection conn = getConn()) {
             return conn.createQuery(sql)
                     .addParameter("ironId", ironId)
                     .executeScalar(String.class);
@@ -253,8 +253,8 @@ public class IronDataHelper extends BaseDataHelper {
 
     public boolean isUserIdInSupplyList(String ironId, String userId) {
         String sql = "select sellerId from iron_buy_supply where ironId=:ironId and sellerId=:userId";
-        try(Connection conn = getConn()) {
-            String sellerId =  conn.createQuery(sql)
+        try (Connection conn = getConn()) {
+            String sellerId = conn.createQuery(sql)
                     .addParameter("ironId", ironId)
                     .addParameter("userId", userId)
                     .executeScalar(String.class);
@@ -264,7 +264,7 @@ public class IronDataHelper extends BaseDataHelper {
 
     public void selectIronBuySupply(String ironId, String supplyUserId) {
         String sql = "update iron_buy set supplyUserId=:userId, status=1,supplyWinTime=:time where id=:ironId";
-        try(Connection conn = getConn()) {
+        try (Connection conn = getConn()) {
             conn.createQuery(sql)
                     .addParameter("ironId", ironId)
                     .addParameter("time", System.currentTimeMillis())
@@ -274,7 +274,7 @@ public class IronDataHelper extends BaseDataHelper {
 
     public int getIronBuyStatus(String ironId) {
         String sql = "select status from iron_buy where id=:ironId";
-        try(Connection conn = getConn()) {
+        try (Connection conn = getConn()) {
             return conn.createQuery(sql)
                     .addParameter("ironId", ironId)
                     .executeScalar(Integer.class);
@@ -293,12 +293,12 @@ public class IronDataHelper extends BaseDataHelper {
         String offerTimesSql = "select count(*) from iron_buy_supply where sellerId=:sellerId";
 
         SellerIronBuysResponse response = new SellerIronBuysResponse(pageBuilder.currentPage, pageBuilder.pageCount);
-        try (Connection conn = getConn()){
-            List<IronBuyBrief> ironBuyBriefs =  conn.createQuery(sql)
+        try (Connection conn = getConn()) {
+            List<IronBuyBrief> ironBuyBriefs = conn.createQuery(sql)
                     .addColumnMapping("iron_buy.id", "id")
                     .addParameter("sellerId", sellerId)
                     .executeAndFetch(IronBuyBrief.class);
-            for(IronBuyBrief ironBuyBrief : ironBuyBriefs) {
+            for (IronBuyBrief ironBuyBrief : ironBuyBriefs) {
                 Integer count = conn.createQuery(supplyCountSql)
                         .addParameter("ironId", ironBuyBrief.id)
                         .executeScalar(Integer.class);
@@ -324,7 +324,7 @@ public class IronDataHelper extends BaseDataHelper {
             offerTimes = offerTimes == null ? 0 : offerTimes;
 
             response.offerTimes = offerTimes;
-            response.offerWinRate = (float)winTimes / (float)offerTimes;
+            response.offerWinRate = (float) winTimes / (float) offerTimes;
 
             return response;
         }
@@ -332,7 +332,7 @@ public class IronDataHelper extends BaseDataHelper {
 
     public SellerOffer getSellerOffer(String userId, String buyId) {
         String sql = "select * from iron_buy_supply where sellerId=:sellerId and ironId=:ironId";
-        try(Connection conn = getConn()) {
+        try (Connection conn = getConn()) {
             List<Row> rows = conn.createQuery(sql).addParameter("sellerId", userId).addParameter("ironId", buyId).executeAndFetchTable().rows();
             if (rows.isEmpty()) {
                 return null;
@@ -347,7 +347,7 @@ public class IronDataHelper extends BaseDataHelper {
 
     public boolean isIronBuyExisted(String ironId) {
         String sql = "select count(*) from iron_buy where id=:ironId";
-        try(Connection conn = getConn()) {
+        try (Connection conn = getConn()) {
             Integer count = conn.createQuery(sql).addParameter("ironId", ironId).executeScalar(Integer.class);
             return count != null && count != 0;
         }
@@ -355,7 +355,7 @@ public class IronDataHelper extends BaseDataHelper {
 
     public void offerIronBuy(String sellerId, String ironId, float price, String msg) {
         String sql = "insert into iron_buy_supply set ironId=:ironId, sellerId=:sellerId, supplyPrice=:price, supplyMsg=:msg, salesmanId=0";
-        try(Connection conn = getConn()) {
+        try (Connection conn = getConn()) {
             conn.createQuery(sql)
                     .addParameter("ironId", ironId)
                     .addParameter("sellerId", sellerId)
@@ -367,17 +367,56 @@ public class IronDataHelper extends BaseDataHelper {
 
     public boolean isOffered(String sellerId, String ironId) {
         String sql = "select count(*) from iron_buy_supply where ironId=:ironId";
-        try(Connection conn = getConn()) {
+        try (Connection conn = getConn()) {
             Integer count = conn.createQuery(sql).addParameter("ironId", ironId).executeScalar(Integer.class);
             return count != null && count != 0;
         }
     }
 
-    public List<IronProductBrief> getMyIronProduct(PageBuilder pageBuilder, String userId) {
-        String sql = "select " + generateFiledString(IronProductBrief.class) + " from iron_product where userId=:userId " + pageBuilder.generateLimit();
+    public List<IronProduct> getMyIronProduct(PageBuilder pageBuilder, String userId) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "select " + generateFiledString(IronProduct.class) + " from iron_product where userId=:userId order by pushTime desc" + pageBuilder.generateLimit();
+        try (Connection conn = getConn()) {
+            List<IronProduct> ironProducts = conn.createQuery(sql)
+                    .addParameter("userId", userId).executeAndFetch(IronProduct.class);
+            for (IronProduct ironProduct : ironProducts) {
+                ironProduct.setSourceCity(CityDataHelper.instance().getCityDescById(ironProduct.sourceCityId));
+            }
+            return ironProducts;
+        }
+    }
+
+    public int getMyIronProductCount(String userId) {
+        String sql = "select count(*) from iron_product where userId=:userId";
+        try (Connection conn = getConn()) {
+            Integer count = conn.createQuery(sql)
+                    .addParameter("userId", userId).executeScalar(Integer.class);
+            return count == null ? 0 : count;
+        }
+    }
+
+    public boolean isUserIronRight(String userId, String ironId) {
+        String sql = "select userId from iron_product where proId=:id";
+        try (Connection conn = getConn()) {
+            String userQuery = conn.createQuery(sql).addParameter("id", ironId).executeScalar(String.class);
+            return StringUtils.equals(userId, userQuery);
+        }
+    }
+
+    public void updateIronProduct(String ironId, long numbers, float price) {
+        String sql = "update iron_product set numbers=:numbers, price=:price where proId=:proId";
         try(Connection conn = getConn()) {
-            return conn.createQuery(sql)
-                    .addParameter("userId", userId).executeAndFetch(IronProductBrief.class);
+            conn.createQuery(sql)
+                    .addParameter("numbers", numbers)
+                    .addParameter("price", price)
+                    .addParameter("proId", ironId).executeUpdate();
+        }
+    }
+
+    public void deleteIronProduct(String ironId) {
+        String sql = "delete from iron_product where proId=:proId";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql)
+                    .addParameter("proId", ironId).executeUpdate();
         }
     }
 

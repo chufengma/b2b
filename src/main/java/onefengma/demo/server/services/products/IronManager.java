@@ -9,8 +9,8 @@ import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.product.*;
 import onefengma.demo.server.model.metaData.IconDataCategory;
 import onefengma.demo.server.model.product.IronDetail;
-import onefengma.demo.server.model.product.IronProduct;
 import onefengma.demo.server.services.funcs.CityDataHelper;
+import onefengma.demo.server.services.order.OrderDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
 import onefengma.demo.server.services.user.UserDataHelper;
 
@@ -196,6 +196,32 @@ public class IronManager extends BaseManager {
                 return error("此次求购已经结束");
             }
             IronDataHelper.getIronDataHelper().selectIronBuySupply(requestBean.ironBuyId, requestBean.supplyId);
+            return success();
+        }));
+
+        get("myProducts", BaseAuthPageBean.class, ((request, response, requestBean) -> {
+            MyIronProductResponse myIronProductResponse = new MyIronProductResponse(requestBean.currentPage, requestBean.pageCount);
+            myIronProductResponse.maxCount = IronDataHelper.getIronDataHelper().getMyIronProductCount(requestBean.getUserId());
+            myIronProductResponse.irons = IronDataHelper.getIronDataHelper().getMyIronProduct(new PageBuilder(requestBean.currentPage, requestBean.pageCount), requestBean.getUserId());
+            return success(myIronProductResponse);
+        }));
+
+        post("updateProduct", UpdateIronProductRequest.class, ((request, response, requestBean) -> {
+            if(!IronDataHelper.getIronDataHelper().isUserIronRight(requestBean.getUserId(), requestBean.ironId)) {
+                return error("用户权限错误");
+            }
+            IronDataHelper.getIronDataHelper().updateIronProduct(requestBean.ironId, requestBean.numbers, requestBean.price);
+            return success();
+        }));
+
+        post("deleteProduct", DeleteIronProductRequest.class, ((request, response, requestBean) -> {
+            if(!IronDataHelper.getIronDataHelper().isUserIronRight(requestBean.getUserId(), requestBean.ironId)) {
+                return error("用户权限错误");
+            }
+            if (OrderDataHelper.instance().isProductInOrdering(requestBean.ironId, 0)) {
+                return error("该产品有相关订单,请处理后再删除");
+            }
+            IronDataHelper.getIronDataHelper().deleteIronProduct(requestBean.ironId);
             return success();
         }));
 

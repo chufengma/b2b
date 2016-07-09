@@ -10,6 +10,7 @@ import onefengma.demo.server.model.metaData.HandingDataCategory;
 import onefengma.demo.server.model.product.HandingDetail;
 import onefengma.demo.server.model.product.HandingProduct;
 import onefengma.demo.server.services.funcs.CityDataHelper;
+import onefengma.demo.server.services.order.OrderDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
 import onefengma.demo.server.services.user.UserDataHelper;
 
@@ -126,6 +127,34 @@ public class HandingManager extends BaseManager{
         get("shopRecommend", BaseBean.class, ((request, response, requestBean) -> {
             return success(SellerDataHelper.instance().getRecommendShopsByHanding());
         }));
+
+        get("myProducts", BaseAuthPageBean.class, ((request, response, requestBean) -> {
+            MyHandingProductResponse myHandingProductResponse = new MyHandingProductResponse(requestBean.currentPage, requestBean.pageCount);
+            myHandingProductResponse.maxCount = HandingDataHelper.getHandingDataHelper().getMyHandingProductCount(requestBean.getUserId());
+            myHandingProductResponse.handings = HandingDataHelper.getHandingDataHelper().getMyHandingProduct(new PageBuilder(requestBean.currentPage, requestBean.pageCount), requestBean.getUserId());
+            return success(myHandingProductResponse);
+        }));
+
+        post("updateProduct", UpdateHandingProductRequest.class, ((request, response, requestBean) -> {
+            if(!HandingDataHelper.getHandingDataHelper().isUserHandingRight(requestBean.getUserId(), requestBean.handingId)) {
+                return error("用户权限错误");
+            }
+            HandingDataHelper.getHandingDataHelper().updateHandingProduct(requestBean.handingId, requestBean.price);
+            return success();
+        }));
+
+        post("deleteProduct", DeleteHandingProductRequest.class, ((request, response, requestBean) -> {
+            if(!HandingDataHelper.getHandingDataHelper().isUserHandingRight(requestBean.getUserId(), requestBean.handingId)) {
+                return error("用户权限错误");
+            }
+            if (OrderDataHelper.instance().isProductInOrdering(requestBean.handingId, 1)) {
+                return error("该产品有相关订单,请处理后再删除");
+            }
+            HandingDataHelper.getHandingDataHelper().deleteHandingProduct(requestBean.handingId);
+            return success();
+        }));
+
+
     }
 
     @Override

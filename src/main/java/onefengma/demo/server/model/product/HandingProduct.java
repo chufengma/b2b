@@ -15,4 +15,15 @@ public class HandingProduct {
     public String image2;
     public String image3;
     public String userId;
+    public long pushTime;
+
+    private String sourceCity;
+
+    public String getSourceCity() {
+        return sourceCity;
+    }
+
+    public void setSourceCity(String sourceCity) {
+        this.sourceCity = sourceCity;
+    }
 }

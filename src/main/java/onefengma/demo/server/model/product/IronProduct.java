@@ -25,4 +25,14 @@ public class IronProduct {
     public long pushTime;
     public long numbers;
     public boolean reviewed = false;
+
+    private String sourceCity;
+
+    public String getSourceCity() {
+        return sourceCity;
+    }
+
+    public void setSourceCity(String sourceCity) {
+        this.sourceCity = sourceCity;
+    }
 }

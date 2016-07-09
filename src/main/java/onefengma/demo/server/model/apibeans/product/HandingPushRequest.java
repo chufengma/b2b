@@ -38,6 +38,7 @@ public class HandingPushRequest extends AuthSession {
         handingProduct.image2 = FileHelper.generateRelativeInternetUri(image2);
         handingProduct.image3 = FileHelper.generateRelativeInternetUri(image3);
         handingProduct.userId = getUserId();
+        handingProduct.pushTime = System.currentTimeMillis();
         return handingProduct;
     }
 }

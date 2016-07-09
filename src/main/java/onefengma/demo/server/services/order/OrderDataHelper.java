@@ -362,6 +362,18 @@ public class OrderDataHelper extends BaseDataHelper {
         }
     }
 
+    public boolean isProductInOrdering(String proId, int productType) {
+        String sql = "select count(*) from product_orders where productType=:productType and productId=:proId and status=0";
+        try(Connection conn = getConn()) {
+            Integer count = conn.createQuery(sql)
+                    .addParameter("productType", productType)
+                    .addParameter("proId", proId)
+                    .executeScalar(Integer.class);
+
+            return count != null && count != 0;
+        }
+    }
+
     public static class OrderSeller {
         public String sellerId;
         public int salesmanId;
