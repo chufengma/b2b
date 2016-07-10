@@ -3,6 +3,7 @@ package onefengma.demo.server.services.products;
 import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.model.apibeans.product.SellerIronBuysResponse;
 import onefengma.demo.server.model.product.*;
+import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import onefengma.demo.server.services.order.OrderDataHelper;
 import onefengma.demo.server.services.user.UserDataHelper;
 import org.apache.commons.logging.Log;
@@ -280,10 +281,13 @@ public class IronDataHelper extends BaseDataHelper {
                 return;
             }
             Float price = conn.createQuery(supplyPriceSql).addParameter("ironId", ironId).addParameter("sellerId", supplyUserId).executeScalar(Float.class);
+            price = price == null ? 0 : price;
             float totalMoney = price * numbers;
             OrderDataHelper.instance().addIntegralByBuy(conn, buyerId, supplyUserId, totalMoney);
         }
 
+        // 增加站内信
+        InnerMessageDataHelper.instance().addInnerMessage(supplyUserId, "恭喜您成功中标", "您已经被买家不锈钢求购中标");
     }
 
     public int getIronBuyStatus(String ironId) {

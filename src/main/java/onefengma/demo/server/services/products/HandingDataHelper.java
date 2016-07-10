@@ -3,6 +3,8 @@ package onefengma.demo.server.services.products;
 import onefengma.demo.server.model.apibeans.product.SellerHandingBuysResponse;
 import onefengma.demo.server.model.apibeans.product.SellerIronBuysResponse;
 import onefengma.demo.server.model.product.*;
+import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
+import onefengma.demo.server.services.order.OrderDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper.SellerOffer;
 import org.sql2o.Connection;
 
@@ -233,14 +235,25 @@ public class HandingDataHelper extends BaseDataHelper {
         }
     }
 
-    public void selectHandingBuySupply(String handingId, String supplyUserId) {
+    public void selectHandingBuySupply(String buyerId, String handingId, String supplyUserId) {
         String sql = "update handing_buy set supplyUserId=:userId, status=1,supplyWinTime=:time where id=:handingId";
+
+        String supplyPriceSql = "select supplyPrice from handing_buy_supply where where handingId=:handingId and sellerId=:sellerId";
+
         try(Connection conn = getConn()) {
             conn.createQuery(sql)
                     .addParameter("handingId", handingId)
                     .addParameter("time", System.currentTimeMillis())
                     .addParameter("userId", supplyUserId).executeUpdate();
+
+            Float price = conn.createQuery(supplyPriceSql).addParameter("handingId", handingId).addParameter("sellerId", supplyUserId).executeScalar(Float.class);
+            price = price == null ? 0 : price;
+            float totalMoney = price;
+            OrderDataHelper.instance().addIntegralByBuy(conn, buyerId, supplyUserId, totalMoney);
         }
+
+        // 增加站内信
+        InnerMessageDataHelper.instance().addInnerMessage(supplyUserId, "恭喜您成功中标", "您已经被买家加工求购中标");
     }
 
     public int getHandingBuyStatus(String handingId) {

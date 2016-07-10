@@ -4,6 +4,7 @@ import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.UpdateBuilder;
 import onefengma.demo.server.model.SalesMan;
 import onefengma.demo.server.model.UserProfile;
+import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import org.sql2o.Connection;
 
 import java.util.ArrayList;
@@ -80,6 +81,7 @@ public class UserDataHelper extends BaseDataHelper {
                     .addParameter("mobile", user.getMobile())
                     .executeUpdate();
         }
+        InnerMessageDataHelper.instance().addRegisterSuccessMessage(user.getUserId());
     }
 
     public void setSeller(String userId, boolean seller) throws NoSuchFieldException, IllegalAccessException {

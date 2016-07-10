@@ -120,7 +120,7 @@ public class HandingManager extends BaseManager{
             if (!StringUtils.isEmpty(HandingDataHelper.getHandingDataHelper().getSupplyUserId(requestBean.handingBuyId))) {
                 return error("此次求购已经结束");
             }
-            HandingDataHelper.getHandingDataHelper().selectHandingBuySupply(requestBean.handingBuyId, requestBean.supplyId);
+            HandingDataHelper.getHandingDataHelper().selectHandingBuySupply(requestBean.getUserId(), requestBean.handingBuyId, requestBean.supplyId);
             return success();
         }));
 

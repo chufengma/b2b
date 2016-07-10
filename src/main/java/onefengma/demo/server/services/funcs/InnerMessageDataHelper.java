@@ -22,6 +22,10 @@ public class InnerMessageDataHelper extends BaseDataHelper {
         return instance;
     }
 
+    public void addRegisterSuccessMessage(String userId) {
+        addInnerMessage(userId, "欢迎加入淘不秀", "淘不秀好得很淘不秀好得很淘不秀好得很淘不秀好得很淘不秀好得很淘不秀好得很");
+    }
+
     public void addInnerMessage(String userId, String title, String message) {
         String sql = "insert into inner_message set title=:title, userId=:userId, message=:message, pushTime:time ";
         try(Connection conn = getConn()) {
