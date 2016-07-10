@@ -277,4 +277,12 @@ public class SellerDataHelper extends BaseDataHelper {
             conn.createQuery(sql).addParameter("userId", userId).executeUpdate();
         }
     }
+
+    public float getSellerIntegral(String userId) {
+        String sql = "select integral from seller where userId=:userId";
+        try(Connection conn = getConn()) {
+            Float integral = conn.createQuery(sql).addParameter("userId", userId).executeScalar(Float.class);
+            return integral == null ? 0 : integral;
+        }
+    }
 }

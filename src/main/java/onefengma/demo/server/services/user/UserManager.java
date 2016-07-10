@@ -154,6 +154,10 @@ public class UserManager extends BaseManager {
             return success();
         }));
 
+        get("myIntegral", AuthSession.class, ((request, response, requestBean) -> {
+            return success(UserDataHelper.instance().getBuyerIntegral(requestBean.getUserId()));
+        }));
+
         // just for test
         multiPost("upload", UploadDemo.class, (request, response, requestBean) -> {
             return success(requestBean);
@@ -174,6 +178,7 @@ public class UserManager extends BaseManager {
         getPage("upload", BaseBean.class, "upload.html", (request, response, requestBean) -> {
             return null;
         });
+
     }
 
 

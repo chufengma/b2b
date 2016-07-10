@@ -209,6 +209,14 @@ public class SellerManager extends BaseManager {
             SellerDataHelper.instance().updateSeller(updateBuilder, requestBean.getUserId());
             return success();
         }));
+
+
+        get("myIntegral", AuthSession.class, ((request, response, requestBean) -> {
+            if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
+                return error("用户权限错误");
+            }
+            return success(SellerDataHelper.instance().getSellerIntegral(requestBean.getUserId()));
+        }));
     }
 
     @Override

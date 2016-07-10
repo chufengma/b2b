@@ -141,4 +141,12 @@ public class UserDataHelper extends BaseDataHelper {
             conn.createQuery(sql).addParameter("userId", userId).executeUpdate();
         }
     }
+
+    public float getBuyerIntegral(String userId) {
+        String sql = "select integral from user where userId=:userId";
+        try(Connection conn = getConn()) {
+            Float integral = conn.createQuery(sql).addParameter("userId", userId).executeScalar(Float.class);
+            return integral == null ? 0 : integral;
+        }
+    }
 }
