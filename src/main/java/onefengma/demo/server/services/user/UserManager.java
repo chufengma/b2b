@@ -4,23 +4,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 import onefengma.demo.common.*;
-import onefengma.demo.server.core.UpdateBuilder;
+import onefengma.demo.server.core.*;
 import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.UploadDemo;
 import onefengma.demo.server.model.User;
-import onefengma.demo.server.core.BaseManager;
-import onefengma.demo.server.core.MsgCodeHelper;
-import onefengma.demo.server.core.ValidateHelper;
 import onefengma.demo.server.core.request.AuthHelper;
 import onefengma.demo.server.model.apibeans.AuthSession;
+import onefengma.demo.server.model.apibeans.BaseAuthPageBean;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.SellerRequest;
 import onefengma.demo.server.model.apibeans.login.ChangePassword;
 import onefengma.demo.server.model.apibeans.login.ChangeUserProfile;
 import onefengma.demo.server.model.apibeans.login.Login;
 import onefengma.demo.server.model.apibeans.login.Register;
+import onefengma.demo.server.model.innermessage.InnerMessageDetailRequest;
+import onefengma.demo.server.model.innermessage.InnerMessagesResponse;
 import onefengma.demo.server.model.metaData.City;
 import onefengma.demo.server.services.funcs.CityDataHelper;
+import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 
 /**
  * @author yfchu
@@ -154,8 +155,31 @@ public class UserManager extends BaseManager {
             return success();
         }));
 
+        get("profile", AuthSession.class, ((request, response, requestBean) -> {
+            return success(UserDataHelper.instance().getUserProfile(requestBean.getUserId()));
+        }));
+
         get("myIntegral", AuthSession.class, ((request, response, requestBean) -> {
             return success(UserDataHelper.instance().getBuyerIntegral(requestBean.getUserId()));
+        }));
+
+        get("myInnerMessage", BaseAuthPageBean.class, ((request, response, requestBean) -> {
+            InnerMessagesResponse innerMessagesResponse = new InnerMessagesResponse(requestBean.currentPage, requestBean.pageCount);
+            innerMessagesResponse.maxCount = InnerMessageDataHelper.instance().getInnerMessageCountByUser(requestBean.getUserId());
+            innerMessagesResponse.messages = InnerMessageDataHelper.instance().getInnerMessages(new PageBuilder(requestBean.currentPage, requestBean.pageCount), requestBean.getUserId());
+            return success(innerMessagesResponse);
+        }));
+
+        get("myInnerMessageDetail", InnerMessageDetailRequest.class, ((request, response, requestBean) -> {
+            return success(InnerMessageDataHelper.instance().getInnerMessageDetail(requestBean.messageId));
+        }));
+
+        post("deleteInnerMessage", InnerMessageDetailRequest.class, ((request, response, requestBean) -> {
+            if (!InnerMessageDataHelper.instance().isMessageUserRight(requestBean.getUserId(), requestBean.messageId)) {
+                return error("用户权限错误");
+            }
+            InnerMessageDataHelper.instance().deleteInnerMessage(requestBean.messageId);
+            return success("删除成功");
         }));
 
         // just for test

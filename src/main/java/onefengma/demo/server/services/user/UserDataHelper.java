@@ -3,6 +3,7 @@ package onefengma.demo.server.services.user;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.UpdateBuilder;
 import onefengma.demo.server.model.SalesMan;
+import onefengma.demo.server.model.UserProfile;
 import org.sql2o.Connection;
 
 import java.util.ArrayList;
@@ -139,6 +140,13 @@ public class UserDataHelper extends BaseDataHelper {
         String sql = "update user set " + updateSql  + " where userId=:userId";
         try(Connection conn = getConn()) {
             conn.createQuery(sql).addParameter("userId", userId).executeUpdate();
+        }
+    }
+
+    public UserProfile getUserProfile(String userId) {
+        String sql = "select " + generateFiledString(UserProfile.class) + " from user where userId=:userId ";
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql).addParameter("userId", userId).executeAndFetchFirst(UserProfile.class);
         }
     }
 
