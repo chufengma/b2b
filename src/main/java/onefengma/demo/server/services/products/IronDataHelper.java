@@ -3,6 +3,7 @@ package onefengma.demo.server.services.products;
 import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.model.apibeans.product.SellerIronBuysResponse;
 import onefengma.demo.server.model.product.*;
+import onefengma.demo.server.services.order.OrderDataHelper;
 import onefengma.demo.server.services.user.UserDataHelper;
 import org.apache.commons.logging.Log;
 import org.sql2o.Connection;
@@ -262,14 +263,27 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
-    public void selectIronBuySupply(String ironId, String supplyUserId) {
+    public void selectIronBuySupply(String buyerId, String ironId, String supplyUserId) {
         String sql = "update iron_buy set supplyUserId=:userId, status=1, supplyWinTime=:time where id=:ironId";
+
+        String numberSql = "select numbers from iron_buy where where id=:ironId";
+        String supplyPriceSql = "select supplyPrice from iron_buy_supply where where ironId=:ironId and sellerId=:sellerId";
+
         try (Connection conn = getConn()) {
             conn.createQuery(sql)
                     .addParameter("ironId", ironId)
                     .addParameter("time", System.currentTimeMillis())
                     .addParameter("userId", supplyUserId).executeUpdate();
+
+            Integer numbers = conn.createQuery(numberSql).addParameter("ironId", ironId).executeScalar(Integer.class);
+            if (numbers == null || numbers == 0) {
+                return;
+            }
+            Float price = conn.createQuery(supplyPriceSql).addParameter("ironId", ironId).addParameter("sellerId", supplyUserId).executeScalar(Float.class);
+            float totalMoney = price * numbers;
+            OrderDataHelper.instance().addIntegralByBuy(conn, buyerId, supplyUserId, totalMoney);
         }
+
     }
 
     public int getIronBuyStatus(String ironId) {

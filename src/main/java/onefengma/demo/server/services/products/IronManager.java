@@ -195,7 +195,7 @@ public class IronManager extends BaseManager {
             if (!StringUtils.isEmpty(IronDataHelper.getIronDataHelper().getSupplyUserId(requestBean.ironBuyId))) {
                 return error("此次求购已经结束");
             }
-            IronDataHelper.getIronDataHelper().selectIronBuySupply(requestBean.ironBuyId, requestBean.supplyId);
+            IronDataHelper.getIronDataHelper().selectIronBuySupply(requestBean.getUserId(), requestBean.ironBuyId, requestBean.supplyId);
             return success();
         }));
 
