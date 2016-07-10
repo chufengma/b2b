@@ -238,7 +238,7 @@ public class IronDataHelper extends BaseDataHelper {
             List<SupplyBrief> supplyBriefs = new ArrayList<>();
             for (Row row : rows) {
                 SupplyBrief supplyBrief = new SupplyBrief();
-                supplyBrief.companyName = row.getString("buyerCompanyName");
+                supplyBrief.companyName = row.getString("companyName");
                 supplyBrief.score = row.getFloat("score");
                 supplyBrief.sellerId = row.getString("userId");
                 supplyBrief.status = row.getInteger("status");
