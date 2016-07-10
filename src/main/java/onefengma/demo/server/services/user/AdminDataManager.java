@@ -5,6 +5,7 @@ import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.Admin;
 import onefengma.demo.server.model.SalesMan;
+import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.admin.AdminSellersResponse;
 import onefengma.demo.server.model.admin.AdminUsersResponse;
 import onefengma.demo.server.model.apibeans.admin.AdminOrdersResponse;
@@ -94,13 +95,13 @@ public class AdminDataManager extends BaseDataHelper {
             totalMoneyKeyName = "sellerTotalMoney";
         }
 
-        String companySql = StringUtils.isEmpty(companyName) ? "" :  "and buyerCompanyName like '%" + companyName +"%' ";
+        String companySql = StringUtils.isEmpty(companyName) ? "" :  "and companyName like '%" + companyName +"%' ";
 
         String maxCountSql = "select count(*) from user,seller,salesman where user.userId=seller.userId and user.salesManId=salesman.id "
                 + " and registerTime<:registerEndTime and registerTime>=:registerStartTime "
                 + ((StringUtils.isEmpty(whereSql)) ? "" : " and " + whereSql);
-        String sellerSql = "select userId,buyerCompanyName,passTime as becomeSellerTime,contact as contactName,productCount,score, mobile,registerTime, sum(ironMoney + handingMoney)  as " + totalMoneyKeyName + " , tel as salesMobile,salesId " +
-                "from (select buyerCompanyName,user.userId,passTime,contact, productCount,score,mobile,registerTime,user.salesManId as salesId, tel " +
+        String sellerSql = "select userId,companyName,passTime as becomeSellerTime,contact as contactName,productCount,score, mobile,registerTime, sum(ironMoney + handingMoney)  as " + totalMoneyKeyName + " , tel as salesMobile,salesId " +
+                "from (select companyName,user.userId,passTime,contact, productCount,score,mobile,registerTime,user.salesManId as salesId, tel " +
                 "from user,salesman,seller where user.salesManId=salesman.id and user.userId=seller.userId) " +
                 "as userComplete left join " + amountTable + " " +
                 "on (userId=sellerId and day>=:dataStartTime and day<:dataEndTime) " +
@@ -158,6 +159,16 @@ public class AdminDataManager extends BaseDataHelper {
                 orderForAdmin.finishTime = row.getLong("finishTime");
                 orderForAdmin.status = row.getInteger("status");
                 orderForAdmin.salesManId = row.getInteger("salesmanId");
+
+                String buyerId = row.getString("buyerId");
+                orderForAdmin.buyerMobile = UserDataHelper.instance().getUserMobile(buyerId);
+
+                String sellerId = row.getString("sellerId");
+                Seller seller = SellerDataHelper.instance().getSeller(sellerId);
+                if (seller != null) {
+                    orderForAdmin.sellerMobile = UserDataHelper.instance().getUserMobile(sellerId);
+                    orderForAdmin.sellerCompany = seller.companyName;
+                }
 
                 SalesMan salesMan = UserDataHelper.instance().getSalesManById(orderForAdmin.salesManId);
                 if (salesMan != null) {
