@@ -51,7 +51,7 @@ public class UserDataHelper extends BaseDataHelper {
     }
 
     public User findUserByUserId(String userId) throws NoSuchFieldException, IllegalAccessException {
-        String sql = createSql("select " + generateFiledString(User.class) + "from @USER_TABLE where @USER_ID=:userId");
+        String sql = "select " + generateFiledString(User.class) + " from user where userId=:userId";
         List<User> users;
         try (Connection con = getConn()) {
             users = con.createQuery(sql)
