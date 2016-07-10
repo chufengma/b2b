@@ -54,7 +54,7 @@ public class SellerRequest extends AuthSession {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        seller.officeAddress = cityDesc + "" + sellerRequest.officeAddress;
+        seller.officeAddress = sellerRequest.officeAddress;
         seller.qq = sellerRequest.qq;
         seller.shopProfile = sellerRequest.shopProfile;
         seller.cover = FileHelper.generateRelativeInternetUri(cover);
