@@ -36,6 +36,14 @@ public class IronDataHelper extends BaseDataHelper {
         return ironDataHelper;
     }
 
+    public float getIronPrice(String ironId) {
+        String sql = "select price from iron_product where proId=:id";
+        try (Connection conn = getConn()) {
+            Float price = conn.createQuery(sql).addParameter("id", ironId).executeScalar(Float.class);
+            return price == null ? 0 : price;
+        }
+    }
+
     public int getMaxIronCounts(PageBuilder pageBuilder) {
         String sql = "select count(*)" +
                 " from iron_product " + generateWhereKey(pageBuilder, false);

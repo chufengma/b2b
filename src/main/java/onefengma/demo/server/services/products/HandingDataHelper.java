@@ -34,6 +34,14 @@ public class HandingDataHelper extends BaseDataHelper {
         return handingDataHelper;
     }
 
+    public float getHandingPrice(String handingId) {
+        String sql = "select price from handing_product where id=:id";
+        try (Connection conn = getConn()) {
+            Float price = conn.createQuery(sql).addParameter("id", handingId).executeScalar(Float.class);
+            return price == null ? 0 : price;
+        }
+    }
+
     public int getMaxCount(PageBuilder pageBuilder) {
         String sql = "select count(*)"
             + " from handing_product " + generateWhereKey(pageBuilder, false);

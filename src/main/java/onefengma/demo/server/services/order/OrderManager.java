@@ -9,7 +9,13 @@ import onefengma.demo.server.model.apibeans.BaseAuthPageBean;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.LastRecords;
 import onefengma.demo.server.model.apibeans.order.*;
+import onefengma.demo.server.model.apibeans.order.OrderAllRequest.OrderSingle;
 import onefengma.demo.server.model.order.Order;
+import onefengma.demo.server.model.product.IronDetail;
+import onefengma.demo.server.services.products.HandingDataHelper;
+import onefengma.demo.server.services.products.IronDataHelper;
+import onefengma.demo.server.services.user.SellerDataHelper;
+import onefengma.demo.server.services.user.UserDataHelper;
 
 import java.util.List;
 
@@ -35,11 +41,35 @@ public class OrderManager extends BaseManager{
         }));
 
         post("translate", OrderRequest.class, ((request, response, requestBean) -> {
+            if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
+                float price = 0;
+                if (requestBean.productType == 0) {
+                    price = IronDataHelper.getIronDataHelper().getIronPrice(requestBean.productId);
+                } else {
+                    price = HandingDataHelper.getHandingDataHelper().getHandingPrice(requestBean.productId);
+                }
+                if (price * requestBean.count >= 5000) {
+                    return error("您不是企业用户，请前往后台点击成为商家上传公司三证等相关资料");
+                }
+            }
             OrderDataHelper.instance().translate(requestBean.generateOrder(), requestBean.isFromCar);
             return success();
         }));
 
         post("translateAll", OrderAllRequest.class, ((request, response, requestBean) -> {
+            if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
+                for(OrderSingle order : requestBean.orders) {
+                    float price = 0;
+                    if (order.productType == 0) {
+                        price = IronDataHelper.getIronDataHelper().getIronPrice(order.productId);
+                    } else {
+                        price = HandingDataHelper.getHandingDataHelper().getHandingPrice(order.productId);
+                    }
+                    if (price * order.count >= 5000) {
+                        return error("您不是企业用户，请前往后台点击成为商家上传公司三证等相关资料");
+                    }
+                }
+            }
             List<Order> orders = requestBean.generateOrders();
             for(Order order : orders) {
                 OrderDataHelper.instance().translate(order, true);
