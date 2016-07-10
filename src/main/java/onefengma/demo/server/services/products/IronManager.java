@@ -46,6 +46,7 @@ public class IronManager extends BaseManager {
                     .addEqualWhere("surface", requestBean.surface)
                     .addEqualWhere("proPlace", requestBean.proPlace)
                     .addEqualWhere("userId", requestBean.sellerId)
+                    .addEqualWhere("reviewed", true)
                     .addInWhere("sourceCityId", CityDataHelper.instance().getCitiesById(new ArrayList<>(), requestBean.cityId))
                     .setOrderByRequest(requestBean);
 
