@@ -111,6 +111,28 @@ public class UserDataHelper extends BaseDataHelper {
         }
     }
 
+    public String getSalesManIdByMobile(String mobile) {
+        String sql = "select id from salesman where tel=:tel";
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql).addParameter("tel", mobile).executeScalar(String.class);
+        }
+    }
+
+    public int getSalesManId(String userId) {
+        String sql = "select salesManId from user where userId=:userId";
+        try(Connection conn = getConn()) {
+            Integer id = conn.createQuery(sql).addParameter("userId", userId).executeScalar(Integer.class);
+            return id == null ? 0 : id;
+        }
+    }
+
+    public String getUserIdByMobile(String mobile) {
+        String sql = "select userId from user where mobile=:mobile";
+        try(Connection conn = getConn()) {
+           return conn.createQuery(sql).addParameter("mobile", mobile).executeAndFetchFirst(String.class);
+        }
+    }
+
     public SalesMan getSalesManById(int salesId) {
         String sql = "select " + generateFiledString(SalesMan.class) + " from salesman where id=:id";
         try(Connection conn = getConn()) {

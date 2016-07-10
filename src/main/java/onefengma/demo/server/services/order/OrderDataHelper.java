@@ -10,6 +10,8 @@ import onefengma.demo.server.model.order.OrderBrief;
 import onefengma.demo.server.model.product.HandingProductBrief;
 import onefengma.demo.server.model.product.IronProductBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
+import onefengma.demo.server.services.products.HandingDataHelper;
+import onefengma.demo.server.services.products.IronDataHelper;
 import onefengma.demo.server.services.user.UserDataHelper;
 import org.sql2o.Connection;
 
@@ -184,43 +186,44 @@ public class OrderDataHelper extends BaseDataHelper {
         String idSql = "select count(id) from product_orders where sellTime >= :lastTime and sellTime < :nextTime";
         String tableName = ((order.productType == 0) ? "iron_product" : "handing_product");
         String proId = ((order.productType == 0) ? tableName + ".proId" : tableName + ".id");
-        String sellerIdSql = "select (seller.userId) as sellerId ,salesmanId from " + tableName + ",seller where seller.userId=" + tableName +".userId and " + proId + "=:proId";
-
+        String sellerIdSql = "select userId from " + tableName + " where " + proId + "=:proId";
         String deleteCarSql = "delete from order_car where userId=:userId and proId=:proId and productType=:productType";
         String selectCarSql = "select count(*) from order_car where userId=:userId and proId=:proId and productType=:productType";
 
-        transaction(new Func() {
-            @Override
-            public void doIt(Connection conn) throws Exception {
-                if (isFromCar) {
-                    Integer count = conn.createQuery(selectCarSql).addParameter("userId", order.buyerId)
-                            .addParameter("proId", order.productId)
-                            .addParameter("productType", order.productType).executeScalar(Integer.class);
+        order.salesmanId = UserDataHelper.instance().getSalesManId(order.buyerId);
 
-                    if (count == null || count == 0) {
-                        return;
-                    }
+        if (order.productType == 0) {
+            order.totalMoney = IronDataHelper.getIronDataHelper().getIronPrice(order.productId) * order.count;
+        } else {
+            order.totalMoney = HandingDataHelper.getHandingDataHelper().getHandingPrice(order.productId) * order.count;
+        }
 
-                    conn.createQuery(deleteCarSql).addParameter("userId", order.buyerId)
-                            .addParameter("proId", order.productId)
-                            .addParameter("productType", order.productType).executeUpdate();
-                }
-
-
-                List<OrderSeller> orderSellers = conn.createQuery(sellerIdSql)
+        transaction(conn -> {
+            if (isFromCar) {
+                Integer count = conn.createQuery(selectCarSql).addParameter("userId", order.buyerId)
                         .addParameter("proId", order.productId)
-                        .executeAndFetch(OrderSeller.class);
-                int id = conn.createQuery(idSql)
-                        .addParameter("lastTime", DateHelper.getLastDayTimestamp())
-                        .addParameter("nextTime", DateHelper.getNextDayTimestamp())
-                        .executeScalar(Integer.class);
-                String dateStr = DateHelper.getDataStrWithOut();
-                dateStr = order.productType + dateStr + "0" + id;
-                order.id = dateStr;
-                order.sellerId = orderSellers.get(0).sellerId;
-                order.salesmanId = orderSellers.get(0).salesmanId;
-                createInsertQuery(conn, "product_orders", order).executeUpdate();
+                        .addParameter("productType", order.productType).executeScalar(Integer.class);
+                if (count == null || count == 0) {
+                    return;
+                }
+                conn.createQuery(deleteCarSql).addParameter("userId", order.buyerId)
+                        .addParameter("proId", order.productId)
+                        .addParameter("productType", order.productType).executeUpdate();
             }
+
+            String sellerId = conn.createQuery(sellerIdSql)
+                    .addParameter("proId", order.productId).executeScalar(String.class);
+
+            int id = conn.createQuery(idSql)
+                    .addParameter("lastTime", DateHelper.getLastDayTimestamp())
+                    .addParameter("nextTime", DateHelper.getNextDayTimestamp())
+                    .executeScalar(Integer.class);
+            String dateStr = DateHelper.getDataStrWithOut();
+            dateStr = order.productType + dateStr + "0" + id;
+            order.id = dateStr;
+            order.sellerId = sellerId;
+
+            createInsertQuery(conn, "product_orders", order).executeUpdate();
         });
     }
 
@@ -340,9 +343,12 @@ public class OrderDataHelper extends BaseDataHelper {
     }
 
     public void confirmOrder(String orderId) {
-        String sql = "update product_orders set status = 1 where id=:orderId and status=0";
+        String sql = "update product_orders set status = 1, finishTime=:finisTime where id=:orderId and status=0";
         try(Connection conn = getConn()) {
-            conn.createQuery(sql).addParameter("orderId", orderId).executeUpdate();
+            conn.createQuery(sql)
+                    .addParameter("finishTime", System.currentTimeMillis())
+                    .addParameter("orderId", orderId)
+                    .executeUpdate();
         }
         addBuyerIntegralByOrder(orderId);
     }

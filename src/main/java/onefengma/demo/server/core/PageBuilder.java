@@ -127,6 +127,15 @@ public class PageBuilder {
         return this;
     }
 
+    public PageBuilder addEqualWhereCanEmpty(String key, String value) {
+        if (value == null) {
+            return this;
+        }
+        this.wereList.add(new Where(key, value));
+        return this;
+    }
+
+
     public PageBuilder addInWhere(String key, List<String> value) {
         if (value == null || value.isEmpty()) {
             return this;
@@ -229,9 +238,6 @@ public class PageBuilder {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < wereList.size(); i++) {
             Where where = wereList.get(i);
-            if (StringUtils.isEmpty((String) where.value)) {
-                continue;
-            }
             stringBuilder.append(where.generate());
             if (i != wereList.size() - 1) {
                 stringBuilder.append(" and");

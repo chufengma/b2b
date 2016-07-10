@@ -14,4 +14,5 @@ public class Order {
     public long timeLimit;
     public long sellTime;
     public int status;
+    public float totalMoney;
 }

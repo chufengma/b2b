@@ -4,8 +4,12 @@ import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.Admin;
+import onefengma.demo.server.model.SalesMan;
 import onefengma.demo.server.model.admin.AdminSellersResponse;
 import onefengma.demo.server.model.admin.AdminUsersResponse;
+import onefengma.demo.server.model.apibeans.admin.AdminOrdersResponse;
+import onefengma.demo.server.services.products.HandingDataHelper;
+import onefengma.demo.server.services.products.IronDataHelper;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 import org.sql2o.data.Table;
@@ -90,13 +94,13 @@ public class AdminDataManager extends BaseDataHelper {
             totalMoneyKeyName = "sellerTotalMoney";
         }
 
-        String companySql = StringUtils.isEmpty(companyName) ? "" :  "and companyName like '%" + companyName +"%' ";
+        String companySql = StringUtils.isEmpty(companyName) ? "" :  "and buyerCompanyName like '%" + companyName +"%' ";
 
         String maxCountSql = "select count(*) from user,seller,salesman where user.userId=seller.userId and user.salesManId=salesman.id "
                 + " and registerTime<:registerEndTime and registerTime>=:registerStartTime "
                 + ((StringUtils.isEmpty(whereSql)) ? "" : " and " + whereSql);
-        String sellerSql = "select userId,companyName,passTime as becomeSellerTime,contact as contactName,productCount,score, mobile,registerTime, sum(ironMoney + handingMoney)  as " + totalMoneyKeyName + " , tel as salesMobile,salesId " +
-                "from (select companyName,user.userId,passTime,contact, productCount,score,mobile,registerTime,user.salesManId as salesId, tel " +
+        String sellerSql = "select userId,buyerCompanyName,passTime as becomeSellerTime,contact as contactName,productCount,score, mobile,registerTime, sum(ironMoney + handingMoney)  as " + totalMoneyKeyName + " , tel as salesMobile,salesId " +
+                "from (select buyerCompanyName,user.userId,passTime,contact, productCount,score,mobile,registerTime,user.salesManId as salesId, tel " +
                 "from user,salesman,seller where user.salesManId=salesman.id and user.userId=seller.userId) " +
                 "as userComplete left join " + amountTable + " " +
                 "on (userId=sellerId and day>=:dataStartTime and day<:dataEndTime) " +
@@ -126,6 +130,66 @@ public class AdminDataManager extends BaseDataHelper {
         return adminSellersResponse;
     }
 
+
+    public AdminOrdersResponse getOrdersForAdmin(PageBuilder pageBuilder) {
+        String sql = "select * from product_orders " + (pageBuilder.hasWhere() ? " where " : " ") + pageBuilder.generateWhere() + " " + pageBuilder.generateLimit();
+        String countSql = "select count(*) from product_orders " + (pageBuilder.hasWhere() ? " where " : " ") + pageBuilder.generateWhere();
+
+        AdminOrdersResponse adminOrdersResponse = new AdminOrdersResponse();
+        adminOrdersResponse.currentPage = pageBuilder.currentPage;
+        adminOrdersResponse.pageCount = pageBuilder.pageCount;
+        List<OrderForAdmin> orderForAdmins = new ArrayList<>();
+        try(Connection conn = getConn()) {
+            List<Row> rows = conn.createQuery(sql).executeAndFetchTable().rows();
+            for (Row row : rows) {
+                OrderForAdmin orderForAdmin = new OrderForAdmin();
+                orderForAdmin.orderId = row.getString("id");
+                int productType = row.getInteger("productType");
+
+                orderForAdmin.count = row.getFloat("count");
+                if (productType == 0) {
+                    orderForAdmin.price = IronDataHelper.getIronDataHelper().getIronPrice(orderForAdmin.orderId);
+                } else {
+                    orderForAdmin.price = HandingDataHelper.getHandingDataHelper().getHandingPrice(orderForAdmin.orderId);
+                }
+                orderForAdmin.totalMoney = row.getFloat("totalMoney");
+                orderForAdmin.pushTime = row.getLong("sellTime");
+                orderForAdmin.outDateTime = orderForAdmin.pushTime + row.getLong("timeLimit");
+                orderForAdmin.finishTime = row.getLong("finishTime");
+                orderForAdmin.status = row.getInteger("status");
+                orderForAdmin.salesManId = row.getInteger("salesmanId");
+
+                SalesMan salesMan = UserDataHelper.instance().getSalesManById(orderForAdmin.salesManId);
+                if (salesMan != null) {
+                    orderForAdmin.salesManMobile = salesMan.tel;
+                }
+                orderForAdmins.add(orderForAdmin);
+            }
+
+            Integer count = conn.createQuery(countSql).executeScalar(Integer.class);
+            count = count == null ? 0 : count;
+
+            adminOrdersResponse.maxCount = count;
+            adminOrdersResponse.orders = orderForAdmins;
+        }
+        return adminOrdersResponse;
+    }
+
+    public static class OrderForAdmin {
+        public String orderId;
+        public String buyerMobile;
+        public String sellerMobile;
+        public String sellerCompany;
+        public float price;
+        public float count;
+        public float totalMoney;
+        public long pushTime;
+        public long outDateTime;
+        public long finishTime;
+        public int status;
+        public int salesManId;
+        public String salesManMobile;
+    }
 
     public static class SellerBrief {
         public String userId;

@@ -23,7 +23,7 @@ public class SellerDataHelper extends BaseDataHelper {
     private static final String TABLE = "seller";
     private static final String ID = "id";
     private static final String USER_ID = "userId";
-    private static final String COMPANY_NAME = "companyName";
+    private static final String COMPANY_NAME = "buyerCompanyName";
     private static final String REG_MONEY = "regMoney";
     private static final String CONTACT = "contact";
     private static final String CANTACT_TEL = "cantactTel";
@@ -50,12 +50,12 @@ public class SellerDataHelper extends BaseDataHelper {
         String sql = createSql("insert into @TABLE(@USER_ID, @COMPANY_NAME, @REG_MONEY, @CONTACT," +
                 "@CANTACT_TEL, @FAX, @CITY_ID, @OFFICE_ADDRESS, @QQ, @SHOP_PROFILE, " +
                 "@ALL_CER, @BUSINESS_LIC, @CODE_LIC, @FINANCE_LIC) values (" +
-                ":userId, :companyName, :regMoney, :contact, :cantactTel," +
+                ":userId, :buyerCompanyName, :regMoney, :contact, :cantactTel," +
                 ":fax, :cityId, :officeAddress, :qq, :shopProfile, :allCer," +
                 ":buCli, :codeCli, :finCli)");
         try(Connection connection = getConn()) {
             connection.createQuery(sql).addParameter("userId", seller.userId)
-                    .addParameter("companyName", seller.companyName)
+                    .addParameter("buyerCompanyName", seller.companyName)
                     .addParameter("regMoney", seller.regMoney)
                     .addParameter("contact", seller.contact)
                     .addParameter("cantactTel", seller.cantactTel)
@@ -91,7 +91,7 @@ public class SellerDataHelper extends BaseDataHelper {
     public List<ShopBrief> searchShops(String keyword, PageBuilder pageBuilder) {
         keyword = "%" + keyword + "%";
         String sql = "select " + generateFiledString(ShopBrief.class) + " from seller, shop_orders " +
-                "where userId = sellerId and companyName like '" + keyword + "'" +
+                "where userId = sellerId and buyerCompanyName like '" + keyword + "'" +
                 " or officeAddress like '" + keyword + "'" +
                 " or shopProfile like '" + keyword + "'" + pageBuilder.generateLimit();
         try(Connection conn = getConn()) {
@@ -102,7 +102,7 @@ public class SellerDataHelper extends BaseDataHelper {
     public int searchShopCount(String keyword) {
         keyword = "%" + keyword + "%";
         String sql = "select count(*) from seller,shop_orders " +
-                "where userId=sellerId and companyName like '" + keyword + "'" +
+                "where userId=sellerId and buyerCompanyName like '" + keyword + "'" +
                 " or officeAddress like '" + keyword + "'" +
                 " or shopProfile like '" + keyword + "'";
         try(Connection conn = getConn()) {
@@ -156,7 +156,7 @@ public class SellerDataHelper extends BaseDataHelper {
     }
 
     private String generateKeyword(String keyword) {
-        return " and companyName like '%" + keyword + "%'" +
+        return " and buyerCompanyName like '%" + keyword + "%'" +
         " or officeAddress like '%" + keyword + "%'" +
                 " or shopProfile like '%" + keyword + "%'";
     }
@@ -283,6 +283,13 @@ public class SellerDataHelper extends BaseDataHelper {
         try(Connection conn = getConn()) {
             Float integral = conn.createQuery(sql).addParameter("userId", userId).executeScalar(Float.class);
             return integral == null ? 0 : integral;
+        }
+    }
+
+    public List<String> getUserIdsByCompanyName(String companyName) {
+        String sql = "select userId from seller where companyName like '%" + companyName + "%' ";
+        try(Connection conn = getConn()) {
+            return  conn.createQuery(sql).executeAndFetch(String.class);
         }
     }
 }

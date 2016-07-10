@@ -11,11 +11,10 @@ import onefengma.demo.server.model.admin.AdminSellersRequest;
 import onefengma.demo.server.model.admin.AdminSellersResponse;
 import onefengma.demo.server.model.admin.AdminUsersRequest;
 import onefengma.demo.server.model.admin.AdminUsersResponse;
-import onefengma.demo.server.model.apibeans.AdminAuthSession;
 import onefengma.demo.server.model.apibeans.admin.AdminLoginRequest;
+import onefengma.demo.server.model.apibeans.admin.AdminOrdersRequest;
 import onefengma.demo.server.model.apibeans.admin.DeleteUserRequest;
 import onefengma.demo.server.model.apibeans.admin.UpdateUserRequest;
-import onefengma.demo.server.services.user.AdminDataManager.BuyerBrief;
 import spark.Session;
 
 import java.util.List;
@@ -93,6 +92,49 @@ public class AdminManager extends BaseManager {
                             , dateStartTime, dateEndTime, isBuyerStart, requestBean.companyName);
 
             return success(adminSellersResponse);
+        }));
+
+        get("orders", AdminOrdersRequest.class, ((request, response, requestBean) -> {
+
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
+                    .addEqualWhere("status", requestBean.status)
+                    .addEqualWhere("id", requestBean.orderId);
+
+            if (!StringUtils.isEmpty(requestBean.buyerMobile)) {
+                String buyerId = UserDataHelper.instance().getUserIdByMobile(requestBean.buyerMobile);
+                buyerId = buyerId == null ? "" : buyerId;
+                pageBuilder.addEqualWhereCanEmpty("buyerId", buyerId);
+            }
+
+            if (!StringUtils.isEmpty(requestBean.sellerMobile)) {
+                String sellerId = UserDataHelper.instance().getUserIdByMobile(requestBean.sellerMobile);
+                sellerId = sellerId == null ? "" : sellerId;
+                pageBuilder.addEqualWhereCanEmpty("sellerId", sellerId);
+            }
+
+            if (!StringUtils.isEmpty(requestBean.salesManMobile)) {
+                String salesManID = UserDataHelper.instance().getSalesManIdByMobile(requestBean.salesManMobile);
+                salesManID = salesManID == null ? "" : salesManID;
+                pageBuilder.addEqualWhereCanEmpty("salesmanId", salesManID);
+            }
+
+            if (!StringUtils.isEmpty(requestBean.buyerCompanyName)) {
+                List<String> ids = SellerDataHelper.instance().getUserIdsByCompanyName(requestBean.buyerCompanyName);
+                if (ids.isEmpty()) {
+                    ids.add("");
+                }
+                pageBuilder.addInWhere("buyerId", ids);
+            }
+
+            if (!StringUtils.isEmpty(requestBean.sellerCompanyName)) {
+                List<String> ids = SellerDataHelper.instance().getUserIdsByCompanyName(requestBean.sellerCompanyName);
+                if (ids.isEmpty()) {
+                    ids.add("");
+                }
+                pageBuilder.addInWhere("sellerId", ids);
+            }
+
+            return success(AdminDataManager.instance().getOrdersForAdmin(pageBuilder));
         }));
     }
 
