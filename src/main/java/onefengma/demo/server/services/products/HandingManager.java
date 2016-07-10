@@ -102,10 +102,10 @@ public class HandingManager extends BaseManager{
 
         get("handingDetail", HandingDetailRequest.class, ((request, response, requestBean) -> {
             HandingDetail handingProduct = HandingDataHelper.getHandingDataHelper().getHandingProductById(requestBean.handingId);
-            handingProduct.setCityName(CityDataHelper.instance().getCityDescById(handingProduct.souCityId));
             if (handingProduct == null) {
                 return error("未找到相关加工信息");
             }
+            handingProduct.setCityName(CityDataHelper.instance().getCityDescById(handingProduct.souCityId));
             return success(handingProduct);
         }));
 

@@ -155,7 +155,7 @@ public class IronDataHelper extends BaseDataHelper {
     }
 
     public IronDetail getIronProductById(String proId) {
-        String sql = "select * from iron_product where proId=:proId";
+        String sql = "select " + generateFiledString(IronDetail.class) + " from iron_product where proId=:proId";
         try (Connection conn = getConn()) {
             List<IronDetail> ironProducts = conn.createQuery(sql).addParameter("proId", proId).executeAndFetch(IronDetail.class);
             if (ironProducts.isEmpty()) {

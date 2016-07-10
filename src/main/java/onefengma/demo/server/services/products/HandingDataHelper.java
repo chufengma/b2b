@@ -163,7 +163,7 @@ public class HandingDataHelper extends BaseDataHelper {
     }
 
     public HandingDetail getHandingProductById(String id) {
-        String sql = "select * from handing_product where id=:id";
+        String sql = "select " + generateFiledString(HandingDetail.class) + " from handing_product where id=:id";
         try(Connection conn = getConn()) {
             List<HandingDetail> handingProducts = conn.createQuery(sql).addParameter("id", id).executeAndFetch(HandingDetail.class);
             if (handingProducts.isEmpty()) {
