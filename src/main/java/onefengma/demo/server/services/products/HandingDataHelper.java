@@ -418,5 +418,23 @@ public class HandingDataHelper extends BaseDataHelper {
         }
     }
 
+    public HandingBuyOfferDetail getWinSellerOffer(String handingBuyId, String userId) {
+        String sql = "select " + generateFiledString(HandingBuyOfferDetail.class) + " from handing_buy_supply where handingId=:id and sellerId=:userId";
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql).addParameter("id", handingBuyId).addParameter("userId", userId).executeAndFetchFirst(HandingBuyOfferDetail.class);
+        }
+    }
+
+    public static class HandingBuyOfferDetail {
+        public String id;
+        public String handingId;
+        public String sellerId;
+        public float supplyPrice;
+        public String supplyMsg;
+        public int status;
+        public int salesmanId;
+    }
+
+
 
 }

@@ -12,4 +12,5 @@ public class HandingBuy {
     public long pushTime;
     public long timeLimit;
     public int status = 0; // 0 正常状态, 1 交易完成,  2 过期
+    public int salesmanId;
 }

@@ -453,6 +453,23 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
+    public IronBuyOfferDetail getWinSellerOffer(String ironBuyId, String userId) {
+        String sql = "select " + generateFiledString(IronBuyOfferDetail.class) + " from iron_buy_supply where ironId=:id and sellerId=:userId";
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql).addParameter("id", ironBuyId).addParameter("userId", userId).executeAndFetchFirst(IronBuyOfferDetail.class);
+        }
+    }
+
+    public static class IronBuyOfferDetail {
+        public String id;
+        public String ironId;
+        public String sellerId;
+        public float supplyPrice;
+        public String supplyMsg;
+        public int status;
+        public int salesmanId;
+    }
+
     public static class SellerOffer {
         public float price;
         public String supplyMsg;

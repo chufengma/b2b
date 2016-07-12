@@ -8,9 +8,12 @@ import onefengma.demo.server.model.SalesMan;
 import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.admin.AdminSellersResponse;
 import onefengma.demo.server.model.admin.AdminUsersResponse;
+import onefengma.demo.server.model.apibeans.admin.AdminBuysResponse;
 import onefengma.demo.server.model.apibeans.admin.AdminOrdersResponse;
 import onefengma.demo.server.services.products.HandingDataHelper;
+import onefengma.demo.server.services.products.HandingDataHelper.HandingBuyOfferDetail;
 import onefengma.demo.server.services.products.IronDataHelper;
+import onefengma.demo.server.services.products.IronDataHelper.IronBuyOfferDetail;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 import org.sql2o.data.Table;
@@ -184,6 +187,92 @@ public class AdminDataManager extends BaseDataHelper {
             adminOrdersResponse.orders = orderForAdmins;
         }
         return adminOrdersResponse;
+    }
+
+    public AdminBuysResponse getBuysForAdmin(PageBuilder pageBuilder, int productType) {
+        String tableName = "";
+        if (productType == 0) {
+            tableName = "iron_buy";
+        } else {
+            tableName = "handing_buy";
+        }
+        String sql = "select * from " + tableName + " " + (pageBuilder.hasWhere() ? " where " : " ") + pageBuilder.generateWhere() + " " + pageBuilder.generateLimit();
+        String countSql = "select count(*) from  " + tableName + " " + (pageBuilder.hasWhere() ? " where " : " ") + pageBuilder.generateWhere();
+
+        AdminBuysResponse adminBuysResponse = new AdminBuysResponse();
+        adminBuysResponse.currentPage = pageBuilder.currentPage;
+        adminBuysResponse.pageCount = pageBuilder.pageCount;
+        List<BuyForAdmin> buyForAdmins = new ArrayList<>();
+        try(Connection conn = getConn()) {
+            List<Row> rows = conn.createQuery(sql).executeAndFetchTable().rows();
+            for (Row row : rows) {
+                BuyForAdmin buyForAdmin = new BuyForAdmin();
+                buyForAdmin.buyId = row.getString("id");
+                buyForAdmin.count = productType == 0 ? row.getFloat("numbers") : 1;
+                buyForAdmin.productType = productType;
+
+                String supplyUserId = row.getString("supplyUserId");
+                String buyerId = row.getString("userId");
+
+                if (productType == 0) {
+                    IronBuyOfferDetail detail = IronDataHelper.getIronDataHelper().getWinSellerOffer(buyForAdmin.buyId, supplyUserId);
+                    if (detail != null) {
+                        buyForAdmin.supplyPrice = detail.supplyPrice;
+                        buyForAdmin.totalMoney = buyForAdmin.supplyPrice * buyForAdmin.count;
+                    }
+                } else {
+                    HandingBuyOfferDetail detail = HandingDataHelper.getHandingDataHelper().getWinSellerOffer(buyForAdmin.buyId, supplyUserId);
+                    if (detail != null) {
+                        buyForAdmin.supplyPrice = detail.supplyPrice;
+                        buyForAdmin.totalMoney = buyForAdmin.supplyPrice * buyForAdmin.count;
+                    }
+                }
+                buyForAdmin.pushTime = row.getLong("pushTime");
+                buyForAdmin.outDateTime = buyForAdmin.pushTime + row.getLong("timeLimit");
+                buyForAdmin.finishTime = row.getLong("supplyWinTime");
+                buyForAdmin.status = row.getInteger("status");
+
+                SalesMan salesMan = UserDataHelper.instance().getSalesMan(buyerId);
+                if (salesMan != null) {
+                    buyForAdmin.salesManId = salesMan.id;
+                    buyForAdmin.salesManMobile = salesMan.tel;
+                }
+
+                buyForAdmin.buyerMobile = UserDataHelper.instance().getUserMobile(buyerId);
+
+                Seller seller = SellerDataHelper.instance().getSeller(supplyUserId);
+                if (seller != null) {
+                    buyForAdmin.sellerMobile = UserDataHelper.instance().getUserMobile(supplyUserId);
+                    buyForAdmin.sellerCompany = seller.companyName;
+                }
+
+                buyForAdmins.add(buyForAdmin);
+            }
+
+            Integer count = conn.createQuery(countSql).executeScalar(Integer.class);
+            count = count == null ? 0 : count;
+
+            adminBuysResponse.maxCount = count;
+            adminBuysResponse.buys = buyForAdmins;
+        }
+        return adminBuysResponse;
+    }
+
+    public static class BuyForAdmin {
+        public String buyId;   // ok
+        public int productType;  // ok
+        public String buyerMobile;
+        public String sellerMobile;
+        public String sellerCompany;
+        public float supplyPrice;  // ok
+        public float count;    // ok
+        public float totalMoney; // ok
+        public long pushTime;  // ok
+        public long outDateTime; // ok
+        public long finishTime; // ok
+        public int status;   // ok
+        public int salesManId;   // ok
+        public String salesManMobile; // ok
     }
 
     public static class OrderForAdmin {

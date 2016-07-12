@@ -20,4 +20,5 @@ public class IronBuy {
     public String tolerance;
     public long numbers;
     public long timeLimit;
+    public int salesmanId;
 }

@@ -8,6 +8,7 @@ import onefengma.demo.server.model.apibeans.BaseAuthPageBean;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.product.*;
 import onefengma.demo.server.model.metaData.IconDataCategory;
+import onefengma.demo.server.model.product.IronBuy;
 import onefengma.demo.server.model.product.IronDetail;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.order.OrderDataHelper;
@@ -116,7 +117,9 @@ public class IronManager extends BaseManager {
             if (!CityDataHelper.instance().isCityExist(requestBean.locationCityId)) {
                 return errorAndClear(requestBean, "交货地点不存在");
             }
-            IronDataHelper.getIronDataHelper().pushIronBuy(requestBean.generateIronBug());
+            IronBuy ironBuy = requestBean.generateIronBug();
+            ironBuy.salesmanId = UserDataHelper.instance().getSalesManId(requestBean.getUserId());
+            IronDataHelper.getIronDataHelper().pushIronBuy(ironBuy);
             return success();
         }));
 

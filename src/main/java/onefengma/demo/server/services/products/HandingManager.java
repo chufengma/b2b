@@ -7,6 +7,7 @@ import onefengma.demo.server.model.apibeans.BaseAuthPageBean;
 import onefengma.demo.server.model.apibeans.product.*;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.metaData.HandingDataCategory;
+import onefengma.demo.server.model.product.HandingBuy;
 import onefengma.demo.server.model.product.HandingDetail;
 import onefengma.demo.server.model.product.HandingProduct;
 import onefengma.demo.server.services.funcs.CityDataHelper;
@@ -61,7 +62,9 @@ public class HandingManager extends BaseManager{
             if (!CityDataHelper.instance().isCityExist(requestBean.souCityId)) {
                 return errorAndClear(requestBean, "加工所在城市选择有误");
             }
-            HandingDataHelper.getHandingDataHelper().pushHandingBuy(requestBean.generateBuy());
+            HandingBuy handingBuy = requestBean.generateBuy();
+            handingBuy.salesmanId = UserDataHelper.instance().getSalesManId(requestBean.getUserId());
+            HandingDataHelper.getHandingDataHelper().pushHandingBuy(handingBuy);
             return success();
         }));
 
