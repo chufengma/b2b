@@ -176,7 +176,21 @@ public class AdminManager extends BaseManager {
 
             return success(AdminDataManager.instance().getBuysForAdmin(pageBuilder, requestBean.productType));
         }));
+
+        get("salesmans", AdminSalesRequest.class, ((request, response, requestBean) -> {
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount);
+            pageBuilder.addEqualWhere("id", requestBean.salesManId)
+            .addEqualWhere("tel", requestBean.salesManMobile);
+
+            if (requestBean.startTime == -1 || requestBean.endTime == -1) {
+                requestBean.startTime = DateHelper.getThisMonthStartTimestamp();
+                requestBean.endTime = DateHelper.getNextMonthStatimestamp();
+            }
+
+            return success(AdminDataManager.instance().getSales(pageBuilder, requestBean.startTime, requestBean.endTime));
+        }));
     }
+
 
 
 

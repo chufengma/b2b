@@ -10,6 +10,7 @@ import onefengma.demo.server.model.admin.AdminSellersResponse;
 import onefengma.demo.server.model.admin.AdminUsersResponse;
 import onefengma.demo.server.model.apibeans.admin.AdminBuysResponse;
 import onefengma.demo.server.model.apibeans.admin.AdminOrdersResponse;
+import onefengma.demo.server.model.apibeans.admin.AdminSalessResponse;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.HandingDataHelper.HandingBuyOfferDetail;
 import onefengma.demo.server.services.products.IronDataHelper;
@@ -256,6 +257,73 @@ public class AdminDataManager extends BaseDataHelper {
             adminBuysResponse.buys = buyForAdmins;
         }
         return adminBuysResponse;
+    }
+
+    public AdminSalessResponse getSales(PageBuilder pageBuilder, long startTime, long endTime) {
+        String salesSql = "select * from salesman " + (pageBuilder.hasWhere() ? " where " : " ") + pageBuilder.generateWhere() + " " + pageBuilder.generateLimit();
+        String maxCountSql = "select count(*) from salesman" + (pageBuilder.hasWhere() ? " where " : " ") + pageBuilder.generateWhere() + " ";
+        String userCountSql = "select userId from user where salesManId=:id";
+
+        String orderMoneySql = "select sum(totalMoney) from product_orders where buyerId=:buyerId and status=1 and finishTime<:endTime and finishTime>=:startTime";
+        String handingBuyMoneySql = "select sum(supplyPrice) from handing_buy,handing_buy_supply " +
+                "where handing_buy.supplyUserId = handing_buy_supply.sellerId and handing_buy_supply.sellerId=:userId" +
+                " and supplyWinTime<:endTime and supplyWinTime>=:startTime ";
+        String ironBuyMoneySql = "select sum(supplyPrice*numbers) from iron_buy,iron_buy_supply " +
+                "where iron_buy.supplyUserId = iron_buy_supply.sellerId and iron_buy_supply.sellerId=:userId" +
+                " and supplyWinTime<:endTime and supplyWinTime>=:startTime ";
+
+        AdminSalessResponse adminSalessResponse = new AdminSalessResponse();
+        adminSalessResponse.pageCount = pageBuilder.pageCount;
+        adminSalessResponse.currentPage = pageBuilder.currentPage;
+
+        List<SalesManAdmin> admins = new ArrayList<>();
+        try(Connection conn = getConn()) {
+            List<Row> rows = conn.createQuery(salesSql).executeAndFetchTable().rows();
+            for(Row row : rows) {
+                SalesManAdmin salesManAdmin = new SalesManAdmin();
+                salesManAdmin.id = row.getInteger("id");
+                salesManAdmin.name = row.getString("name");
+                salesManAdmin.mobile = row.getString("tel");
+                List<Row> userRows = conn.createQuery(userCountSql).addParameter("id", salesManAdmin.id).executeAndFetchTable().rows();
+                salesManAdmin.userCount = userRows.size();
+                for(Row userRow : userRows) {
+                    String userId = userRow.getString("userId");
+                    Float orderTotal = conn.createQuery(orderMoneySql)
+                            .addParameter("startTime", startTime)
+                            .addParameter("endTime", endTime)
+                            .addParameter("buyerId", userId).executeScalar(Float.class);
+                    orderTotal = orderTotal == null ? 0 : orderTotal;
+
+                    Float handingBuyTotal = conn.createQuery(handingBuyMoneySql)
+                            .addParameter("startTime", startTime)
+                            .addParameter("endTime", endTime)
+                            .addParameter("userId", userId).executeScalar(Float.class);
+                    handingBuyTotal = handingBuyTotal == null ? 0 : handingBuyTotal;
+
+                    Float ironBuyTotal = conn.createQuery(ironBuyMoneySql)
+                            .addParameter("startTime", startTime)
+                            .addParameter("endTime", endTime)
+                            .addParameter("userId", userId).executeScalar(Float.class);
+                    ironBuyTotal = ironBuyTotal == null ? 0 : ironBuyTotal;
+
+                    salesManAdmin.totalMoney += handingBuyTotal + ironBuyTotal + orderTotal;
+                }
+                admins.add(salesManAdmin);
+            }
+            Integer maxCount = conn.createQuery(maxCountSql).executeScalar(Integer.class);
+            maxCount = maxCount == null ? 0 : maxCount;
+            adminSalessResponse.maxCount = maxCount;
+        }
+        adminSalessResponse.sales = admins;
+        return adminSalessResponse;
+    }
+
+    public static class SalesManAdmin {
+        public int id;
+        public String name;
+        public String mobile;
+        public int userCount;
+        public float totalMoney;
     }
 
     public static class BuyForAdmin {
