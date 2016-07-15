@@ -1,5 +1,6 @@
 package onefengma.demo.server.services.user;
 
+import onefengma.demo.server.core.UpdateBuilder;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -56,27 +57,52 @@ public class AdminDataManager extends BaseDataHelper {
 
     public void deleteUser(String userId) throws Exception {
         String sql = "delete from user where userId=:userId";
+        String sellerSql = "delete from seller where userId=:userId";
         String bakSql = "insert into user_bak select * from user where userId=:userId";
 
         try (Connection conn = getConn()) {
             conn.createQuery(bakSql).addParameter("userId", userId).executeUpdate();
             conn.createQuery(sql).addParameter("userId", userId).executeUpdate();
+            conn.createQuery(sellerSql).addParameter("userId", userId).executeUpdate();
         }
     }
 
-    public void updateUser(String userId, int salesmanId) {
-        String sql = "update user set salesManId=:salesManId where userId=:userId";
-
+    public void deleteSeller(String sellerId) throws Exception {
+        String sellerSql = "delete from seller where userId=:userId";
         try (Connection conn = getConn()) {
-            conn.createQuery(sql).addParameter("userId", userId).addParameter("salesManId", salesmanId).executeUpdate();
+            conn.createQuery(sellerSql).addParameter("userId", sellerId).executeUpdate();
+        }
+    }
+
+    public void updateUser(String userId, float integral, int salesmanId) {
+        String sql = "update user set salesManId=:salesManId,integral=:integral where userId=:userId";
+        try (Connection conn = getConn()) {
+            conn.createQuery(sql)
+                    .addParameter("integral", integral)
+                    .addParameter("userId", userId)
+                    .addParameter("salesManId", salesmanId).executeUpdate();
+        }
+    }
+
+    public void updateSeller(String sellerId, float integral, int salesmanId) {
+        String sql = "update seller set integral=:integral where userId=:userId";
+        String userSql = "update user set salesmanId=:salesManId where userId=:userId";
+        try (Connection conn = getConn()) {
+            conn.createQuery(sql)
+                    .addParameter("integral", integral)
+                    .addParameter("userId", sellerId).executeUpdate();
+
+            conn.createQuery(userSql)
+                    .addParameter("salesManId", salesmanId)
+                    .addParameter("userId", sellerId).executeUpdate();
         }
     }
 
     public AdminUsersResponse getBuyer(PageBuilder pageBuilder) {
         String whereSql = pageBuilder.generateWhere();
         String maxCountSql = "select count(*) from user,salesman where salesman.id=buySellerId " + ((StringUtils.isEmpty(whereSql)) ? "" : " and " + whereSql);
-        String userSalesMoneySql = "select userId, mobile,registerTime, sum(ironMoney + handingMoney)  as buyMoney , tel as salesTel, salesmanId as salesId " +
-                "from (select userId, mobile,registerTime,salesmanId,tel from user,salesman where salesmanId=salesman.id) as userComplete" +
+        String userSalesMoneySql = "select userId,integral, mobile,registerTime, sum(ironMoney + handingMoney)  as buyMoney , tel as salesTel, salesmanId as salesId " +
+                "from (select userId,integral, mobile,registerTime,salesmanId,tel from user,salesman where salesmanId=salesman.id) as userComplete" +
                 " left join buyer_amount on (userId=buyerId and day <=:endTime and day>:startTime ) "
                 + (StringUtils.isEmpty(pageBuilder.generateWhere()) ? "" : " where " + whereSql)
                 + " group by userId  order by buyMoney desc" + pageBuilder.generateLimit();
@@ -110,8 +136,8 @@ public class AdminDataManager extends BaseDataHelper {
         String maxCountSql = "select count(*) from user,seller,salesman where user.userId=seller.userId and user.salesManId=salesman.id "
                 + " and registerTime<:registerEndTime and registerTime>=:registerStartTime "
                 + ((StringUtils.isEmpty(whereSql)) ? "" : " and " + whereSql);
-        String sellerSql = "select userId,companyName,passTime as becomeSellerTime,contact as contactName,productCount,score, mobile,registerTime, sum(ironMoney + handingMoney)  as " + totalMoneyKeyName + " , tel as salesMobile,salesId " +
-                "from (select companyName,user.userId,passTime,contact, productCount,score,mobile,registerTime,user.salesManId as salesId, tel " +
+        String sellerSql = "select userId,integral,companyName,passTime as becomeSellerTime,contact as contactName,productCount,score, mobile,registerTime, sum(ironMoney + handingMoney)  as " + totalMoneyKeyName + " , tel as salesMobile,salesId " +
+                "from (select companyName,seller.integral as integral,user.userId,passTime,contact, productCount,score,mobile,registerTime,user.salesManId as salesId, tel " +
                 "from user,salesman,seller where user.salesManId=salesman.id and user.userId=seller.userId) " +
                 "as userComplete left join " + amountTable + " " +
                 "on (userId=sellerId and day>=:dataStartTime and day<:dataEndTime) " +
@@ -158,6 +184,8 @@ public class AdminDataManager extends BaseDataHelper {
                 int productType = row.getInteger("productType");
 
                 orderForAdmin.count = row.getFloat("count");
+                orderForAdmin.productType = productType;
+                orderForAdmin.productId = row.getString("productId");
                 if (productType == 0) {
                     orderForAdmin.price = IronDataHelper.getIronDataHelper().getIronPrice(orderForAdmin.orderId);
                 } else {
@@ -266,8 +294,8 @@ public class AdminDataManager extends BaseDataHelper {
     }
 
     public AdminSalessResponse getSales(PageBuilder pageBuilder, long startTime, long endTime) {
-        String salesSql = "select * from salesman " + (pageBuilder.hasWhere() ? " where " : " ") + pageBuilder.generateWhere() + " " + pageBuilder.generateLimit();
-        String maxCountSql = "select count(*) from salesman" + (pageBuilder.hasWhere() ? " where " : " ") + pageBuilder.generateWhere() + " ";
+        String salesSql = "select * from salesman where id<>0 " + (pageBuilder.hasWhere() ? " and " : " ") + pageBuilder.generateWhere() + " " + pageBuilder.generateLimit();
+        String maxCountSql = "select count(*) from salesman where id<>0 " + (pageBuilder.hasWhere() ? " and " : " ") + pageBuilder.generateWhere() + " ";
         String userCountSql = "select userId from user where salesManId=:id";
 
         String orderMoneySql = "select sum(totalMoney) from product_orders where buyerId=:buyerId and status=1 and finishTime<:endTime and finishTime>=:startTime";
@@ -520,6 +548,26 @@ public class AdminDataManager extends BaseDataHelper {
         }
     }
 
+    public void updateSalesman(int id, String name, String mobile) {
+        UpdateBuilder updateBuilder = new UpdateBuilder();
+        updateBuilder.addStringMap("name", name);
+        updateBuilder.addStringMap("tel", mobile);
+        String sql = "update salesman set " + updateBuilder.generateSql() + " where id=:id";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("id", id).executeUpdate();
+        }
+    }
+
+    public void addNewSalesMan(String name, String mobile) {
+        String sql = "insert into salesman set name=:name, tel=:tel";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql)
+                    .addParameter("name", name)
+                    .addParameter("tel", mobile)
+                    .executeUpdate();
+        }
+    }
+
     public static class ProductVerify {
         public String productId;
         public String productType;
@@ -578,6 +626,9 @@ public class AdminDataManager extends BaseDataHelper {
         public int status;
         public int salesManId;
         public String salesManMobile;
+
+        public String productId;
+        public int productType;
     }
 
     public static class SellerBrief {
@@ -591,6 +642,7 @@ public class AdminDataManager extends BaseDataHelper {
         public float score;
         public int salesId;
         public String salesMobile;
+        public float integral;
 
         private float sellerTotalMoney;
         private float buyerTotalMoney;
@@ -619,6 +671,7 @@ public class AdminDataManager extends BaseDataHelper {
         public String salesTel;
         public float buyMoney;
         public String userId;
+        public float integral;
 
         public long getRegisterTime() {
             return registerTime;

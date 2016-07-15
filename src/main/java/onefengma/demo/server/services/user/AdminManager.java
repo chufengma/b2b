@@ -6,27 +6,25 @@ import onefengma.demo.common.DateHelper;
 import onefengma.demo.common.DateHelper.TimeRange;
 import onefengma.demo.common.IdUtils;
 import onefengma.demo.common.StringUtils;
+import onefengma.demo.common.VerifyUtils;
 import onefengma.demo.server.core.BaseAdminPageBean;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.Admin;
+import onefengma.demo.server.model.SalesMan;
 import onefengma.demo.server.model.admin.AdminDetailRequest;
 import onefengma.demo.server.model.admin.AdminOperationRequest;
 import onefengma.demo.server.model.admin.AdminSellersRequest;
 import onefengma.demo.server.model.admin.AdminSellersResponse;
 import onefengma.demo.server.model.admin.AdminUsersRequest;
 import onefengma.demo.server.model.admin.AdminUsersResponse;
-import onefengma.demo.server.model.apibeans.admin.AdminBuysRequest;
-import onefengma.demo.server.model.apibeans.admin.AdminFindHelpRequest;
-import onefengma.demo.server.model.apibeans.admin.AdminLoginRequest;
-import onefengma.demo.server.model.apibeans.admin.AdminOrdersRequest;
-import onefengma.demo.server.model.apibeans.admin.AdminSalesRequest;
-import onefengma.demo.server.model.apibeans.admin.DeleteUserRequest;
-import onefengma.demo.server.model.apibeans.admin.UpdateUserRequest;
+import onefengma.demo.server.model.apibeans.admin.*;
+import onefengma.demo.server.model.apibeans.others.AddSalesRequest;
 import onefengma.demo.server.model.apibeans.others.InnerMessageRequest;
 import onefengma.demo.server.model.product.HandingDetail;
 import onefengma.demo.server.model.product.IronDetail;
 import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
+import onefengma.demo.server.services.order.OrderDataHelper;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper;
 import spark.Session;
@@ -74,11 +72,24 @@ public class AdminManager extends BaseManager {
             return success("删除成功");
         }));
 
+        post("deleteSeller", DeleteUserRequest.class, ((request, response, requestBean) -> {
+            AdminDataManager.instance().deleteSeller(requestBean.userId);
+            return success("删除成功");
+        }));
+
         post("updateUser", UpdateUserRequest.class, ((request, response, requestBean) -> {
             if (!UserDataHelper.instance().isSalesManExited(requestBean.salesmanId)) {
                 return error("该顾问不存在");
             }
-            AdminDataManager.instance().updateUser(requestBean.userId, requestBean.salesmanId);
+            AdminDataManager.instance().updateUser(requestBean.userId, requestBean.integral,requestBean.salesmanId);
+            return success("修改成功");
+        }));
+
+        post("updateSeller", UpdateUserRequest.class, ((request, response, requestBean) -> {
+            if (!UserDataHelper.instance().isSalesManExited(requestBean.salesmanId)) {
+                return error("该顾问不存在");
+            }
+            AdminDataManager.instance().updateSeller(requestBean.userId,requestBean.integral, requestBean.salesmanId);
             return success("修改成功");
         }));
 
@@ -145,8 +156,20 @@ public class AdminManager extends BaseManager {
                 }
                 pageBuilder.addInWhere("sellerId", ids);
             }
-
+            OrderDataHelper.instance().updateOutofDateStatic("", "");
             return success(AdminDataManager.instance().getOrdersForAdmin(pageBuilder));
+        }));
+
+        post("deleteOrder", AdminDeleteOrderRequest.class, ((request, response, requestBean) -> {
+            if (!OrderDataHelper.instance().isOrderExited(requestBean.orderId)) {
+                return error("该订单不存在");
+            }
+            int status = OrderDataHelper.instance().getOrderStatus(requestBean.orderId);
+            if (status == 0) {
+                return error("订单正在进行中,无法删除");
+            }
+            OrderDataHelper.instance().deleteOrderBuyAdmin(requestBean.orderId);
+            return success("删除成功");
         }));
 
 
@@ -192,6 +215,12 @@ public class AdminManager extends BaseManager {
             return success(AdminDataManager.instance().getBuysForAdmin(pageBuilder, requestBean.productType));
         }));
 
+
+        post("deleteProduct", AdminDeleteBuyRequest.class, ((request, response, requestBean) -> {
+            //TODO 删除订单
+            return error("删除订单出错");
+        }));
+
         get("salesmans", AdminSalesRequest.class, ((request, response, requestBean) -> {
             PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount);
             pageBuilder.addEqualWhere("id", requestBean.salesManId)
@@ -203,6 +232,23 @@ public class AdminManager extends BaseManager {
             }
 
             return success(AdminDataManager.instance().getSales(pageBuilder, requestBean.startTime, requestBean.endTime));
+        }));
+
+        post("updateSalesman", AdminChangeSalesmanRequest.class, ((request, response, requestBean) -> {
+            if (UserDataHelper.instance().getSalesManById(requestBean.id) == null) {
+                return error("没有该业务员");
+            }
+            if (StringUtils.isEmpty(requestBean.name) || StringUtils.isEmpty(requestBean.mobile)) {
+                return success();
+            }
+
+            if (!StringUtils.isEmpty(requestBean.mobile)) {
+                if (!VerifyUtils.isMobile(requestBean.mobile)) {
+                    return error("手机号格式不正确");
+                }
+            }
+            AdminDataManager.instance().updateSalesman(requestBean.id, requestBean.name, requestBean.mobile);
+            return success("操作成功");
         }));
 
         get("sellerVerify", BaseAdminPageBean.class, ((request, response, requestBean) -> {
@@ -296,6 +342,18 @@ public class AdminManager extends BaseManager {
             }
             InnerMessageDataHelper.instance().addInnerMessage(userId, requestBean.title, requestBean.message);
             return success("操作成功");
+        }));
+
+        post("addSales", AddSalesRequest.class, ((request, response, requestBean) -> {
+            if (!VerifyUtils.isMobile(requestBean.tel)) {
+                return error("手机号格式不对");
+            }
+            String salesMan = UserDataHelper.instance().getSalesManIdByMobile(requestBean.tel);
+            if (!StringUtils.isEmpty(salesMan)) {
+                return error("该手机号已经存在");
+            }
+            AdminDataManager.instance().addNewSalesMan(requestBean.name, requestBean.tel);
+            return success("添加成功");
         }));
     }
 

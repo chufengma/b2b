@@ -115,6 +115,10 @@ public class OrderDataHelper extends BaseDataHelper {
             myOrdersResponse.waitForConfirm = conn.createQuery(waitForConfirmSql).addParameter("userId", userId).executeScalar(Integer.class);
             myOrdersResponse.waitForVote = conn.createQuery(waitForVoteSql).addParameter("userId", userId).executeScalar(Integer.class);
         }
+
+        updateOutofDateStatic("", userId);
+        updateOutofDateStatic(userId, "");
+
         return myOrdersResponse;
     }
 
@@ -165,6 +169,20 @@ public class OrderDataHelper extends BaseDataHelper {
             }
         }
         return orderBrief;
+    }
+
+    public void updateOutofDateStatic(String sellerId, String buyerId) {
+        PageBuilder pageBuilder = new PageBuilder(0, 0);
+        pageBuilder.addEqualWhere("sellerId", sellerId);
+        pageBuilder.addEqualWhere("buyerId", buyerId);
+
+        String sql = "update product_orders " +
+                "set status = 3,cancelBy = 3 where (sellTime+timeLimit) < :currentTime and status = 0 "
+                + (pageBuilder.hasWhere() ? " where " : "  ") + pageBuilder.generateWhere();
+
+        try (Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("currentTime", System.currentTimeMillis()).executeUpdate();
+        }
     }
 
     public String getSellerMobile(Connection conn, String sellerId) {
@@ -342,6 +360,14 @@ public class OrderDataHelper extends BaseDataHelper {
         }
     }
 
+    public boolean isOrderExited(String orderId) {
+        String sql = "select count(*) from product_orders where id=:orderId";
+        try(Connection conn = getConn()) {
+            Integer count = conn.createQuery(sql).addParameter("orderId", orderId).executeScalar(Integer.class);
+            return count != null && count > 0;
+        }
+    }
+
     public void confirmOrder(String orderId) {
         String sql = "update product_orders set status = 1, finishTime=:finisTime where id=:orderId and status=0";
         try(Connection conn = getConn()) {
@@ -393,11 +419,17 @@ public class OrderDataHelper extends BaseDataHelper {
     }
 
     public void deleteOrder(String orderId, boolean isFromSeller) {
-        String sellerSql = "update product_orders set status=4,deleteBy=2 where id=:orderId and (status=1 or status=2)";
-        String buyerSql = "update product_orders set status=4,deleteBy=1 where id=:orderId and (status=1 or status=2)";
-        String sql = isFromSeller ? sellerSql : buyerSql;
+        deleteOrderInner(orderId, isFromSeller ? 2 : 1);
+    }
+
+    public void deleteOrderBuyAdmin(String orderId) {
+        deleteOrderInner(orderId, 3);
+    }
+
+    private void deleteOrderInner(String orderId, int from) {
+        String sellerSql = "update product_orders set status=4,deleteBy=" + from + " where id=:orderId and (status=1 or status=2)";
         try(Connection conn = getConn()) {
-            conn.createQuery(sql).addParameter("orderId", orderId).executeUpdate();
+            conn.createQuery(sellerSql).addParameter("orderId", orderId).executeUpdate();
         }
     }
 
