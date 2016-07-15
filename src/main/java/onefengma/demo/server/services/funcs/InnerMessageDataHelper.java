@@ -1,12 +1,12 @@
 package onefengma.demo.server.services.funcs;
 
-import onefengma.demo.common.StringUtils;
-import onefengma.demo.server.core.BaseDataHelper;
-import onefengma.demo.server.core.PageBuilder;
-import onefengma.demo.server.core.UpdateBuilder;
 import org.sql2o.Connection;
 
 import java.util.List;
+
+import onefengma.demo.common.StringUtils;
+import onefengma.demo.server.core.BaseDataHelper;
+import onefengma.demo.server.core.PageBuilder;
 
 /**
  * Created by chufengma on 16/7/10.
@@ -27,7 +27,7 @@ public class InnerMessageDataHelper extends BaseDataHelper {
     }
 
     public void addInnerMessage(String userId, String title, String message) {
-        String sql = "insert into inner_message set title=:title, userId=:userId, message=:message, pushTime:time ";
+        String sql = "insert into inner_message set title=:title, userId=:userId, message=:message, pushTime=:time ";
         try(Connection conn = getConn()) {
             conn.createQuery(sql)
                     .addParameter("title", title)

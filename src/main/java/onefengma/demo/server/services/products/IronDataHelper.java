@@ -1,14 +1,7 @@
 package onefengma.demo.server.services.products;
 
-import onefengma.demo.server.core.LogUtils;
-import onefengma.demo.server.model.apibeans.product.SellerIronBuysResponse;
-import onefengma.demo.server.model.product.*;
-import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
-import onefengma.demo.server.services.order.OrderDataHelper;
-import onefengma.demo.server.services.user.UserDataHelper;
-import org.apache.commons.logging.Log;
 import org.sql2o.Connection;
-import org.sql2o.Query;
+import org.sql2o.data.Row;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
@@ -17,9 +10,19 @@ import java.util.List;
 
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
+import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.model.apibeans.product.SellerIronBuysResponse;
+import onefengma.demo.server.model.product.IronBuy;
+import onefengma.demo.server.model.product.IronBuyBrief;
+import onefengma.demo.server.model.product.IronDetail;
+import onefengma.demo.server.model.product.IronProduct;
+import onefengma.demo.server.model.product.IronProductBrief;
+import onefengma.demo.server.model.product.IronRecommend;
+import onefengma.demo.server.model.product.SupplyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
-import org.sql2o.data.Row;
+import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
+import onefengma.demo.server.services.order.OrderDataHelper;
 
 /**
  * @author yfchu
@@ -154,14 +157,16 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
-    public IronDetail getIronProductById(String proId) {
+    public IronDetail getIronProductById(String proId) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(IronDetail.class) + " from iron_product where proId=:proId";
         try (Connection conn = getConn()) {
             List<IronDetail> ironProducts = conn.createQuery(sql).addParameter("proId", proId).executeAndFetch(IronDetail.class);
             if (ironProducts.isEmpty()) {
                 return null;
             } else {
-                return ironProducts.get(0);
+                IronDetail detail = ironProducts.get(0);
+                detail.setCityName(CityDataHelper.instance().getCityDescById(detail.sourceCityId));
+                return detail;
             }
         }
     }

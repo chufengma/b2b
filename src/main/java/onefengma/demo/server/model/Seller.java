@@ -1,7 +1,5 @@
 package onefengma.demo.server.model;
 
-import onefengma.demo.server.model.apibeans.SellerRequest;
-
 /**
  * Created by chufengma on 16/6/2.
  */
@@ -25,4 +23,5 @@ public class Seller {
 
     public String ironTypeDesc;
     public String handingTypeDesc;
+    public long applyTime;
 }

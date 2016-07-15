@@ -1,20 +1,33 @@
 package onefengma.demo.server.services.user;
 
+import java.util.List;
+
 import onefengma.demo.common.DateHelper;
 import onefengma.demo.common.DateHelper.TimeRange;
 import onefengma.demo.common.IdUtils;
 import onefengma.demo.common.StringUtils;
+import onefengma.demo.server.core.BaseAdminPageBean;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.Admin;
+import onefengma.demo.server.model.admin.AdminDetailRequest;
+import onefengma.demo.server.model.admin.AdminOperationRequest;
 import onefengma.demo.server.model.admin.AdminSellersRequest;
 import onefengma.demo.server.model.admin.AdminSellersResponse;
 import onefengma.demo.server.model.admin.AdminUsersRequest;
 import onefengma.demo.server.model.admin.AdminUsersResponse;
-import onefengma.demo.server.model.apibeans.admin.*;
+import onefengma.demo.server.model.apibeans.admin.AdminBuysRequest;
+import onefengma.demo.server.model.apibeans.admin.AdminLoginRequest;
+import onefengma.demo.server.model.apibeans.admin.AdminOrdersRequest;
+import onefengma.demo.server.model.apibeans.admin.AdminSalesRequest;
+import onefengma.demo.server.model.apibeans.admin.DeleteUserRequest;
+import onefengma.demo.server.model.apibeans.admin.UpdateUserRequest;
+import onefengma.demo.server.model.product.HandingDetail;
+import onefengma.demo.server.model.product.IronDetail;
+import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
+import onefengma.demo.server.services.products.HandingDataHelper;
+import onefengma.demo.server.services.products.IronDataHelper;
 import spark.Session;
-
-import java.util.List;
 
 /**
  * Created by chufengma on 16/7/2.
@@ -188,6 +201,80 @@ public class AdminManager extends BaseManager {
             }
 
             return success(AdminDataManager.instance().getSales(pageBuilder, requestBean.startTime, requestBean.endTime));
+        }));
+
+        get("sellerVerify", BaseAdminPageBean.class, ((request, response, requestBean) -> {
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount);
+            return success(AdminDataManager.instance().getSellerVerify(pageBuilder));
+        }));
+
+        get("sellerVerifyDetail", AdminDetailRequest.class, ((request, response, requestBean) -> {
+            if (AdminDataManager.instance().isSellerApplyHandled(requestBean.id)) {
+                return error("用户不再审核范围之内");
+            }
+            return success(SellerDataHelper.instance().getSeller(requestBean.id));
+        }));
+
+        post("sellerVerifyOp", AdminOperationRequest.class, ((request, response, requestBean) -> {
+            if (AdminDataManager.instance().isSellerApplyHandled(requestBean.id)) {
+                return error("用户不再审核范围之内");
+            }
+            AdminDataManager.instance().sellerVerifyOperation(requestBean.id, requestBean.operation == 1, requestBean.message);
+            return success("操作成功");
+        }));
+
+        get("ironVerify", BaseAdminPageBean.class, ((request, response, requestBean) -> {
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount);
+            return success(AdminDataManager.instance().getIronVerify(pageBuilder));
+        }));
+
+        get("ironVerifyDetail", AdminDetailRequest.class, ((request, response, requestBean) -> {
+            IronDetail ironDetail = IronDataHelper.getIronDataHelper().getIronProductById(requestBean.id);
+            if (ironDetail == null) {
+                return error("找不到该产品信息");
+            }
+            return success(ironDetail);
+        }));
+
+        post("ironVerifyOp", AdminOperationRequest.class, ((request, response, requestBean) -> {
+            IronDetail ironDetail = IronDataHelper.getIronDataHelper().getIronProductById(requestBean.id);
+            if (ironDetail == null) {
+                return error("找不到该产品信息");
+            }
+            AdminDataManager.instance().ironVerifyOperation(requestBean.id, requestBean.operation == 1, requestBean.message);
+            if (requestBean.operation == 1) {
+                InnerMessageDataHelper.instance().addInnerMessage(ironDetail.userId, "恭喜资源成功", "恭喜资源成功");
+            } else if (requestBean.operation == 2)  {
+                InnerMessageDataHelper.instance().addInnerMessage(ironDetail.userId, "恭喜资源失败！", "很抱歉，恭喜资源失败！");
+            }
+            return success("操作成功");
+        }));
+
+        get("handingVerify", BaseAdminPageBean.class, ((request, response, requestBean) -> {
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount);
+            return success(AdminDataManager.instance().getHandingVerify(pageBuilder));
+        }));
+
+        get("handingVerifyDetail", AdminDetailRequest.class, ((request, response, requestBean) -> {
+            HandingDetail handingDetail = HandingDataHelper.getHandingDataHelper().getHandingProductById(requestBean.id);
+            if (handingDetail == null) {
+                return error("找不到该产品信息");
+            }
+            return success(handingDetail);
+        }));
+
+        post("handingVerifyOp", AdminOperationRequest.class, ((request, response, requestBean) -> {
+            HandingDetail handingDetail = HandingDataHelper.getHandingDataHelper().getHandingProductById(requestBean.id);
+            if (handingDetail == null) {
+                return error("找不到该产品信息");
+            }
+            AdminDataManager.instance().handingVerifyOperation(requestBean.id, requestBean.operation == 1, requestBean.message);
+            if (requestBean.operation == 1) {
+                InnerMessageDataHelper.instance().addInnerMessage(handingDetail.userId, "恭喜资源成功", "恭喜资源成功");
+            } else if (requestBean.operation == 2)  {
+                InnerMessageDataHelper.instance().addInnerMessage(handingDetail.userId, "恭喜资源失败！", "很抱歉，恭喜资源失败！");
+            }
+            return success("操作成功");
         }));
     }
 

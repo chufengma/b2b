@@ -1,5 +1,11 @@
 package onefengma.demo.server.services.user;
 
+import org.sql2o.Connection;
+import org.sql2o.data.Row;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
@@ -9,18 +15,16 @@ import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.admin.AdminSellersResponse;
 import onefengma.demo.server.model.admin.AdminUsersResponse;
 import onefengma.demo.server.model.apibeans.admin.AdminBuysResponse;
+import onefengma.demo.server.model.apibeans.admin.AdminHandingVerifyResponse;
+import onefengma.demo.server.model.apibeans.admin.AdminIronVerifyResponse;
 import onefengma.demo.server.model.apibeans.admin.AdminOrdersResponse;
 import onefengma.demo.server.model.apibeans.admin.AdminSalessResponse;
+import onefengma.demo.server.model.apibeans.admin.AdminSellerVerifyResponse;
+import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.HandingDataHelper.HandingBuyOfferDetail;
 import onefengma.demo.server.services.products.IronDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper.IronBuyOfferDetail;
-import org.sql2o.Connection;
-import org.sql2o.data.Row;
-import org.sql2o.data.Table;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -316,6 +320,200 @@ public class AdminDataManager extends BaseDataHelper {
         }
         adminSalessResponse.sales = admins;
         return adminSalessResponse;
+    }
+
+    public AdminSellerVerifyResponse getSellerVerify(PageBuilder pageBuilder) {
+        String sql = "select * from seller where passed=false " + pageBuilder.generateLimit();
+        String countSql = "select count(*) from seller where passed=false ";
+        AdminSellerVerifyResponse adminSellerVerifyResponse = new AdminSellerVerifyResponse();
+        adminSellerVerifyResponse.currentPage = pageBuilder.currentPage;
+        adminSellerVerifyResponse.pageCount = pageBuilder.pageCount;
+        try(Connection conn = getConn()) {
+            List<SellerVerify> sellerVerifies = new ArrayList<>();
+            List<Row> rows = conn.createQuery(sql).executeAndFetchTable().rows();
+            for(Row row : rows) {
+                SellerVerify sellerVerify = new SellerVerify();
+                sellerVerify.userId = row.getString("userId");
+                sellerVerify.companyName = row.getString("companyName");
+                sellerVerify.mobile = row.getString("cantactTel");
+                sellerVerify.applyTime = row.getLong("applyTime");
+
+                SalesMan salesMan = UserDataHelper.instance().getSalesMan(sellerVerify.userId);
+                if (salesMan != null) {
+                    sellerVerify.salesManName = salesMan.name;
+                    sellerVerify.salesManMobile = salesMan.tel;
+                }
+                sellerVerifies.add(sellerVerify);
+            }
+
+            Integer count = conn.createQuery(countSql).executeScalar(Integer.class);
+            count = count == null ? 0 : count;
+
+            adminSellerVerifyResponse.maxCount = count;
+            adminSellerVerifyResponse.sellers = sellerVerifies;
+        }
+        return adminSellerVerifyResponse;
+    }
+
+    public void sellerVerifyOperation(String userId, boolean pass, String message) {
+        if (pass) {
+            doSellerVerify(userId, 1, message);
+            InnerMessageDataHelper.instance().addInnerMessage(userId, "恭喜您申请成为商家成功！", "恭喜您成功入住淘不锈");
+        } else {
+            doSellerVerify(userId, 2, message);
+            InnerMessageDataHelper.instance().addInnerMessage(userId, "很抱歉，申请成为商家失败！", "很抱歉，申请成为商家失败！");
+        }
+    }
+
+    private void doSellerVerify(String userId, int pass, String message) {
+        String sql = "update seller set passed=:pass , refuseMessage=:message where userId=:userId and passed=false ";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("userId", userId)
+                    .addParameter("message", message)
+                    .addParameter("pass", pass).executeUpdate();
+        }
+    }
+
+    public boolean isSellerApplyHandled(String userId) {
+        String sql = "select count(*) from seller where userId=:userId and passed=false ";
+        try(Connection conn = getConn()) {
+            Integer count = conn.createQuery(sql).addParameter("userId", userId).executeScalar(Integer.class);
+            return count == null || count == 0;
+        }
+    }
+
+    public AdminIronVerifyResponse getIronVerify(PageBuilder pageBuilder) {
+        String sql = "select * from iron_product where reviewed=false " + pageBuilder.generateLimit();
+        String countSql = "select count(*) from iron_product where reviewed=false ";
+        AdminIronVerifyResponse adminIronVerifyResponse = new AdminIronVerifyResponse();
+        adminIronVerifyResponse.currentPage = pageBuilder.currentPage;
+        adminIronVerifyResponse.pageCount = pageBuilder.pageCount;
+        try(Connection conn = getConn()) {
+            List<ProductVerify> productVerifies = new ArrayList<>();
+            List<Row> rows = conn.createQuery(sql).executeAndFetchTable().rows();
+            for(Row row : rows) {
+                ProductVerify sellerVerify = new ProductVerify();
+                sellerVerify.productId = row.getString("proId");
+                sellerVerify.applyTime = row.getLong("pushTime");
+
+                String userId = row.getString("userId");
+                Seller seller = SellerDataHelper.instance().getSeller(userId);
+
+                if (seller != null) {
+                    sellerVerify.companyName = seller.companyName;
+                    sellerVerify.mobile = seller.cantactTel;
+                }
+
+                SalesMan salesMan = UserDataHelper.instance().getSalesMan(userId);
+                if (salesMan != null) {
+                    sellerVerify.salesManName = salesMan.name;
+                    sellerVerify.salesManMobile = salesMan.tel;
+                }
+                productVerifies.add(sellerVerify);
+            }
+
+            Integer count = conn.createQuery(countSql).executeScalar(Integer.class);
+            count = count == null ? 0 : count;
+
+            adminIronVerifyResponse.maxCount = count;
+            adminIronVerifyResponse.products = productVerifies;
+        }
+        return adminIronVerifyResponse;
+    }
+
+    public void ironVerifyOperation(String proId, boolean pass, String message) {
+
+        if (pass) {
+            doIronVerify(proId, 1, message);
+        } else {
+            doIronVerify(proId, 2, message);
+        }
+    }
+
+    private void doIronVerify(String proId, int pass, String message) {
+        String sql = "update iron_product set reviewed=:pass , refuseMessage=:message where proId=:proId and reviewed=false ";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("proId", proId)
+                    .addParameter("message", message)
+                    .addParameter("pass", pass).executeUpdate();
+        }
+    }
+
+    public AdminHandingVerifyResponse getHandingVerify(PageBuilder pageBuilder) {
+        String sql = "select * from handing_product where reviewed=false " + pageBuilder.generateLimit();
+        String countSql = "select count(*) from handing_product where reviewed=false ";
+        AdminHandingVerifyResponse adminHandingVerifyResponse = new AdminHandingVerifyResponse();
+        adminHandingVerifyResponse.currentPage = pageBuilder.currentPage;
+        adminHandingVerifyResponse.pageCount = pageBuilder.pageCount;
+        try(Connection conn = getConn()) {
+            List<ProductVerify> productVerifies = new ArrayList<>();
+            List<Row> rows = conn.createQuery(sql).executeAndFetchTable().rows();
+            for(Row row : rows) {
+                ProductVerify sellerVerify = new ProductVerify();
+                sellerVerify.productId = row.getString("id");
+                sellerVerify.applyTime = row.getLong("pushTime");
+
+                String userId = row.getString("userId");
+                Seller seller = SellerDataHelper.instance().getSeller(userId);
+
+                if (seller != null) {
+                    sellerVerify.companyName = seller.companyName;
+                    sellerVerify.mobile = seller.cantactTel;
+                }
+
+                SalesMan salesMan = UserDataHelper.instance().getSalesMan(userId);
+                if (salesMan != null) {
+                    sellerVerify.salesManName = salesMan.name;
+                    sellerVerify.salesManMobile = salesMan.tel;
+                }
+                productVerifies.add(sellerVerify);
+            }
+
+            Integer count = conn.createQuery(countSql).executeScalar(Integer.class);
+            count = count == null ? 0 : count;
+
+            adminHandingVerifyResponse.maxCount = count;
+            adminHandingVerifyResponse.products = productVerifies;
+        }
+        return adminHandingVerifyResponse;
+    }
+
+
+    public void handingVerifyOperation(String proId, boolean pass, String message) {
+
+        if (pass) {
+            doHandingVerify(proId, 1, message);
+        } else {
+            doHandingVerify(proId, 2, message);
+        }
+    }
+
+    private void doHandingVerify(String proId, int pass, String message) {
+        String sql = "update handing_product set reviewed=:pass , refuseMessage=:message where id=:proId and reviewed=false ";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("proId", proId)
+                    .addParameter("message", message)
+                    .addParameter("pass", pass).executeUpdate();
+        }
+    }
+
+    public static class ProductVerify {
+        public String productId;
+        public String productType;
+        public String mobile;
+        public long applyTime;
+        public String companyName;
+        public String salesManName;
+        public String salesManMobile;
+    }
+
+    public static class SellerVerify {
+        public String userId;
+        public String mobile;
+        public long applyTime;
+        public String companyName;
+        public String salesManName;
+        public String salesManMobile;
     }
 
     public static class SalesManAdmin {

@@ -1,12 +1,7 @@
 package onefengma.demo.server.services.products;
 
-import onefengma.demo.server.model.apibeans.product.SellerHandingBuysResponse;
-import onefengma.demo.server.model.apibeans.product.SellerIronBuysResponse;
-import onefengma.demo.server.model.product.*;
-import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
-import onefengma.demo.server.services.order.OrderDataHelper;
-import onefengma.demo.server.services.products.IronDataHelper.SellerOffer;
 import org.sql2o.Connection;
+import org.sql2o.data.Row;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
@@ -15,10 +10,18 @@ import java.util.List;
 
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
-import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.model.apibeans.product.SellerHandingBuysResponse;
+import onefengma.demo.server.model.product.HandingBuy;
+import onefengma.demo.server.model.product.HandingBuyBrief;
+import onefengma.demo.server.model.product.HandingDetail;
+import onefengma.demo.server.model.product.HandingProduct;
+import onefengma.demo.server.model.product.HandingProductBrief;
+import onefengma.demo.server.model.product.SupplyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
-import org.sql2o.data.Row;
+import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
+import onefengma.demo.server.services.order.OrderDataHelper;
+import onefengma.demo.server.services.products.IronDataHelper.SellerOffer;
 
 /**
  * Created by chufengma on 16/6/5.
@@ -162,14 +165,16 @@ public class HandingDataHelper extends BaseDataHelper {
         }
     }
 
-    public HandingDetail getHandingProductById(String id) {
+    public HandingDetail getHandingProductById(String id) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(HandingDetail.class) + " from handing_product where id=:id";
         try(Connection conn = getConn()) {
             List<HandingDetail> handingProducts = conn.createQuery(sql).addParameter("id", id).executeAndFetch(HandingDetail.class);
             if (handingProducts.isEmpty()) {
                 return null;
             } else {
-                return handingProducts.get(0);
+                HandingDetail detail = handingProducts.get(0);
+                detail.setCityName(CityDataHelper.instance().getCityDescById(detail.souCityId));
+                return detail;
             }
         }
     }

@@ -1,6 +1,5 @@
 package onefengma.demo.server.services.user;
 
-import onefengma.demo.server.core.UpdateBuilder;
 import org.sql2o.Connection;
 
 import java.util.List;
@@ -9,11 +8,10 @@ import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.core.UpdateBuilder;
 import onefengma.demo.server.model.Seller;
-import onefengma.demo.server.model.apibeans.product.ShopDetailRequest;
 import onefengma.demo.server.model.product.ShopBrief;
 import onefengma.demo.server.model.product.ShopDetail;
-import sun.rmi.runtime.Log;
 
 /**
  * Created by chufengma on 16/6/2.
@@ -49,10 +47,10 @@ public class SellerDataHelper extends BaseDataHelper {
     public void insertSeller(Seller seller) throws NoSuchFieldException, IllegalAccessException {
         String sql = createSql("insert into @TABLE(@USER_ID, @COMPANY_NAME, @REG_MONEY, @CONTACT," +
                 "@CANTACT_TEL, @FAX, @CITY_ID, @OFFICE_ADDRESS, @QQ, @SHOP_PROFILE, " +
-                "@ALL_CER, @BUSINESS_LIC, @CODE_LIC, @FINANCE_LIC) values (" +
+                "@ALL_CER, @BUSINESS_LIC, @CODE_LIC, @FINANCE_LIC, applyTime) values (" +
                 ":userId, :companyName, :regMoney, :contact, :cantactTel," +
                 ":fax, :cityId, :officeAddress, :qq, :shopProfile, :allCer," +
-                ":buCli, :codeCli, :finCli)");
+                ":buCli, :codeCli, :finCli, :applyTime)");
         try(Connection connection = getConn()) {
             connection.createQuery(sql).addParameter("userId", seller.userId)
                     .addParameter("companyName", seller.companyName)
@@ -68,6 +66,7 @@ public class SellerDataHelper extends BaseDataHelper {
                     .addParameter("buCli", seller.businessLic)
                     .addParameter("codeCli", seller.codeLic)
                     .addParameter("finCli", seller.financeLic)
+                    .addParameter("applyTime", seller.applyTime)
                     .executeUpdate();
         }
     }

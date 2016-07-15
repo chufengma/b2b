@@ -62,6 +62,9 @@ public class SellerRequest extends AuthSession {
         seller.businessLic = sellerRequest.businessLic == null ? "" : FileHelper.generateRelativeInternetUri(sellerRequest.businessLic.getPath());
         seller.codeLic = sellerRequest.codeLic == null ? "" : FileHelper.generateRelativeInternetUri(sellerRequest.codeLic.getPath());
         seller.financeLic = sellerRequest.financeLic == null ? "" : FileHelper.generateRelativeInternetUri(sellerRequest.financeLic.getPath());
+
+        seller.applyTime = System.currentTimeMillis();
+
         return seller;
     }
 }
