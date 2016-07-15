@@ -16,10 +16,12 @@ import onefengma.demo.server.model.admin.AdminSellersResponse;
 import onefengma.demo.server.model.admin.AdminUsersResponse;
 import onefengma.demo.server.model.apibeans.admin.AdminBuysResponse;
 import onefengma.demo.server.model.apibeans.admin.AdminHandingVerifyResponse;
+import onefengma.demo.server.model.apibeans.admin.AdminHelpFindProductResponse;
 import onefengma.demo.server.model.apibeans.admin.AdminIronVerifyResponse;
 import onefengma.demo.server.model.apibeans.admin.AdminOrdersResponse;
 import onefengma.demo.server.model.apibeans.admin.AdminSalessResponse;
 import onefengma.demo.server.model.apibeans.admin.AdminSellerVerifyResponse;
+import onefengma.demo.server.model.apibeans.others.HelpFindProduct;
 import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.HandingDataHelper.HandingBuyOfferDetail;
@@ -478,6 +480,27 @@ public class AdminDataManager extends BaseDataHelper {
         return adminHandingVerifyResponse;
     }
 
+    public AdminHelpFindProductResponse getHelpFindProducts(PageBuilder pageBuilder) {
+        String sql = "select " + generateFiledString(HelpFindProduct.class) + " from help_find_product " + pageBuilder.generateLimit();
+        String countSql = "select count(*) from help_find_product";
+        AdminHelpFindProductResponse response = new AdminHelpFindProductResponse();
+        response.currentPage = pageBuilder.currentPage;
+        response.pageCount = pageBuilder.pageCount;
+        try(Connection conn = getConn()) {
+            response.requests = conn.createQuery(sql).executeAndFetch(HelpFindProduct.class);
+            Integer count = conn.createQuery(countSql).executeScalar(Integer.class);
+            count = count == null ? 0 : count;
+            response.maxCount = count;
+        }
+        return response;
+    }
+
+    public void deleteFindProduct(int id) {
+        String sql = "delete from help_find_product where id=:id";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("id", id).executeUpdate();
+        }
+    }
 
     public void handingVerifyOperation(String proId, boolean pass, String message) {
 

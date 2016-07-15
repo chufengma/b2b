@@ -1,14 +1,24 @@
 package onefengma.demo.server.services.products;
 
+import java.util.ArrayList;
+
+import onefengma.demo.common.VerifyUtils;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
-import onefengma.demo.server.model.apibeans.product.*;
+import onefengma.demo.server.model.apibeans.others.HelpFindProduct;
+import onefengma.demo.server.model.apibeans.others.HelpFindProductRequest;
+import onefengma.demo.server.model.apibeans.product.ProShopRequest;
+import onefengma.demo.server.model.apibeans.product.ProShopResponse;
+import onefengma.demo.server.model.apibeans.product.SearchRequest;
+import onefengma.demo.server.model.apibeans.product.SearchResponse;
+import onefengma.demo.server.model.apibeans.product.ShopDetailRequest;
+import onefengma.demo.server.model.apibeans.product.ShopRequest;
+import onefengma.demo.server.model.apibeans.product.ShopResponse;
+import onefengma.demo.server.model.metaData.IconDataCategory;
 import onefengma.demo.server.model.product.ShopBrief;
 import onefengma.demo.server.model.product.ShopDetail;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
-
-import java.util.ArrayList;
 
 /**
  * @author yfchu
@@ -78,6 +88,19 @@ public class ProductManager extends BaseManager {
             shopResponse.productType = requestBean.productType;
             shopResponse.shop = shopBrief;
             return success(shopResponse);
+        }));
+
+        post("helpFindProduct", HelpFindProductRequest.class, ((request, response, requestBean) -> {
+            HelpFindProduct helpFindProduct = requestBean.generateHelpFind();
+            if(!VerifyUtils.isMobile(helpFindProduct.mobile)) {
+                return error("手机号码格式不对");
+            }
+            // 不锈钢品类
+            if (!IconDataCategory.get().types.contains(helpFindProduct.type)) {
+                return errorAndClear(requestBean, "不锈钢品类填写不正确");
+            }
+            IronDataHelper.getIronDataHelper().insertFindHelpProduct(helpFindProduct);
+            return success();
         }));
     }
 

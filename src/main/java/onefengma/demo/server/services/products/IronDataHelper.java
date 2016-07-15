@@ -12,6 +12,7 @@ import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.model.apibeans.others.HelpFindProduct;
 import onefengma.demo.server.model.apibeans.product.SellerIronBuysResponse;
 import onefengma.demo.server.model.product.IronBuy;
 import onefengma.demo.server.model.product.IronBuyBrief;
@@ -462,6 +463,12 @@ public class IronDataHelper extends BaseDataHelper {
         String sql = "select " + generateFiledString(IronBuyOfferDetail.class) + " from iron_buy_supply where ironId=:id and sellerId=:userId";
         try(Connection conn = getConn()) {
             return conn.createQuery(sql).addParameter("id", ironBuyId).addParameter("userId", userId).executeAndFetchFirst(IronBuyOfferDetail.class);
+        }
+    }
+
+    public void insertFindHelpProduct(HelpFindProduct helpFindProduct) throws InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException, IllegalAccessException {
+        try(Connection conn = getConn()) {
+            createInsertQuery(conn, "help_find_product", helpFindProduct);
         }
     }
 

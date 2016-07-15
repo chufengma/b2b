@@ -17,11 +17,13 @@ import onefengma.demo.server.model.admin.AdminSellersResponse;
 import onefengma.demo.server.model.admin.AdminUsersRequest;
 import onefengma.demo.server.model.admin.AdminUsersResponse;
 import onefengma.demo.server.model.apibeans.admin.AdminBuysRequest;
+import onefengma.demo.server.model.apibeans.admin.AdminFindHelpRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminLoginRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminOrdersRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminSalesRequest;
 import onefengma.demo.server.model.apibeans.admin.DeleteUserRequest;
 import onefengma.demo.server.model.apibeans.admin.UpdateUserRequest;
+import onefengma.demo.server.model.apibeans.others.InnerMessageRequest;
 import onefengma.demo.server.model.product.HandingDetail;
 import onefengma.demo.server.model.product.IronDetail;
 import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
@@ -276,9 +278,26 @@ public class AdminManager extends BaseManager {
             }
             return success("操作成功");
         }));
+
+        get("findHelpProduct", BaseAdminPageBean.class, ((request, response, requestBean) -> {
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount);
+            return success(AdminDataManager.instance().getHelpFindProducts(pageBuilder));
+        }));
+
+        post("deleteFindHelpProduct", AdminFindHelpRequest.class, ((request, response, requestBean) -> {
+            AdminDataManager.instance().deleteFindProduct(requestBean.id);
+            return success("操作成功");
+        }));
+
+        post("postInnerMessage", InnerMessageRequest.class, ((request, response, requestBean) -> {
+            String userId = UserDataHelper.instance().getUserIdByMobile(requestBean.mobile);
+            if (StringUtils.isEmpty(userId)) {
+                return error("该用户不存在！");
+            }
+            InnerMessageDataHelper.instance().addInnerMessage(userId, requestBean.title, requestBean.message);
+            return success("操作成功");
+        }));
     }
-
-
 
 
     @Override
