@@ -181,4 +181,24 @@ public class UserDataHelper extends BaseDataHelper {
             return integral == null ? 0 : integral;
         }
     }
+
+    public void bindSalesman(String userId, int salesmanId) {
+        String sql = "update user set salesmanId =:salesmanId where userId=:userId";
+        try(Connection conn= getConn()) {
+            conn.createQuery(sql).addParameter("userId", userId)
+                                    .addParameter("salesmanId", salesmanId).executeUpdate();
+            updateSalesmanBindTime(salesmanId, userId);
+        }
+    }
+
+    public void updateSalesmanBindTime(int salesmanId, String userId) {
+        String salesManSql = "update salesman set bindTime=:time where id=:id";
+        String userSql = "update user set salesBindTime=:time where userId=:userId";
+        try(Connection conn= getConn()) {
+            conn.createQuery(salesManSql).addParameter("id", salesmanId)
+                    .addParameter("time", System.currentTimeMillis()).executeUpdate();
+            conn.createQuery(userSql).addParameter("userId", userId)
+                    .addParameter("time", System.currentTimeMillis()).executeUpdate();
+        }
+    }
 }

@@ -82,6 +82,7 @@ public class AdminManager extends BaseManager {
                 return error("该顾问不存在");
             }
             AdminDataManager.instance().updateUser(requestBean.userId, requestBean.integral,requestBean.salesmanId);
+            UserDataHelper.instance().updateSalesmanBindTime(requestBean.salesmanId, requestBean.userId);
             return success("修改成功");
         }));
 
@@ -90,6 +91,7 @@ public class AdminManager extends BaseManager {
                 return error("该顾问不存在");
             }
             AdminDataManager.instance().updateSeller(requestBean.userId,requestBean.integral, requestBean.salesmanId);
+            UserDataHelper.instance().updateSalesmanBindTime(requestBean.salesmanId, requestBean.userId);
             return success("修改成功");
         }));
 

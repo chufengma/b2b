@@ -208,6 +208,11 @@ public class AdminDataManager extends BaseDataHelper {
                     orderForAdmin.sellerCompany = seller.companyName;
                 }
 
+                Seller buyer = SellerDataHelper.instance().getSeller(buyerId);
+                if (buyer != null) {
+                    orderForAdmin.buyerCompany = buyer.companyName;
+                }
+
                 SalesMan salesMan = UserDataHelper.instance().getSalesManById(orderForAdmin.salesManId);
                 if (salesMan != null) {
                     orderForAdmin.salesManMobile = salesMan.tel;
@@ -296,7 +301,7 @@ public class AdminDataManager extends BaseDataHelper {
     public AdminSalessResponse getSales(PageBuilder pageBuilder, long startTime, long endTime) {
         String salesSql = "select * from salesman where id<>0 " + (pageBuilder.hasWhere() ? " and " : " ") + pageBuilder.generateWhere() + " " + pageBuilder.generateLimit();
         String maxCountSql = "select count(*) from salesman where id<>0 " + (pageBuilder.hasWhere() ? " and " : " ") + pageBuilder.generateWhere() + " ";
-        String userCountSql = "select userId from user where salesManId=:id";
+        String userCountSql = "select userId from user where salesManId=:id and salesBindTime<:endTime and salesBindTime>=:startTime  ";
 
         String orderMoneySql = "select sum(totalMoney) from product_orders where buyerId=:buyerId and status=1 and finishTime<:endTime and finishTime>=:startTime";
         String handingBuyMoneySql = "select sum(supplyPrice) from handing_buy,handing_buy_supply " +
@@ -312,13 +317,17 @@ public class AdminDataManager extends BaseDataHelper {
 
         List<SalesManAdmin> admins = new ArrayList<>();
         try(Connection conn = getConn()) {
-            List<Row> rows = conn.createQuery(salesSql).executeAndFetchTable().rows();
+            List<Row> rows = conn.createQuery(salesSql)
+                            .executeAndFetchTable().rows();
             for(Row row : rows) {
                 SalesManAdmin salesManAdmin = new SalesManAdmin();
                 salesManAdmin.id = row.getInteger("id");
                 salesManAdmin.name = row.getString("name");
                 salesManAdmin.mobile = row.getString("tel");
-                List<Row> userRows = conn.createQuery(userCountSql).addParameter("id", salesManAdmin.id).executeAndFetchTable().rows();
+                List<Row> userRows = conn.createQuery(userCountSql)
+                        .addParameter("endTime", endTime)
+                        .addParameter("startTime", startTime)
+                        .addParameter("id", salesManAdmin.id).executeAndFetchTable().rows();
                 salesManAdmin.userCount = userRows.size();
                 for(Row userRow : userRows) {
                     String userId = userRow.getString("userId");
@@ -619,6 +628,7 @@ public class AdminDataManager extends BaseDataHelper {
     public static class OrderForAdmin {
         public String orderId;
         public String buyerMobile;
+        public String buyerCompany;
         public String sellerMobile;
         public String sellerCompany;
         public float price;

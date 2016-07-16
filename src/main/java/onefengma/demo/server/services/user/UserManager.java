@@ -9,10 +9,7 @@ import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.UploadDemo;
 import onefengma.demo.server.model.User;
 import onefengma.demo.server.core.request.AuthHelper;
-import onefengma.demo.server.model.apibeans.AuthSession;
-import onefengma.demo.server.model.apibeans.BaseAuthPageBean;
-import onefengma.demo.server.model.apibeans.BaseBean;
-import onefengma.demo.server.model.apibeans.SellerRequest;
+import onefengma.demo.server.model.apibeans.*;
 import onefengma.demo.server.model.apibeans.login.ChangePassword;
 import onefengma.demo.server.model.apibeans.login.ChangeUserProfile;
 import onefengma.demo.server.model.apibeans.login.Login;
@@ -180,6 +177,11 @@ public class UserManager extends BaseManager {
             }
             InnerMessageDataHelper.instance().deleteInnerMessage(requestBean.messageId);
             return success("删除成功");
+        }));
+
+        post("bindSalesman", BindSalesManRequest.class, ((request, response, requestBean) -> {
+            UserDataHelper.instance().bindSalesman(requestBean.getUserId(), requestBean.salesmanId);
+            return success();
         }));
 
         // just for test
