@@ -64,7 +64,7 @@ public class IronDataHelper extends BaseDataHelper {
     public int getMaxIronCounts(PageBuilder pageBuilder) {
         String sql = "select count(*)" +
                 " from iron_product " +
-                " left join (select productId, sum(totalMoney) as monthSellCount from product_orders) as orders " +
+                " left join (select productId, sum(count) as monthSellCount from product_orders) as orders " +
                 " on orders.productId = iron_product.proId "  + generateWhereKey(pageBuilder, false);
         try (Connection conn = getConn()) {
             return conn.createQuery(sql).executeScalar(Integer.class);
@@ -74,7 +74,7 @@ public class IronDataHelper extends BaseDataHelper {
     public List<IronProductBrief> getIronProducts(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(IronProductBrief.class) +
                 " from iron_product " +
-                "left join (select productId, sum(totalMoney) as monthSellCount from product_orders where finishTime<:endTime and finishTime>=:startTime) as orders " +
+                "left join (select productId, sum(count) as monthSellCount from product_orders where productType=0 and  finishTime<:endTime and finishTime>=:startTime) as orders " +
                 " on orders.productId = iron_product.proId " + generateWhereKey(pageBuilder, true);
 
         try (Connection conn = getConn()) {

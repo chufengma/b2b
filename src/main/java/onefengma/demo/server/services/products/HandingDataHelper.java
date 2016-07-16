@@ -1,5 +1,7 @@
 package onefengma.demo.server.services.products;
 
+import onefengma.demo.common.DateHelper;
+import onefengma.demo.server.model.product.*;
 import onefengma.demo.server.services.order.TransactionDataHelper;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
@@ -13,12 +15,6 @@ import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.product.SellerHandingBuysResponse;
-import onefengma.demo.server.model.product.HandingBuy;
-import onefengma.demo.server.model.product.HandingBuyBrief;
-import onefengma.demo.server.model.product.HandingDetail;
-import onefengma.demo.server.model.product.HandingProduct;
-import onefengma.demo.server.model.product.HandingProductBrief;
-import onefengma.demo.server.model.product.SupplyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import onefengma.demo.server.services.order.OrderDataHelper;
@@ -58,8 +54,10 @@ public class HandingDataHelper extends BaseDataHelper {
     }
 
     public int getMaxCount(PageBuilder pageBuilder) {
-        String sql = "select count(*)"
-            + " from handing_product " + generateWhereKey(pageBuilder, false);
+        String sql = "select count(*)" +
+                " from handing_product " +
+                "left join (select productId, sum(count) as monthSellCount from product_orders where productType=1) as orders " +
+                " on orders.productId = handing_product.id " + generateWhereKey(pageBuilder, false);
         try(Connection connection = getConn()){
             return connection.createQuery(sql).executeScalar(Integer.class);
         }
@@ -73,11 +71,15 @@ public class HandingDataHelper extends BaseDataHelper {
     }
 
     public List<HandingProductBrief> getHandingProducts(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
-        String sql = "select " + generateFiledString(HandingProductBrief.class)
-                + " from handing_product " + generateWhereKey(pageBuilder, true);
+        String sql = "select " + generateFiledString(HandingProductBrief.class) +
+                " from handing_product " +
+                "left join (select productId, sum(count) as monthSellCount from product_orders where productType=1 and finishTime<:endTime and finishTime>=:startTime) as orders " +
+                " on orders.productId = handing_product.id " + generateWhereKey(pageBuilder, true);
 
         try (Connection conn = getConn()) {
-            List<HandingProductBrief> briefs =  conn.createQuery(sql).executeAndFetch(HandingProductBrief.class);
+            List<HandingProductBrief> briefs =  conn.createQuery(sql)
+                    .addParameter("startTime", DateHelper.getThisMonthStartTimestamp())
+                    .addParameter("endTime", DateHelper.getNextMonthStatimestamp()).executeAndFetch(HandingProductBrief.class);
             for(HandingProductBrief brief : briefs) {
                 brief.setSourceCity(CityDataHelper.instance().getCityDescById(brief.souCityId));
             }
