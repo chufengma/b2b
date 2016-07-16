@@ -191,6 +191,66 @@ public class UserDataHelper extends BaseDataHelper {
         }
     }
 
+    public UserInfo getUserInfo(String userId) {
+        String sql = "select integral from user where userId=:userId";
+        String ironBuyCountsql = "select count(*) from iron_buy where status = 0 and userId=:userId ";
+        String handingBuyCountsql = "select count(*) from handing_buy where status = 0 and userId=:userId ";
+        String orderCountSql = "select count(*) from product_orders where status = 0 and buyerId=:userId";
+        try(Connection conn = getConn()) {
+            Integer integral = conn.createQuery(sql).addParameter("userId", userId).executeScalar(Integer.class);
+            integral = (integral == null) ? 0 : integral;
+
+            Integer ironCount = conn.createQuery(ironBuyCountsql).addParameter("userId", userId).executeScalar(Integer.class);
+            ironCount = (ironCount == null) ? 0 : ironCount;
+
+            Integer handingCount = conn.createQuery(handingBuyCountsql).addParameter("userId", userId).executeScalar(Integer.class);
+            handingCount = (handingCount == null) ? 0 : handingCount;
+
+            Integer orderCount = conn.createQuery(orderCountSql).addParameter("userId", userId).executeScalar(Integer.class);
+            orderCount = (orderCount == null) ? 0 : orderCount;
+
+            UserInfo userInfo = new UserInfo();
+            userInfo.integral = integral;
+            userInfo.buys = ironCount + handingCount;
+            userInfo.orders = orderCount;
+
+            return userInfo;
+        }
+    }
+
+    public UserInfo getSellerInfo(String userId) {
+        String sql = "select integral from seller where userId=:userId";
+        String ironBuyCountsql = "select count(*) from iron_buy where status = 0 and userId=:userId ";
+        String handingBuyCountsql = "select count(*) from handing_buy where status = 0 and userId=:userId ";
+        String orderCountSql = "select count(*) from product_orders where status = 0 and sellerId=:userId";
+        try(Connection conn = getConn()) {
+            Integer integral = conn.createQuery(sql).addParameter("userId", userId).executeScalar(Integer.class);
+            integral = (integral == null) ? 0 : integral;
+
+            Integer ironCount = conn.createQuery(ironBuyCountsql).addParameter("userId", userId).executeScalar(Integer.class);
+            ironCount = (ironCount == null) ? 0 : ironCount;
+
+            Integer handingCount = conn.createQuery(handingBuyCountsql).addParameter("userId", userId).executeScalar(Integer.class);
+            handingCount = (handingCount == null) ? 0 : handingCount;
+
+            Integer orderCount = conn.createQuery(orderCountSql).addParameter("userId", userId).executeScalar(Integer.class);
+            orderCount = (orderCount == null) ? 0 : orderCount;
+
+            UserInfo userInfo = new UserInfo();
+            userInfo.integral = integral;
+            userInfo.buys = ironCount + handingCount;
+            userInfo.orders = orderCount;
+
+            return userInfo;
+        }
+    }
+
+    public static class UserInfo {
+        public int integral;
+        public int buys;
+        public int orders;
+    }
+
     public void updateSalesmanBindTime(int salesmanId, String userId) {
         String salesManSql = "update salesman set bindTime=:time where id=:id";
         String userSql = "update user set salesBindTime=:time where userId=:userId";

@@ -184,6 +184,10 @@ public class UserManager extends BaseManager {
             return success();
         }));
 
+        get("userCenterData", AuthSession.class, ((request, response, requestBean) -> {
+            return success(UserDataHelper.instance().getUserInfo(requestBean.getUserId()));
+        }));
+
         // just for test
         multiPost("upload", UploadDemo.class, (request, response, requestBean) -> {
             return success(requestBean);

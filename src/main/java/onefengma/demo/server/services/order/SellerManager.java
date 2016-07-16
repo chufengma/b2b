@@ -217,6 +217,11 @@ public class SellerManager extends BaseManager {
             }
             return success(SellerDataHelper.instance().getSellerIntegral(requestBean.getUserId()));
         }));
+
+        get("sellerCenterData", AuthSession.class, ((request, response, requestBean) -> {
+            return success(UserDataHelper.instance().getSellerInfo(requestBean.getUserId()));
+        }));
+
     }
 
     @Override
