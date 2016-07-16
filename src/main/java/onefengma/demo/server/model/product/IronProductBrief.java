@@ -12,6 +12,7 @@ public class IronProductBrief {
     public float price;
     public float monthSellCount;
     public float score;
+    public boolean isSpec;
 
     public String sourceCityId;
     private String sourceCity;

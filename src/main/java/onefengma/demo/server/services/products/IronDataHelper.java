@@ -1,5 +1,6 @@
 package onefengma.demo.server.services.products;
 
+import onefengma.demo.common.DateHelper;
 import onefengma.demo.server.services.order.TransactionDataHelper;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
@@ -62,7 +63,9 @@ public class IronDataHelper extends BaseDataHelper {
 
     public int getMaxIronCounts(PageBuilder pageBuilder) {
         String sql = "select count(*)" +
-                " from iron_product " + generateWhereKey(pageBuilder, false);
+                " from iron_product " +
+                " left join (select productId, sum(totalMoney) as monthSellCount from product_orders) as orders " +
+                " on orders.productId = iron_product.proId "  + generateWhereKey(pageBuilder, false);
         try (Connection conn = getConn()) {
             return conn.createQuery(sql).executeScalar(Integer.class);
         }
@@ -70,10 +73,15 @@ public class IronDataHelper extends BaseDataHelper {
 
     public List<IronProductBrief> getIronProducts(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(IronProductBrief.class) +
-                " from iron_product " + generateWhereKey(pageBuilder, true);
+                " from iron_product " +
+                "left join (select productId, sum(totalMoney) as monthSellCount from product_orders where finishTime<:endTime and finishTime>=:startTime) as orders " +
+                " on orders.productId = iron_product.proId " + generateWhereKey(pageBuilder, true);
 
         try (Connection conn = getConn()) {
-            List<IronProductBrief> ironProductBriefs = conn.createQuery(sql).executeAndFetch(IronProductBrief.class);
+            List<IronProductBrief> ironProductBriefs = conn.createQuery(sql)
+                    .addParameter("startTime", DateHelper.getThisMonthStartTimestamp())
+                    .addParameter("endTime", DateHelper.getNextMonthStatimestamp())
+                    .executeAndFetch(IronProductBrief.class);
             for (IronProductBrief ironProductBrief : ironProductBriefs) {
                 ironProductBrief.setSourceCity(CityDataHelper.instance().getCityDescById(ironProductBrief.sourceCityId));
             }

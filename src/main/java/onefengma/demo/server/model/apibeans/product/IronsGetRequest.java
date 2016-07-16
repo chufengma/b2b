@@ -23,4 +23,6 @@ public class IronsGetRequest extends BasePageBean {
     public String userId;
     @NotRequired
     public String cityId;
+    @NotRequired
+    public Boolean isSpec;
 }

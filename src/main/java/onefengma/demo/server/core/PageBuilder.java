@@ -123,6 +123,9 @@ public class PageBuilder {
         if (value instanceof Integer && (int) value == -1) {
             return this;
         }
+        if (value == null) {
+            return null;
+        }
         this.wereList.add(new Where(key, value));
         return this;
     }
