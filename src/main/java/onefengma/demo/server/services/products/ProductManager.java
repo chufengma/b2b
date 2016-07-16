@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import onefengma.demo.common.VerifyUtils;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.model.apibeans.AuthSession;
+import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.others.HelpFindProduct;
 import onefengma.demo.server.model.apibeans.others.HelpFindProductRequest;
 import onefengma.demo.server.model.apibeans.product.ProShopRequest;
@@ -18,6 +20,7 @@ import onefengma.demo.server.model.metaData.IconDataCategory;
 import onefengma.demo.server.model.product.ShopBrief;
 import onefengma.demo.server.model.product.ShopDetail;
 import onefengma.demo.server.services.funcs.CityDataHelper;
+import onefengma.demo.server.services.funcs.OthersDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
 
 /**

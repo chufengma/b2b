@@ -7,6 +7,8 @@ import com.oreilly.servlet.MultipartRequest;
 
 import onefengma.demo.server.core.request.*;
 import onefengma.demo.server.model.apibeans.AdminAuthSession;
+import onefengma.demo.server.model.apibeans.AuthData;
+import onefengma.demo.server.services.user.SellerDataHelper;
 import org.sql2o.Connection;
 
 import java.io.File;
@@ -351,20 +353,26 @@ public abstract class BaseManager {
 
     }
 
+    private static String becomeUrl = "/html/view/account/seller/#!/become";
+    private static String loginUrl = "/html/view/common/login.html";
+
     private static void addFilers() {
         Spark.before((request, response) -> {
                     String pathInfo = request.pathInfo();
                     File pageFile = null;
-                    if (pathInfo.endsWith("/")) {
-                        // goto main page
-                        pageFile = FileHelper.getFileFromPath(Config.getIndexPath());
-                    } else if (request.pathInfo().endsWith(".html")) {
+                    if (pathInfo.startsWith("/auth") || pathInfo.startsWith("/html")) {
                         // other pages
                         if (request.pathInfo().startsWith("/auth")) {
                             pageFile = FileHelper.getFileFromPath("notLogin.html");
                         } else if (request.pathInfo().startsWith("/admin/auth")) {
                             if(!AuthHelper.isAdminLogin(request)) {
                                 response.redirect("/admin/login.html");
+                            }
+                        } else if (pathInfo.startsWith("/html/view/account")) {
+                            AuthData serverData = new AuthData(AuthHelper.getServerToken(request), AuthHelper.getServerUserId(request));
+                            AuthData clientData = new AuthData(AuthHelper.getRequestToken(request), AuthHelper.getRequestUserId(request));
+                            if((serverData == null || !serverData.equals(clientData))) {
+                                response.redirect(loginUrl);
                             }
                         } else {
                             pageFile = FileHelper.getFileFromPath(pathInfo);

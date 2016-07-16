@@ -178,7 +178,7 @@ public class OrderDataHelper extends BaseDataHelper {
 
         String sql = "update product_orders " +
                 "set status = 3,cancelBy = 3 where (sellTime+timeLimit) < :currentTime and status = 0 "
-                + (pageBuilder.hasWhere() ? " where " : "  ") + pageBuilder.generateWhere();
+                + (pageBuilder.hasWhere() ? " and " : "  ") + pageBuilder.generateWhere();
 
         try (Connection conn = getConn()) {
             conn.createQuery(sql).addParameter("currentTime", System.currentTimeMillis()).executeUpdate();
@@ -196,7 +196,7 @@ public class OrderDataHelper extends BaseDataHelper {
     }
 
     public List<OrderDynamic> getOrdersDynamic() {
-        String sql = "select product_orders.id,iron_product.proId,ironType,material,mobile,pushTime,count,price  " +
+        String sql = "select product_orders.id,iron_product.proId,iron_product.proId as ironId,ironType,material,mobile,pushTime,count,price  " +
                 "from product_orders, iron_product, user where productType=0 and iron_product.proId = productId and status<>4 and buyerId=user.userId " +
                 "order by sellTime desc limit 0,10";
         try(Connection conn = getConn()) {
