@@ -179,16 +179,18 @@ public class IronDataHelper extends BaseDataHelper {
     }
 
     public IronDetail getIronProductById(String proId) throws NoSuchFieldException, IllegalAccessException {
-        String sql = "select " + generateFiledString(IronDetail.class) + " from iron_product where proId=:proId";
+        String sql = "select " + generateFiledString(IronDetail.class) +
+                " from iron_product " +
+                "left join (select productId, sum(count) as monthSellCount from product_orders where productType=0 and  finishTime<:endTime and finishTime>=:startTime) as orders " +
+                " on orders.productId = iron_product.proId and iron_product.proId=:proId";
+
         try (Connection conn = getConn()) {
-            List<IronDetail> ironProducts = conn.createQuery(sql).addParameter("proId", proId).executeAndFetch(IronDetail.class);
-            if (ironProducts.isEmpty()) {
-                return null;
-            } else {
-                IronDetail detail = ironProducts.get(0);
-                detail.setCityName(CityDataHelper.instance().getCityDescById(detail.sourceCityId));
-                return detail;
-            }
+            List<IronDetail> ironDetails = conn.createQuery(sql)
+                    .addParameter("startTime", DateHelper.getThisMonthStartTimestamp())
+                    .addParameter("proId", proId)
+                    .addParameter("endTime", DateHelper.getNextMonthStatimestamp())
+                    .executeAndFetch(IronDetail.class);
+            return ironDetails.isEmpty() ? null : ironDetails.get(0);
         }
     }
 

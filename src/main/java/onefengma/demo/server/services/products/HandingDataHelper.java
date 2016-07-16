@@ -180,21 +180,26 @@ public class HandingDataHelper extends BaseDataHelper {
     }
 
     public HandingDetail getHandingProductById(String id) throws NoSuchFieldException, IllegalAccessException {
-        String sql = "select " + generateFiledString(HandingDetail.class) + " from handing_product where id=:id";
-        try(Connection conn = getConn()) {
-            List<HandingDetail> handingProducts = conn.createQuery(sql).addParameter("id", id).executeAndFetch(HandingDetail.class);
-            if (handingProducts.isEmpty()) {
-                return null;
-            } else {
-                HandingDetail detail = handingProducts.get(0);
-                detail.setCityName(CityDataHelper.instance().getCityDescById(detail.souCityId));
-                return detail;
-            }
+        String sql = "select " + generateFiledString(HandingDetail.class) +
+                " from handing_product " +
+                "left join (select productId, sum(count) as monthSellCount from product_orders where productType=1 and  finishTime<:endTime and finishTime>=:startTime) as orders " +
+                " on orders.productId = handing_product.id and handing_product.id=:id";
+
+        try (Connection conn = getConn()) {
+            List<HandingDetail> ironDetails = conn.createQuery(sql)
+                    .addParameter("startTime", DateHelper.getThisMonthStartTimestamp())
+                    .addParameter("id", id)
+                    .addParameter("endTime", DateHelper.getNextMonthStatimestamp())
+                    .executeAndFetch(HandingDetail.class);
+            return ironDetails.isEmpty() ? null : ironDetails.get(0);
         }
     }
 
     public List<HandingProductBrief> getHandingProductRecommend() throws NoSuchFieldException, IllegalAccessException {
-        String sql =  "select " + generateFiledString(HandingProductBrief.class) + " from handing_product order by monthSellCount desc limit 0, 6";
+        String sql = "select " + generateFiledString(HandingDetail.class) +
+                " from handing_product " +
+                "left join (select productId, sum(count) as monthSellCount from product_orders where productType=1 and  finishTime<:endTime and finishTime>=:startTime) as orders " +
+                " on orders.productId = handing_product.id and handing_product.id=:id order by monthSellCount desc limit 0, 6";
         try(Connection conn = getConn()) {
             List<HandingProductBrief> briefs =  conn.createQuery(sql).executeAndFetch(HandingProductBrief.class);
             for(HandingProductBrief brief : briefs) {

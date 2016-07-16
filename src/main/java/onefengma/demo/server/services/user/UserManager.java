@@ -188,6 +188,18 @@ public class UserManager extends BaseManager {
             return success(UserDataHelper.instance().getUserInfo(requestBean.getUserId()));
         }));
 
+        post("forgetPassword", ForgetPasswordRequest.class, ((request, response, requestBean) -> {
+            if (!MsgCodeHelper.isMsgCodeRight(request, requestBean.msgCode, requestBean.mobile)) {
+                return error("短信验证码不正确");
+            }
+            String userId = UserDataHelper.instance().getUserIdByMobile(requestBean.mobile);
+            if (!StringUtils.isEmpty(userId)) {
+                return error("没有该用户!");
+            }
+            UserDataHelper.instance().changeUserPassword(userId, IdUtils.md5(requestBean.newPassword));
+            return success();
+        }));
+
         // just for test
         multiPost("upload", UploadDemo.class, (request, response, requestBean) -> {
             return success(requestBean);
