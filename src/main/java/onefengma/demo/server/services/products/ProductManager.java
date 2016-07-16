@@ -82,6 +82,14 @@ public class ProductManager extends BaseManager {
             return success(shopDetail);
         }));
 
+        get("shopBrief", ShopDetailRequest.class, ((request, response, requestBean) -> {
+            ShopBrief shopBrief = SellerDataHelper.instance().getShopBrief(requestBean.sellerId);
+            if (shopBrief == null) {
+                return error("没找到相关店铺");
+            }
+            return success(shopBrief);
+        }));
+
         get("productShop", ProShopRequest.class, ((request, response, requestBean) -> {
             ShopBrief shopBrief = SellerDataHelper.instance().getShopByProId(requestBean.proId, requestBean.productType);
             if (shopBrief == null) {

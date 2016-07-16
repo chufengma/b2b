@@ -137,6 +137,27 @@ public class SellerDataHelper extends BaseDataHelper {
             }
     }
 
+    public ShopBrief getShopBrief(String userId) {
+        String sql = "select * from seller left join " +
+                "(select sellerId, sum(count) as count, sum(money) as money " +
+                "from seller_transactions where finishTime < :endTime and finishTime >= :startTime " +
+                "group by sellerId) as trans " +
+                "on seller.userId = trans.sellerId where seller.userId = :userId " +
+                "order by count desc limit 0, 10";
+        try(Connection conn = getConn()) {
+            List<Row> rows = conn.createQuery(sql)
+                    .addParameter("userId", userId)
+                    .addParameter("startTime", DateHelper.getLastMonthStartTimestamp())
+                    .addParameter("endTime", DateHelper.getNextMonthStatimestamp())
+                    .executeAndFetchTable().rows();
+            List<ShopBrief> shopBriefs = new ArrayList<>();
+            for(Row row : rows) {
+                return generateShopByRow(row, 0);
+            }
+            return null;
+        }
+    }
+
     public ShopBrief generateShopByRow(Row row, int productType) {
         ShopBrief shopBrief = new ShopBrief();
         shopBrief.userId = row.getString("userId");
