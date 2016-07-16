@@ -375,7 +375,7 @@ public abstract class BaseManager {
                                 response.redirect(loginUrl);
                             }
                         } else {
-                            pageFile = FileHelper.getFileFromPath(pathInfo);
+                            return;
                         }
                     }
                     // other request
