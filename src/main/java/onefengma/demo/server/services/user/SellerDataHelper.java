@@ -179,7 +179,7 @@ public class SellerDataHelper extends BaseDataHelper {
     public List<ShopBrief> getShops(PageBuilder pageBuilder, int productType) {
         String productTypeSql = "";
         if (productType == 0 || productType == 1) {
-            productTypeSql = " productType=" + productType + "and ";
+            productTypeSql = " productType=" + productType + " and ";
         };
 
         String sql = "select * from seller left join " +
