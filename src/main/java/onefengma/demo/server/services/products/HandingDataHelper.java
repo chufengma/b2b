@@ -1,5 +1,6 @@
 package onefengma.demo.server.services.products;
 
+import onefengma.demo.server.services.order.TransactionDataHelper;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -41,6 +42,17 @@ public class HandingDataHelper extends BaseDataHelper {
         String sql = "select price from handing_product where id=:id";
         try (Connection conn = getConn()) {
             Float price = conn.createQuery(sql).addParameter("id", handingId).executeScalar(Float.class);
+            return price == null ? 0 : price;
+        }
+    }
+
+    public float getHandingBuySupplyPrice(String handingBuyId) {
+        String sql = "select supplyPrice from handing_buy,handing_buy_supply where " +
+                "handing_buy.supplyUserId = handing_buy_supply.sellerId " +
+                "and handing_buy.id = handing_buy_supply.handingId " +
+                "and handing_buy.id=:handingBuyId";
+        try (Connection conn = getConn()) {
+            Float price = conn.createQuery(sql).addParameter("handingBuyId", handingBuyId).executeScalar(Float.class);
             return price == null ? 0 : price;
         }
     }
@@ -237,6 +249,8 @@ public class HandingDataHelper extends BaseDataHelper {
         }
     }
 
+
+
     public boolean isUserIdInSupplyList(String handingId, String userId) {
         String sql = "select sellerId from handing_buy_supply where handingId=:handingId and sellerId=:userId";
         try(Connection conn = getConn()) {
@@ -248,12 +262,12 @@ public class HandingDataHelper extends BaseDataHelper {
         }
     }
 
-    public void selectHandingBuySupply(String buyerId, String handingId, String supplyUserId) {
+    public void selectHandingBuySupply(String buyerId, String handingId, String supplyUserId) throws Exception {
         String sql = "update handing_buy set supplyUserId=:userId, status=1,supplyWinTime=:time where id=:handingId";
 
         String supplyPriceSql = "select supplyPrice from handing_buy_supply where where handingId=:handingId and sellerId=:sellerId";
 
-        try(Connection conn = getConn()) {
+        transaction((conn -> {
             conn.createQuery(sql)
                     .addParameter("handingId", handingId)
                     .addParameter("time", System.currentTimeMillis())
@@ -262,11 +276,14 @@ public class HandingDataHelper extends BaseDataHelper {
             Float price = conn.createQuery(supplyPriceSql).addParameter("handingId", handingId).addParameter("sellerId", supplyUserId).executeScalar(Float.class);
             price = price == null ? 0 : price;
             float totalMoney = price;
-            OrderDataHelper.instance().addIntegralByBuy(conn, buyerId, supplyUserId, totalMoney);
-        }
 
-        // 增加站内信
-        InnerMessageDataHelper.instance().addInnerMessage(supplyUserId, "恭喜您成功中标", "您已经被买家加工求购中标");
+            // 记录交易
+            TransactionDataHelper.instance().insertHandingBuyTransaction(conn, supplyUserId, handingId, totalMoney, 1);
+            // 添加积分
+            OrderDataHelper.instance().addIntegralByBuy(conn, buyerId, supplyUserId, totalMoney);
+            // 增加站内信
+            InnerMessageDataHelper.instance().addInnerMessage(supplyUserId, "恭喜您成功中标", "您已经被买家加工求购中标");
+        }));
     }
 
     public int getHandingBuyStatus(String handingId) {

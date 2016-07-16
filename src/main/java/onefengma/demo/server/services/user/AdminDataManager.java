@@ -451,7 +451,7 @@ public class AdminDataManager extends BaseDataHelper {
         return adminIronVerifyResponse;
     }
 
-    public void ironVerifyOperation(String proId, boolean pass, String message) {
+    public void ironVerifyOperation(String proId, boolean pass, String message) throws Exception {
 
         if (pass) {
             doIronVerify(proId, 1, message);
@@ -460,13 +460,15 @@ public class AdminDataManager extends BaseDataHelper {
         }
     }
 
-    private void doIronVerify(String proId, int pass, String message) {
+    private void doIronVerify(String proId, int pass, String message) throws Exception {
         String sql = "update iron_product set reviewed=:pass , refuseMessage=:message where proId=:proId and reviewed=false ";
-        try(Connection conn = getConn()) {
+        transaction((conn)->{
             conn.createQuery(sql).addParameter("proId", proId)
                     .addParameter("message", message)
                     .addParameter("pass", pass).executeUpdate();
-        }
+
+           SellerDataHelper.instance().updateSellerProductCount(conn, 0, proId);
+        });
     }
 
     public AdminHandingVerifyResponse getHandingVerify(PageBuilder pageBuilder) {
@@ -530,7 +532,7 @@ public class AdminDataManager extends BaseDataHelper {
         }
     }
 
-    public void handingVerifyOperation(String proId, boolean pass, String message) {
+    public void handingVerifyOperation(String proId, boolean pass, String message) throws NoSuchFieldException, IllegalAccessException {
 
         if (pass) {
             doHandingVerify(proId, 1, message);
@@ -539,12 +541,14 @@ public class AdminDataManager extends BaseDataHelper {
         }
     }
 
-    private void doHandingVerify(String proId, int pass, String message) {
+    private void doHandingVerify(String proId, int pass, String message) throws NoSuchFieldException, IllegalAccessException {
         String sql = "update handing_product set reviewed=:pass , refuseMessage=:message where id=:proId and reviewed=false ";
         try(Connection conn = getConn()) {
             conn.createQuery(sql).addParameter("proId", proId)
                     .addParameter("message", message)
                     .addParameter("pass", pass).executeUpdate();
+
+            SellerDataHelper.instance().updateSellerProductCount(conn, 1, proId);
         }
     }
 

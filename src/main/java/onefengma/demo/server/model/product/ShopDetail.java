@@ -12,10 +12,13 @@ public class ShopDetail {
     public String cover;
     public String ironTypeDesc;
     public String handingTypeDesc;
-    public float ironCount;
-    public float handingCount;
-    public float ironMoney;
-    public float handingMoney;
     public float score;
-    public float productCount;
+
+    public int productNumbers;
+    public float ironMoney;
+    public float ironCount;
+    public float handingMoney;
+    public float handingCount;
+    public float count;
+    public float money;
 }

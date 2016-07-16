@@ -1,5 +1,6 @@
 package onefengma.demo.server.services.products;
 
+import onefengma.demo.server.services.order.TransactionDataHelper;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -44,6 +45,17 @@ public class IronDataHelper extends BaseDataHelper {
         String sql = "select price from iron_product where proId=:id";
         try (Connection conn = getConn()) {
             Float price = conn.createQuery(sql).addParameter("id", ironId).executeScalar(Float.class);
+            return price == null ? 0 : price;
+        }
+    }
+
+    public float getIronBuySupplyPrice(String ironBuyId) {
+        String sql = "select supplyPrice from iron_buy,iron_buy_supply where " +
+                "iron_buy.supplyUserId = iron_buy_supply.sellerId " +
+                "and iron_buy.id = iron_buy_supply.ironId " +
+                "and iron_buy.id=:ironBuyId";
+        try (Connection conn = getConn()) {
+            Float price = conn.createQuery(sql).addParameter("ironBuyId", ironBuyId).executeScalar(Float.class);
             return price == null ? 0 : price;
         }
     }
@@ -184,15 +196,15 @@ public class IronDataHelper extends BaseDataHelper {
     }
 
     public List<IronRecommend> getIronBuyRecommend() {
-        String sql = "select " + generateFiledString(IronRecommend.class) +  " from iron_buy order by pushTime limit 0,10";
+        String sql = "select * from iron_buy order by pushTime limit 0,10";
         try (Connection conn = getConn()) {
             List<IronRecommend> ironRecommends = new ArrayList<>();
-            List<IronBuy> ironBuys = conn.createQuery(sql).executeAndFetch(IronBuy.class);
-            for (IronBuy ironBuy : ironBuys) {
+            List<Row> rows = conn.createQuery(sql).executeAndFetchTable().rows();
+            for (Row row : rows) {
                 IronRecommend ironRecommend = new IronRecommend();
-                ironRecommend.id = ironBuy.id;
-                ironRecommend.time = ironBuy.pushTime;
-                ironRecommend.title = "求购" + ironBuy.ironType;
+                ironRecommend.id = row.getString("id");
+                ironRecommend.time = row.getLong("pushTime");
+                ironRecommend.title = "求购" +  row.getString("ironType");
                 ironRecommends.add(ironRecommend);
             }
             return ironRecommends;
@@ -278,13 +290,13 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
-    public void selectIronBuySupply(String buyerId, String ironId, String supplyUserId) {
+    public void selectIronBuySupply(String buyerId, String ironId, String supplyUserId) throws Exception {
         String sql = "update iron_buy set supplyUserId=:userId, status=1, supplyWinTime=:time where id=:ironId";
 
         String numberSql = "select numbers from iron_buy where where id=:ironId";
         String supplyPriceSql = "select supplyPrice from iron_buy_supply where where ironId=:ironId and sellerId=:sellerId";
 
-        try (Connection conn = getConn()) {
+        transaction ((conn)-> {
             conn.createQuery(sql)
                     .addParameter("ironId", ironId)
                     .addParameter("time", System.currentTimeMillis())
@@ -297,11 +309,14 @@ public class IronDataHelper extends BaseDataHelper {
             Float price = conn.createQuery(supplyPriceSql).addParameter("ironId", ironId).addParameter("sellerId", supplyUserId).executeScalar(Float.class);
             price = price == null ? 0 : price;
             float totalMoney = price * numbers;
+            // 记录交易
+            TransactionDataHelper.instance().insertIronBuyTransaction(conn, supplyUserId, ironId, totalMoney, numbers);
+            // 添加积分
             OrderDataHelper.instance().addIntegralByBuy(conn, buyerId, supplyUserId, totalMoney);
-        }
+            // 增加站内信
+            InnerMessageDataHelper.instance().addInnerMessage(supplyUserId, "恭喜您成功中标", "您已经被买家不锈钢求购中标");
+        });
 
-        // 增加站内信
-        InnerMessageDataHelper.instance().addInnerMessage(supplyUserId, "恭喜您成功中标", "您已经被买家不锈钢求购中标");
     }
 
     public int getIronBuyStatus(String ironId) {

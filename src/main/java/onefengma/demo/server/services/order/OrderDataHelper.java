@@ -190,10 +190,14 @@ public class OrderDataHelper extends BaseDataHelper {
         return conn.createQuery(mobileSql).addParameter("userId", sellerId).executeScalar(String.class);
     }
 
+    public String getSellerUserId(Connection conn, String orderId) {
+        String mobileSql = "select sellerId from user where id=:id";
+        return conn.createQuery(mobileSql).addParameter("id", orderId).executeScalar(String.class);
+    }
+
     public List<OrderDynamic> getOrdersDynamic() {
-        String sql = "select orders.id,ironId,ironType,material,mobile,pushTime,ironCount,price " +
-                "from product_orders,user,iron_product " +
-                "where sellerId=user.userId and productType=1 and ironId = iron_product.proId " +
+        String sql = "select product_orders.id,iron_product.proId,ironType,material,mobile,pushTime,count,price  " +
+                "from product_orders, iron_product, user where productType=0 and iron_product.proId = productId and status<>4 and buyerId=user.userId " +
                 "order by sellTime desc limit 0,10";
         try(Connection conn = getConn()) {
             return conn.createQuery(sql).executeAndFetch(OrderDynamic.class);
@@ -368,15 +372,19 @@ public class OrderDataHelper extends BaseDataHelper {
         }
     }
 
-    public void confirmOrder(String orderId) {
+    public void confirmOrder(String orderId) throws Exception {
         String sql = "update product_orders set status = 1, finishTime=:finisTime where id=:orderId and status=0";
-        try(Connection conn = getConn()) {
+
+        transaction((conn)-> {
             conn.createQuery(sql)
                     .addParameter("finishTime", System.currentTimeMillis())
                     .addParameter("orderId", orderId)
                     .executeUpdate();
-        }
-        addBuyerIntegralByOrder(orderId);
+            // 添加记录
+            TransactionDataHelper.instance().insertOrderTransaction(conn, orderId);
+            // 添加积分
+            addBuyerIntegralByOrder(orderId);
+        });
     }
 
     public void addBuyerIntegralByOrder(String orderId) {

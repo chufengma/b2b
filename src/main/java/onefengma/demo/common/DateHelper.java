@@ -49,6 +49,14 @@ public class DateHelper {
         return calendar.getTimeInMillis();
     }
 
+    public static long getLastMonthStartTimestamp() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), 1, 0, 0, 0);
+        calendar.add(Calendar.MONTH, -1);
+        return calendar.getTimeInMillis();
+    }
+
+
     public static long getNextMonthStatimestamp() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), 1, 0, 0, 0);

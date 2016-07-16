@@ -1,7 +1,14 @@
 package onefengma.demo.server.services.user;
 
+import freemarker.template.utility.DateUtil;
+import onefengma.demo.common.DateHelper;
+import onefengma.demo.server.model.product.HandingBuyBrief;
+import onefengma.demo.server.model.product.IronBuyBrief;
+import onefengma.demo.server.services.products.HandingDataHelper;
+import onefengma.demo.server.services.products.IronDataHelper;
 import org.sql2o.Connection;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import onefengma.demo.common.StringUtils;
@@ -12,6 +19,7 @@ import onefengma.demo.server.core.UpdateBuilder;
 import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.product.ShopBrief;
 import onefengma.demo.server.model.product.ShopDetail;
+import org.sql2o.data.Row;
 
 /**
  * Created by chufengma on 16/6/2.
@@ -110,27 +118,87 @@ public class SellerDataHelper extends BaseDataHelper {
     }
 
     public List<ShopBrief> getRecommendShopsByIron() {
-        String sql = "select " + generateFiledString(ShopBrief.class) + " from seller, shop_orders " +
-                "where userId = sellerId  and passed = true order by ironCount desc limit 0,10";
-        try(Connection conn = getConn()) {
-            return conn.createQuery(sql).executeAndFetch(ShopBrief.class);
+        String sql = "select * from seller left join " +
+                "(select sellerId, sum(count) as count, sum(money) as money " +
+                "from seller_transactions where productType = 0 and finishTime < :endTime and finishTime >= :startTime " +
+                "group by sellerId) as trans " +
+                "on seller.userId = trans.sellerId " +
+                "order by count desc limit 0, 10 ";
+            try(Connection conn = getConn()) {
+                List<Row> rows = conn.createQuery(sql)
+                        .addParameter("startTime", DateHelper.getLastMonthStartTimestamp())
+                        .addParameter("endTime", DateHelper.getNextMonthStatimestamp())
+                        .executeAndFetchTable().rows();
+                List<ShopBrief> shopBriefs = new ArrayList<>();
+                for(Row row : rows) {
+                    shopBriefs.add(generateShopByRow(row, 0));
+                }
+                return shopBriefs;
+            }
+    }
+
+    public ShopBrief generateShopByRow(Row row, int productType) {
+        ShopBrief shopBrief = new ShopBrief();
+        shopBrief.userId = row.getString("userId");
+        shopBrief.companyName = row.getString("companyName");
+        shopBrief.cover = row.getString("cover");
+
+        if (productType == 0) {
+            shopBrief.ironCount = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
+            shopBrief.ironMoney = row.getFloat("money") == null ? 0 : row.getFloat("money");
+            shopBrief.ironTypeDesc = row.getString("ironTypeDesc");
+        } else if (productType == 1){
+            shopBrief.handingCount = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
+            shopBrief.handingMoney = row.getFloat("money") == null ? 0 : row.getFloat("money");
+            shopBrief.handingTypeDesc = row.getString("handingTypeDesc");
+        } else {
+            shopBrief.count = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
+            shopBrief.money = row.getFloat("money") == null ? 0 : row.getFloat("money");
+            shopBrief.handingTypeDesc = row.getString("handingTypeDesc");
+            shopBrief.ironTypeDesc = row.getString("ironTypeDesc");
         }
+        shopBrief.productNumbers = row.getInteger("productNumbers");
+        shopBrief.officeAddress = row.getString("officeAddress");
+        shopBrief.score = row.getFloat("score") == null ? 0 : row.getFloat("score");
+        return shopBrief;
     }
 
     public int getShopCount(PageBuilder pageBuilder, int productType) {
-        String sql = "select count(*)" + " from seller, shop_orders " +
-                "where userId = sellerId  and passed = true " + genereateProductTypeSql(productType) +  generateWhereKey(pageBuilder, false);
+        String sql =  "select count(*) from seller left join " +
+                "(select sellerId, sum(count) as count, sum(money) as money " +
+                "from seller_transactions " +
+                "group by sellerId) as trans " +
+                "on seller.userId = trans.sellerId " +
+                "where passed = true " + genereateProductTypeSql(productType) +  generateWhereKey(pageBuilder, false);
         try (Connection connection = getConn()){
-            return connection.createQuery(sql).executeScalar(Integer.class);
+            Integer count =  connection.createQuery(sql).executeScalar(Integer.class);
+            return count == 0 ? 0 : count;
         }
     }
 
     public List<ShopBrief> getShops(PageBuilder pageBuilder, int productType) {
+        String productTypeSql = "";
+        if (productType == 0 || productType == 1) {
+            productTypeSql = " productType=" + productType + "and ";
+        };
 
-        String sql = "select " + generateFiledString(ShopBrief.class) + " from seller, shop_orders " +
-                "where userId = sellerId and passed = true" + genereateProductTypeSql(productType) + generateWhereKey(pageBuilder, true);
+        String sql = "select * from seller left join " +
+                "(select sellerId, sum(count) as count, sum(money) as money " +
+                "from seller_transactions where " + productTypeSql + " finishTime < :endTime and finishTime >= :startTime " +
+                "group by sellerId) as trans " +
+                "on seller.userId = trans.sellerId " +
+                "where passed = true "
+                + genereateProductTypeSql(productType)
+                + generateWhereKey(pageBuilder, true);
         try (Connection connection = getConn()){
-            return connection.createQuery(sql).executeAndFetch(ShopBrief.class);
+            List<Row> rows = connection.createQuery(sql)
+                    .addParameter("startTime", DateHelper.getThisMonthStartTimestamp())
+                    .addParameter("endTime", DateHelper.getNextMonthStatimestamp()).executeAndFetchTable().rows();
+            List<ShopBrief> shopBriefs = new ArrayList<>();
+            for (Row row : rows) {
+                shopBriefs.add(generateShopByRow(row, productType));
+            }
+            return shopBriefs;
         }
     }
 
@@ -162,10 +230,32 @@ public class SellerDataHelper extends BaseDataHelper {
 
 
     public List<ShopBrief> getRecommendShopsByHanding() {
-        String sql = "select " + generateFiledString(ShopBrief.class) + " from seller, shop_orders " +
-                "where userId = sellerId order by handingCount limit 0, 10";
+        String sql = "select * from seller left join " +
+                "(select sellerId, sum(count) as count, sum(money) as money " +
+                "from seller_transactions where productType = 1 and finishTime < :endTime and finishTime >= :startTime " +
+                "group by sellerId) as trans " +
+                "on seller.userId = trans.sellerId " +
+                "order by count desc limit 0, 10 ";
+
         try(Connection conn = getConn()) {
-            return conn.createQuery(sql).executeAndFetch(ShopBrief.class);
+            List<Row> rows = conn.createQuery(sql)
+                    .addParameter("startTime", DateHelper.getLastMonthStartTimestamp())
+                    .addParameter("endTime", DateHelper.getNextMonthStatimestamp())
+                    .executeAndFetchTable().rows();
+            List<ShopBrief> shopBriefs = new ArrayList<>();
+            for(Row row : rows) {
+                ShopBrief shopBrief = new ShopBrief();
+                shopBrief.userId = row.getString("userId");
+                shopBrief.companyName = row.getString("companyName");
+                shopBrief.cover = row.getString("cover");
+                shopBrief.handingCount = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
+                shopBrief.handingMoney = row.getFloat("money") == null ? 0 : row.getFloat("money");
+                shopBrief.handingTypeDesc = row.getString("handingTypeDesc");
+                shopBrief.officeAddress = row.getString("officeAddress");
+                shopBrief.score = row.getFloat("score") == null ? 0 : row.getFloat("score");
+                shopBriefs.add(shopBrief);
+            }
+            return shopBriefs;
         }
     }
 
@@ -178,31 +268,64 @@ public class SellerDataHelper extends BaseDataHelper {
         } else {
             return null;
         }
-        String sqlShop = "select " + generateFiledString(ShopBrief.class) + " from seller, shop_orders " +
-                "where userId = sellerId and userId=:userId";
+
+        String sqlShop = "select * from seller where seller.userId=:userId";
+        String transSql = "select sum(money) as money , sum(count) as count " +
+                "from seller_transactions where sellerId=:userId";
+
         try(Connection conn = getConn()) {
             String userId = conn.createQuery(sqlUser).addParameter("proId", proId).executeScalar(String.class);
-            List<ShopBrief> briefs = conn.createQuery(sqlShop).addParameter("userId", userId).executeAndFetch(ShopBrief.class);
-            if (briefs.isEmpty()) {
-                return null;
-            } else {
-                return briefs.get(0);
+            List<Row> rows = conn.createQuery(sqlShop).addParameter("userId", userId).executeAndFetchTable().rows();
+            for(Row row : rows) {
+                ShopBrief shopBrief = new ShopBrief();
+                shopBrief.userId = row.getString("userId");
+                shopBrief.companyName = row.getString("companyName");
+                shopBrief.cover = row.getString("cover");
+
+                List<Row> handinRows = conn.createQuery(transSql).addParameter("userId", shopBrief.userId).executeAndFetchTable().rows();
+                if (!handinRows.isEmpty()) {
+                    Row handingRow = handinRows.get(0);
+                    shopBrief.money = (handingRow.getFloat("money") == null ? 0 : handingRow.getFloat("money"));
+                    shopBrief.count = (handingRow.getFloat("count") == null ? 0 : handingRow.getFloat("count"));
+                }
+
+                shopBrief.handingTypeDesc = row.getString("handingTypeDesc");
+                shopBrief.officeAddress = row.getString("officeAddress");
+                shopBrief.score = row.getFloat("score") == null ? 0 : row.getFloat("score");
+                return shopBrief;
             }
         }
+        return null;
     }
 
     public ShopDetail getShopDetail(String userId) {
-        String sql = "select " + generateFiledString(ShopDetail.class)
-                + " from seller,shop_orders where userId = sellerId and userId=:userId";
-        LogUtils.i("---getShopDetail sql--" + sql);
+        String sql = "select * from seller left join " +
+                "(select sellerId, sum(count) as count, sum(money) as money " +
+                "from seller_transactions " +
+                "group by sellerId) as trans " +
+                "on seller.userId = trans.sellerId " +
+                "where seller.userId = :userId";
         try(Connection conn = getConn()) {
-            List<ShopDetail> shopDetails = conn.createQuery(sql)
-                    .addParameter("userId", userId).executeAndFetch(ShopDetail.class);
-            if (!shopDetails.isEmpty()) {
-                return shopDetails.get(0);
-            } else {
-                return null;
+            List<Row> rows = conn.createQuery(sql)
+                    .addParameter("userId", userId).executeAndFetchTable().rows();
+            if (!rows.isEmpty()) {
+                Row row = rows.get(0);
+                ShopDetail shopDetail = new ShopDetail();
+                shopDetail.userId = row.getString("userId");
+                shopDetail.companyName = row.getString("companyName");
+                shopDetail.cover = row.getString("cover");
+                shopDetail.count = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
+                shopDetail.money = row.getFloat("money") == null ? 0 : row.getFloat("money");
+                shopDetail.handingTypeDesc = row.getString("handingTypeDesc");
+                shopDetail.ironTypeDesc = row.getString("ironTypeDesc");
+                shopDetail.productNumbers = row.getInteger("productNumbers");
+                shopDetail.officeAddress = row.getString("officeAddress");
+                shopDetail.score = row.getFloat("score") == null ? 0 : row.getFloat("score");
+                shopDetail.regMoney = row.getInteger("regMoney");
+                shopDetail.shopProfile = row.getString("shopProfile");
+                return shopDetail;
             }
+            return null;
         }
     }
 
@@ -290,5 +413,22 @@ public class SellerDataHelper extends BaseDataHelper {
         try(Connection conn = getConn()) {
             return  conn.createQuery(sql).executeAndFetch(String.class);
         }
+    }
+
+    public void updateSellerProductCount(Connection conn, int productType, String proId) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "select seller set productNumbers=(productNumbers+1) where userId=:userId";
+        String userId = "";
+        if (productType == 0) {
+            IronBuyBrief buyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(proId);
+            if (buyBrief != null) {
+                userId = buyBrief.userId;
+            }
+        } else {
+            HandingBuyBrief handingBuyBrief = HandingDataHelper.getHandingDataHelper().getHandingBrief(proId);
+            if (handingBuyBrief != null) {
+                userId = handingBuyBrief.userId;
+            }
+        }
+        conn.createQuery(sql).addParameter("userId", userId).executeUpdate();
     }
 }

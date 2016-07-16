@@ -17,5 +17,10 @@ public class ShopBrief {
     public float handingCount;
     public float ironMoney;
     public float handingMoney;
+
+    public float money;
+    public float count;
     public float score;
+
+    public int productNumbers;
 }
