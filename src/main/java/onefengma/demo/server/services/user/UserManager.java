@@ -61,6 +61,11 @@ public class UserManager extends BaseManager {
             return success();
         });
 
+        post("quit", AuthSession.class, ((request, response, requestBean) -> {
+            requestBean.cleanLogin(request, response);
+            return success();
+        }));
+
         // 登陆
         post("login", Login.class, (request, response, loginBean) -> {
             User user = getUserDataHelper().findUserByMobile(loginBean.mobile);

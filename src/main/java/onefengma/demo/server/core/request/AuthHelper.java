@@ -64,6 +64,14 @@ public class AuthHelper {
         addCookie(response, TOKEN, token);
     }
 
+    public static void cleanLoginStatus(Request request, Response response) {
+        request.session().removeAttribute(USER_ID);
+        request.session().removeAttribute(TOKEN);
+
+        response.removeCookie(USER_ID);
+        response.removeCookie(TOKEN);
+    }
+
     public static void addCookie(Response response, String key, String value) {
         response.cookie("/", key, value, -1, false);
     }
