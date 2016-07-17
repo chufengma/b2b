@@ -1,6 +1,8 @@
 package onefengma.demo.server.services.products;
 
 import onefengma.demo.common.DateHelper;
+import onefengma.demo.common.ThreadUtils;
+import onefengma.demo.server.model.product.*;
 import onefengma.demo.server.services.order.TransactionDataHelper;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
@@ -16,13 +18,6 @@ import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.others.HelpFindProduct;
 import onefengma.demo.server.model.apibeans.product.SellerIronBuysResponse;
-import onefengma.demo.server.model.product.IronBuy;
-import onefengma.demo.server.model.product.IronBuyBrief;
-import onefengma.demo.server.model.product.IronDetail;
-import onefengma.demo.server.model.product.IronProduct;
-import onefengma.demo.server.model.product.IronProductBrief;
-import onefengma.demo.server.model.product.IronRecommend;
-import onefengma.demo.server.model.product.SupplyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import onefengma.demo.server.services.order.OrderDataHelper;
@@ -169,8 +164,28 @@ public class IronDataHelper extends BaseDataHelper {
     public void pushIronBuy(IronBuy ironBuy) throws InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException, IllegalAccessException {
         try (Connection conn = getConn()) {
             createInsertQuery(conn, "iron_buy", ironBuy).executeUpdate();
+            pushToSellers(ironBuy);
         }
     }
+
+    private void pushToSellers(IronBuy ironBuy) {
+        ThreadUtils.instance().post(new Runnable() {
+            @Override
+            public void run() {
+                String userSql = "select userId from seller where surface like '%" + ironBuy.surface + "%'" +
+                        "or ironType like '%" + ironBuy.ironType + "%'" +
+                        "or proPlace like '%" + ironBuy.proPlace + "%'" +
+                        "or material like '%" + ironBuy.material + "%'";
+                try(Connection conn = getConn()) {
+                    List<String> users = conn.createQuery(userSql).executeAndFetch(String.class);
+                    for(String userId : users) {
+                        addInBuySeller(conn, ironBuy.id, userId);
+                    }
+                }
+            }
+        });
+    }
+
 
     public void pushIronProduct(IronProduct ironProduct) throws IllegalAccessException, UnsupportedEncodingException, NoSuchMethodException, InvocationTargetException {
         try (Connection conn = getConn()) {

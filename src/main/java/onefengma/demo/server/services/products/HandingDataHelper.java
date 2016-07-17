@@ -1,6 +1,7 @@
 package onefengma.demo.server.services.products;
 
 import onefengma.demo.common.DateHelper;
+import onefengma.demo.common.ThreadUtils;
 import onefengma.demo.server.model.product.*;
 import onefengma.demo.server.services.order.TransactionDataHelper;
 import org.sql2o.Connection;
@@ -152,7 +153,23 @@ public class HandingDataHelper extends BaseDataHelper {
     public void pushHandingBuy(HandingBuy handingBuy) throws InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException, IllegalAccessException {
         try (Connection conn = getConn()) {
             createInsertQuery(conn, "handing_buy", handingBuy).executeUpdate();
+            pushToSellers(handingBuy);
         }
+    }
+
+    private void pushToSellers(HandingBuy handingBuy) {
+        ThreadUtils.instance().post(new Runnable() {
+            @Override
+            public void run() {
+                String userSql = "select userId from seller where handingTypeDesc like '%"+ handingBuy.handingType +"%'";
+                try(Connection conn = getConn()) {
+                    List<String> users = conn.createQuery(userSql).executeAndFetch(String.class);
+                    for(String userId : users) {
+                        addInBuySeller(conn, handingBuy.id, userId);
+                    }
+                }
+            }
+        });
     }
 
     public List<HandingProductBrief> searchHandingProduct(String keyword, PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
