@@ -291,7 +291,7 @@ public class HandingDataHelper extends BaseDataHelper {
     public void selectHandingBuySupply(String buyerId, String handingId, String supplyUserId) throws Exception {
         String sql = "update handing_buy set supplyUserId=:userId, status=1,supplyWinTime=:time where id=:handingId";
 
-        String supplyPriceSql = "select supplyPrice from handing_buy_supply where where handingId=:handingId and sellerId=:sellerId";
+        String supplyPriceSql = "select supplyPrice from handing_buy_supply where handingId=:handingId and sellerId=:sellerId";
 
         transaction((conn -> {
             conn.createQuery(sql)
