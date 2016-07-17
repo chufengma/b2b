@@ -341,11 +341,12 @@ public class IronDataHelper extends BaseDataHelper {
 
     public SellerIronBuysResponse getSellerIronBuys(PageBuilder pageBuilder, String sellerId) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select iron_buy.id as id,supplyUserId,supplyWinTime, ironType, material, surface, proPlace, locationCityId, userId, message, pushTime, length, width, height, tolerance, numbers, timeLimit, status " +
-                " from iron_buy,iron_buy_seller where iron_buy_seller.ironId = iron_buy.id and sellerId=:sellerId" + pageBuilder.generateLimit();
+                " from iron_buy,iron_buy_seller " +
+                "where iron_buy_seller.ironId = iron_buy.id and sellerId=:sellerId " + pageBuilder.generateLimit();
 
         String supplyCountSql = "select count(*) from iron_buy_supply where ironId=:ironId";
 
-        String maxCountSql = "select count(*) from iron_buy_seller where sellerId=:sellerId";
+        String maxCountSql = "select count(*) from iron_buy_seller where sellerId=:sellerId ";
 
         String winTimesSql = "select winningTimes from seller where userId=:sellerId";
         String offerTimesSql = "select count(*) from iron_buy_supply where sellerId=:sellerId";
@@ -418,7 +419,7 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
-    public void offerIronBuy(String sellerId, String ironId, float price, String msg) {
+    public void offerIronBuy(String sellerId, String ironId, float price, String msg) throws Exception {
         String sql = "insert into iron_buy_supply set " +
                 "ironId=:ironId, " +
                 "sellerId=:sellerId, " +
@@ -426,7 +427,8 @@ public class IronDataHelper extends BaseDataHelper {
                 "supplyMsg=:msg, " +
                 "unit=:unit, " +
                 "salesmanId=0";
-        try (Connection conn = getConn()) {
+
+        transaction((conn) -> {
             conn.createQuery(sql)
                     .addParameter("ironId", ironId)
                     .addParameter("sellerId", sellerId)
@@ -434,7 +436,17 @@ public class IronDataHelper extends BaseDataHelper {
                     .addParameter("msg", msg)
                     .addParameter("unit", "kg")
                     .executeUpdate();
-        }
+
+            addInBuySeller(conn, ironId, sellerId);
+        });
+    }
+
+    private void addInBuySeller(Connection conn, String ironId, String userId) {
+        String sql = "INSERT INTO iron_buy_seller(ironId, sellerId) " +
+                "SELECT :ironId, :sellerId  FROM DUAL " +
+                "WHERE NOT EXISTS" +
+                "(SELECT ironId FROM iron_buy_seller WHERE ironId=:ironId and sellerId=:sellerId)";
+        conn.createQuery(sql).addParameter("ironId", ironId).addParameter("sellerId", userId).executeUpdate();
     }
 
     public boolean isOffered(String sellerId, String ironId) {

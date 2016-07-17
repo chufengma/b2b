@@ -286,9 +286,9 @@ public class HandingDataHelper extends BaseDataHelper {
             float totalMoney = price;
 
             // 记录交易
-            TransactionDataHelper.instance().insertHandingBuyTransaction(conn, supplyUserId, handingId, totalMoney, 1);
+            // TransactionDataHelper.instance().insertHandingBuyTransaction(conn, supplyUserId, handingId, totalMoney, 1);
             // 添加积分
-            OrderDataHelper.instance().addIntegralByBuy(conn, buyerId, supplyUserId, totalMoney);
+            // OrderDataHelper.instance().addIntegralByBuy(conn, buyerId, supplyUserId, totalMoney);
             // 增加站内信
             InnerMessageDataHelper.instance().addInnerMessage(supplyUserId, "恭喜您成功中标", "您已经被买家加工求购中标");
         }));
@@ -382,10 +382,11 @@ public class HandingDataHelper extends BaseDataHelper {
         }
     }
 
-    public void offerHandingBuy(String sellerId, String handingId, float price, String msg, String unit) {
+    public void offerHandingBuy(String sellerId, String handingId, float price, String msg, String unit) throws Exception {
         String sql = "insert into handing_buy_supply set " +
                 "handingId=:handingId, sellerId=:sellerId, supplyPrice=:price, supplyMsg=:msg, salesmanId=0, unit=:unit";
-        try(Connection conn = getConn()) {
+
+        transaction((conn)-> {
             conn.createQuery(sql)
                     .addParameter("handingId", handingId)
                     .addParameter("sellerId", sellerId)
@@ -393,7 +394,17 @@ public class HandingDataHelper extends BaseDataHelper {
                     .addParameter("unit", unit)
                     .addParameter("msg", msg)
                     .executeUpdate();
-        }
+
+            addInBuySeller(conn, handingId, sellerId);
+        });
+    }
+
+    private void addInBuySeller(Connection conn, String handingBuyId, String userId) {
+        String sql = "INSERT INTO handing_buy_seller(handingId, sellerId) " +
+                "SELECT :handingId, :sellerId  FROM DUAL " +
+                "WHERE NOT EXISTS" +
+                "(SELECT handingId FROM handing_buy_seller WHERE handingId=:handingId and sellerId=:sellerId)";
+        conn.createQuery(sql).addParameter("handingId", handingBuyId).addParameter("sellerId", userId).executeUpdate();
     }
 
     public boolean isOffered(String sellerId, String handingId) {
