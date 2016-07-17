@@ -82,7 +82,7 @@ public class UserDataHelper extends BaseDataHelper {
                     .addParameter("registerTime", System.currentTimeMillis())
                     .executeUpdate();
         }
-        InnerMessageDataHelper.instance().addRegisterSuccessMessage(user.getUserId());
+        InnerMessageDataHelper.instance().addRegisterSuccessMessage(user.getId());
     }
 
     public void setSeller(String userId, boolean seller) throws NoSuchFieldException, IllegalAccessException {
