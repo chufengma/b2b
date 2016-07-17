@@ -7,6 +7,8 @@ import org.sql2o.Sql2o;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -132,6 +134,9 @@ public abstract class BaseDataHelper {
         }
         Field fields[] = clazz.getFields();
         StringBuilder stringBuilder = new StringBuilder("");
+
+        List<String> results = new ArrayList<>();
+
         FIND:
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
@@ -142,11 +147,16 @@ public abstract class BaseDataHelper {
                     }
                 }
             }
-            stringBuilder.append(field.getName());
-            if (i != fields.length -1) {
+            results.add(field.getName());
+        }
+
+        for(int i=0; i< results.size(); i++) {
+            stringBuilder.append(results.get(i));
+            if (i != results.size() - 1) {
                 stringBuilder.append(", ");
             }
         }
+
         return stringBuilder.toString();
     }
 
