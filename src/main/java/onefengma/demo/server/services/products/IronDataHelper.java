@@ -182,7 +182,7 @@ public class IronDataHelper extends BaseDataHelper {
         String sql = "select " + generateFiledString(IronDetail.class) +
                 " from iron_product " +
                 "left join (select productId, sum(count) as monthSellCount from product_orders where productType=0 and  finishTime<:endTime and finishTime>=:startTime) as orders " +
-                " on orders.productId = iron_product.proId and iron_product.proId=:proId";
+                " on orders.productId = iron_product.proId where iron_product.proId=:proId";
 
         try (Connection conn = getConn()) {
             List<IronDetail> ironDetails = conn.createQuery(sql)

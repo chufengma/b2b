@@ -183,7 +183,7 @@ public class HandingDataHelper extends BaseDataHelper {
         String sql = "select " + generateFiledString(HandingDetail.class) +
                 " from handing_product " +
                 "left join (select productId, sum(count) as monthSellCount from product_orders where productType=1 and  finishTime<:endTime and finishTime>=:startTime) as orders " +
-                " on orders.productId = handing_product.id and handing_product.id=:id";
+                " on orders.productId = handing_product.id where handing_product.id=:id";
 
         try (Connection conn = getConn()) {
             List<HandingDetail> ironDetails = conn.createQuery(sql)
