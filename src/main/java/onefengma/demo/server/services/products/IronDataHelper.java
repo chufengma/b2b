@@ -361,7 +361,8 @@ public class IronDataHelper extends BaseDataHelper {
 
         String supplyCountSql = "select count(*) from iron_buy_supply where ironId=:ironId";
 
-        String maxCountSql = "select count(*) from iron_buy_seller where sellerId=:sellerId and status<>2 ";
+        String maxCountSql = "select count(*)" +
+                " from iron_buy,iron_buy_seller where iron_buy_seller.ironId = iron_buy.id and sellerId=:sellerId and status<>2 ";
 
         String winTimesSql = "select winningTimes from seller where userId=:sellerId";
         String offerTimesSql = "select count(*) from iron_buy_supply where sellerId=:sellerId";

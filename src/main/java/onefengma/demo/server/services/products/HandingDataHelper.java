@@ -327,7 +327,8 @@ public class HandingDataHelper extends BaseDataHelper {
 
         String supplyCountSql = "select count(*) from handing_buy_supply where handingId=:ironId";
 
-        String maxCountSql = "select count(*) from handing_buy_seller where sellerId=:sellerId and status<>2 ";
+        String maxCountSql = "select count(*) " +
+        " from handing_buy,handing_buy_seller where handing_buy_seller.handingId = handing_buy.id and sellerId=:sellerId and status<>2 ";
 
         String winTimesSql = "select winningTimes from seller where userId=:sellerId";
         String offerTimesSql = "select count(*) from handing_buy_supply where sellerId=:sellerId";
