@@ -359,7 +359,7 @@ public class IronDataHelper extends BaseDataHelper {
     public SellerIronBuysResponse getSellerIronBuys(PageBuilder pageBuilder, String sellerId) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select iron_buy.id as id,supplyUserId,supplyWinTime, ironType, material, surface, proPlace, locationCityId, userId, message, pushTime, length, width, height, tolerance, numbers, timeLimit, status " +
                 " from iron_buy,iron_buy_seller " +
-                "where iron_buy_seller.ironId = iron_buy.id and sellerId=:sellerId and status<>2 " + pageBuilder.generateLimit();
+                "where iron_buy_seller.ironId = iron_buy.id and sellerId=:sellerId and status<>2 order by pushTime desc  " + pageBuilder.generateLimit();
 
         String supplyCountSql = "select count(*) from iron_buy_supply where ironId=:ironId";
 

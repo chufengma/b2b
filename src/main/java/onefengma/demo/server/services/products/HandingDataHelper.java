@@ -323,7 +323,7 @@ public class HandingDataHelper extends BaseDataHelper {
 
     public SellerHandingBuysResponse getSellerHandingBuys(PageBuilder pageBuilder, String sellerId) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select handing_buy.id as id, handingType, souCityId, message, userId, pushTime, timeLimit, status, supplyUserId, supplyWinTime" +
-                " from handing_buy,handing_buy_seller where handing_buy_seller.handingId = handing_buy.id and sellerId=:sellerId and status<>2 " + pageBuilder.generateLimit();
+                " from handing_buy,handing_buy_seller where handing_buy_seller.handingId = handing_buy.id and sellerId=:sellerId and status<>2 order by pushTime desc " + pageBuilder.generateLimit();
 
         String supplyCountSql = "select count(*) from handing_buy_supply where handingId=:ironId";
 
