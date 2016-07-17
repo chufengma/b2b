@@ -10,6 +10,7 @@ import onefengma.demo.server.model.metaData.HandingDataCategory;
 import onefengma.demo.server.model.product.HandingBuy;
 import onefengma.demo.server.model.product.HandingDetail;
 import onefengma.demo.server.model.product.HandingProduct;
+import onefengma.demo.server.model.product.SupplyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.order.OrderDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
@@ -99,6 +100,17 @@ public class HandingManager extends BaseManager{
             MyHandingDetailResponse myHandingDetailResponse = new MyHandingDetailResponse();
             myHandingDetailResponse.buy = HandingDataHelper.getHandingDataHelper().getHandingBrief(requestBean.handingId);
             myHandingDetailResponse.supplies = HandingDataHelper.getHandingDataHelper().getHandingBuySupplies(requestBean.handingId);
+
+            if (myHandingDetailResponse.supplies!= null
+                    && myHandingDetailResponse.buy != null
+                    && !StringUtils.isEmpty(myHandingDetailResponse.buy.supplyUserId)) {
+                for(SupplyBrief supplyBrief : myHandingDetailResponse.supplies) {
+                    if (StringUtils.equals(myHandingDetailResponse.buy.supplyUserId, supplyBrief.sellerId)) {
+                        supplyBrief.isWinner = true;
+                    }
+                }
+            }
+
             myHandingDetailResponse.salesManPhone = UserDataHelper.instance().getSalesManTel(requestBean.getUserId());
             return success(myHandingDetailResponse);
         }));

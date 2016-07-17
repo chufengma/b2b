@@ -13,4 +13,5 @@ public class SupplyBrief {
     public String companyName;
     public float score;
     public long offerTime;
+    public boolean isWinner;
 }

@@ -10,6 +10,7 @@ import onefengma.demo.server.model.apibeans.product.*;
 import onefengma.demo.server.model.metaData.IconDataCategory;
 import onefengma.demo.server.model.product.IronBuy;
 import onefengma.demo.server.model.product.IronDetail;
+import onefengma.demo.server.model.product.SupplyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.order.OrderDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
@@ -184,6 +185,17 @@ public class IronManager extends BaseManager {
             MyIronBuyDetailResponse myIronBuyDetailResponse = new MyIronBuyDetailResponse();
             myIronBuyDetailResponse.buy = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.ironId);
             myIronBuyDetailResponse.supplies = IronDataHelper.getIronDataHelper().getIronBuySupplies(requestBean.ironId);
+
+            if (myIronBuyDetailResponse.supplies!= null
+                    && myIronBuyDetailResponse.buy != null
+                    && !StringUtils.isEmpty(myIronBuyDetailResponse.buy.supplyUserId)) {
+                for(SupplyBrief supplyBrief : myIronBuyDetailResponse.supplies) {
+                    if (StringUtils.equals(myIronBuyDetailResponse.buy.supplyUserId, supplyBrief.sellerId)) {
+                        supplyBrief.isWinner = true;
+                    }
+                }
+            }
+
             myIronBuyDetailResponse.salesManPhone = UserDataHelper.instance().getSalesManTel(requestBean.getUserId());
             return success(myIronBuyDetailResponse);
         }));

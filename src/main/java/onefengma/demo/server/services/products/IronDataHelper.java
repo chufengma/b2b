@@ -322,7 +322,7 @@ public class IronDataHelper extends BaseDataHelper {
     public void selectIronBuySupply(String buyerId, String ironId, String supplyUserId) throws Exception {
         String sql = "update iron_buy set supplyUserId=:userId, status=1, supplyWinTime=:time where id=:ironId";
 
-        String numberSql = "select numbers from iron_buy where where id=:ironId";
+        String numberSql = "select numbers from iron_buy where id=:ironId";
         String supplyPriceSql = "select supplyPrice from iron_buy_supply where ironId=:ironId and sellerId=:sellerId";
 
         transaction ((conn)-> {
