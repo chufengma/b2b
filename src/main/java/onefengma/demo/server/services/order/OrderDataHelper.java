@@ -155,7 +155,9 @@ public class OrderDataHelper extends BaseDataHelper {
             if (ironTable.rows().size() >= 1) {
                 Row ironRow = ironTable.rows().get(0);
                 orderBrief.cover = ironRow.getString("cover");
-                orderBrief.desc = ironRow.getString("material") + " " + ironRow.getString("ironType");
+                orderBrief.desc = ironRow.getString("material") + " " + ironRow.getString("ironType")
+                        + ironRow.getString("surface") + " "
+                        + ironRow.getString("title");
                 orderBrief.city = CityDataHelper.instance().getCityDescById(ironRow.getString("sourceCityId"));
             }
         } else {
@@ -291,7 +293,10 @@ public class OrderDataHelper extends BaseDataHelper {
                         brief.cover = ironProductBrief.cover;
                         brief.price = ironProductBrief.price;
                         brief.sourceCity = CityDataHelper.instance().getCityDescById(ironProductBrief.sourceCityId);
-                        brief.desc = ironProductBrief.material + " " + ironProductBrief.ironType;
+                        brief.desc = ironProductBrief.material + " "
+                                + ironProductBrief.ironType + " "
+                                + ironProductBrief.surface + " "
+                                + ironProductBrief.title;
                     }
                 } else if (brief.productType == 1) {
                     HandingProductBrief handingProductBrief = conn.createQuery(handingSql).addParameter("id", brief.proId).executeAndFetchFirst(HandingProductBrief.class);
