@@ -295,7 +295,7 @@ public class AdminManager extends BaseManager {
             if (requestBean.operation == 1) {
                 InnerMessageDataHelper.instance().addInnerMessage(ironDetail.userId, "恭喜资源成功", "恭喜资源成功");
             } else if (requestBean.operation == 2)  {
-                InnerMessageDataHelper.instance().addInnerMessage(ironDetail.userId, "恭喜资源失败！", "很抱歉，恭喜资源失败！");
+                InnerMessageDataHelper.instance().addInnerMessage(ironDetail.userId, "资源发布失败！", "很抱歉，资源发布失败！");
             }
             return success("操作成功");
         }));

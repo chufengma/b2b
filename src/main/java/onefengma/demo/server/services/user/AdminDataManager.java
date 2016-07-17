@@ -410,6 +410,10 @@ public class AdminDataManager extends BaseDataHelper {
             conn.createQuery(sql).addParameter("userId", userId)
                     .addParameter("message", message)
                     .addParameter("pass", pass).executeUpdate();
+            if (pass == 2) {
+                String deleteSeller = "delete from seller where userId=:userId  and passed=false ";
+                conn.createQuery(deleteSeller).addParameter("userId", userId);
+            }
         }
     }
 
