@@ -306,11 +306,11 @@ public class HandingDataHelper extends BaseDataHelper {
 
     public SellerHandingBuysResponse getSellerHandingBuys(PageBuilder pageBuilder, String sellerId) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select handing_buy.id as id, handingType, souCityId, message, userId, pushTime, timeLimit, status, supplyUserId, supplyWinTime" +
-                " from handing_buy,handing_buy_seller where handing_buy_seller.handingId = handing_buy.id and sellerId=:sellerId" + pageBuilder.generateLimit();
+                " from handing_buy,handing_buy_seller where handing_buy_seller.handingId = handing_buy.id and sellerId=:sellerId and status<>2 " + pageBuilder.generateLimit();
 
         String supplyCountSql = "select count(*) from handing_buy_supply where handingId=:ironId";
 
-        String maxCountSql = "select count(*) from handing_buy_seller where sellerId=:sellerId";
+        String maxCountSql = "select count(*) from handing_buy_seller where sellerId=:sellerId and status<>2 ";
 
         String winTimesSql = "select winningTimes from seller where userId=:sellerId";
         String offerTimesSql = "select count(*) from handing_buy_supply where sellerId=:sellerId";
@@ -417,7 +417,7 @@ public class HandingDataHelper extends BaseDataHelper {
     }
 
     public List<HandingProduct> getMyHandingProduct(PageBuilder pageBuilder, String userId) throws NoSuchFieldException, IllegalAccessException {
-        String sql = "select " + generateFiledString(HandingProduct.class) + " from handing_product where userId=:userId order by pushTime desc" + pageBuilder.generateLimit();
+        String sql = "select " + generateFiledString(HandingProduct.class) + " from handing_product where userId=:userId order by pushTime desc " + pageBuilder.generateLimit();
         try (Connection conn = getConn()) {
             List<HandingProduct> handingProducts = conn.createQuery(sql)
                     .addParameter("userId", userId).executeAndFetch(HandingProduct.class);

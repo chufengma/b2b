@@ -22,23 +22,27 @@ public class OrderAllRequest extends AuthSession {
     public List<Order> generateOrders() {
         List<Order> orderList = new ArrayList<>();
         for(OrderSingle single : orders) {
-            Order order = new Order();
-            order.buyerId = getUserId();
-            order.count = single.count;
-            order.productId = single.productId;
-            order.productType = single.productType;
-            order.status = 0;
-            order.sellTime = System.currentTimeMillis();
-            order.timeLimit = order.sellTime + timeLimit;
-
-            orderList.add(order);
+            orderList.add(generateOrder(single));
         }
         return orderList;
+    }
+
+    public Order generateOrder(OrderSingle single) {
+        Order order = new Order();
+        order.buyerId = getUserId();
+        order.count = single.count;
+        order.productId = single.productId;
+        order.productType = single.productType;
+        order.status = 0;
+        order.sellTime = System.currentTimeMillis();
+        order.timeLimit = timeLimit;
+        return order;
     }
 
     public static class OrderSingle {
         public int productType;
         public String productId;
         public float count;
+        public int carId;
     }
 }

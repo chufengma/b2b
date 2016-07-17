@@ -15,6 +15,8 @@ public class OrderRequest extends AuthSession {
 
     @NotRequired
     public boolean isFromCar = false;
+    @NotRequired
+    public int carId;
 
     public Order generateOrder() {
         Order order = new Order();

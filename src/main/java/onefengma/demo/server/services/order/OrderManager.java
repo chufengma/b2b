@@ -59,7 +59,7 @@ public class OrderManager extends BaseManager{
                 }
             }
 
-            OrderDataHelper.instance().translate(requestBean.generateOrder(), requestBean.isFromCar);
+            OrderDataHelper.instance().translate(requestBean.generateOrder(), requestBean.isFromCar, requestBean.carId);
             return success();
         }));
 
@@ -77,13 +77,12 @@ public class OrderManager extends BaseManager{
                     }
                 }
             }
-            List<Order> orders = requestBean.generateOrders();
-            for(Order order : orders) {
+            for(OrderSingle order : requestBean.orders) {
                 String checkResult = orderCheck(order.productId, order.productType, requestBean.getUserId());
                 if (!StringUtils.isEmpty(checkResult)) {
                     return error(checkResult);
                 }
-                OrderDataHelper.instance().translate(order, true);
+                OrderDataHelper.instance().translate(requestBean.generateOrder(order), true, order.carId);
             }
             return success();
         }));
@@ -156,18 +155,18 @@ public class OrderManager extends BaseManager{
         if (productType == 0) {
             IronDetail ironDetail = IronDataHelper.getIronDataHelper().getIronProductById(proId);
             if (ironDetail == null) {
-                return "加入购物车出错, 没有该商品";
+                return "订单出错, 没有该商品";
             }
             if (StringUtils.equals(ironDetail.userId, userId)) {
-                return "加入购物车出错, 无法购买自己店铺商品";
+                return "订单出错, 无法购买自己店铺商品";
             }
         } else {
             HandingDetail handingDetail = HandingDataHelper.getHandingDataHelper().getHandingProductById(proId);
             if (handingDetail == null) {
-                return "加入购物车出错, 没有该商品";
+                return "订单出错, 没有该商品";
             }
             if (StringUtils.equals(handingDetail.userId, userId)) {
-                return "加入购物车出错, 无法购买自己店铺商品";
+                return "订单出错, 无法购买自己店铺商品";
             }
         }
 

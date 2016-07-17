@@ -204,12 +204,12 @@ public class OrderDataHelper extends BaseDataHelper {
         }
     }
 
-    public void translate(Order order, boolean isFromCar) throws Exception {
+    public void translate(Order order, boolean isFromCar, int carId) throws Exception {
         String idSql = "select count(id) from product_orders where sellTime >= :lastTime and sellTime < :nextTime";
         String tableName = ((order.productType == 0) ? "iron_product" : "handing_product");
         String proId = ((order.productType == 0) ? tableName + ".proId" : tableName + ".id");
         String sellerIdSql = "select userId from " + tableName + " where " + proId + "=:proId";
-        String deleteCarSql = "delete from order_car where userId=:userId and proId=:proId and productType=:productType";
+        String deleteCarSql = "delete from order_car where userId=:userId and proId=:proId and productType=:productType and carId=:carId";
         String selectCarSql = "select count(*) from order_car where userId=:userId and proId=:proId and productType=:productType";
 
         order.salesmanId = UserDataHelper.instance().getSalesManId(order.buyerId);
@@ -230,6 +230,7 @@ public class OrderDataHelper extends BaseDataHelper {
                 }
                 conn.createQuery(deleteCarSql).addParameter("userId", order.buyerId)
                         .addParameter("proId", order.productId)
+                        .addParameter("carId", carId)
                         .addParameter("productType", order.productType).executeUpdate();
             }
 
