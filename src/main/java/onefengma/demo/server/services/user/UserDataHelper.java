@@ -1,6 +1,7 @@
 package onefengma.demo.server.services.user;
 
 import onefengma.demo.common.StringUtils;
+import onefengma.demo.server.config.Config;
 import onefengma.demo.server.core.UpdateBuilder;
 import onefengma.demo.server.model.SalesMan;
 import onefengma.demo.server.model.UserProfile;
@@ -73,12 +74,13 @@ public class UserDataHelper extends BaseDataHelper {
     }
 
     public void insertUser(User user) throws NoSuchFieldException, IllegalAccessException {
-        String sql = createSql("insert into @USER_TABLE(@USER_ID, @NAME, @PASSWORD, @MOBILE, registerTime) values (:id, :name, :pass, :mobile, :registerTime)");
+        String sql = createSql("insert into @USER_TABLE(@USER_ID, @NAME, @PASSWORD, @MOBILE, registerTime, avator) values (:id, :name, :pass, :mobile, :registerTime, :avator)");
         try (Connection con = getConn()) {
             con.createQuery(sql).addParameter("id", user.getId())
-                    .addParameter("name", user.getName())
+                    .addParameter("name", "用户")
                     .addParameter("pass", user.getPassword())
                     .addParameter("mobile", user.getMobile())
+                    .addParameter("avator", Config.DEFAULT_AVATAR_URL)
                     .addParameter("registerTime", System.currentTimeMillis())
                     .executeUpdate();
         }

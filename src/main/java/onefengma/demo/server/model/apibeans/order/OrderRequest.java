@@ -26,7 +26,7 @@ public class OrderRequest extends AuthSession {
         order.productType = productType;
         order.status = 0;
         order.sellTime = System.currentTimeMillis();
-        order.timeLimit = order.sellTime + timeLimit;
+        order.timeLimit = timeLimit;
         return order;
     }
 }

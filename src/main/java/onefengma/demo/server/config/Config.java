@@ -42,6 +42,8 @@ public class Config {
     private static final String BASE_PAGE_PATH = "./res/B2BPlatformFront/";
     private static final String BASE_META_PATH = "./res/meta/";
 
+    public static final String DEFAULT_AVATAR_URL = "./files/2016/6/19/WdDfdnobGk7Y.jpg";
+
     public static final int PORT = 9090;
     private static String HOST;
 
