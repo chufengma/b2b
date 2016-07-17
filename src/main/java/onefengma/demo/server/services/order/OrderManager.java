@@ -122,9 +122,6 @@ public class OrderManager extends BaseManager{
                 return error("无权限操作");
             }
             int status = OrderDataHelper.instance().getOrderStatus(requestBean.orderId);
-            if (status != 1 && status != 2) {
-                return error("该订单无法删除");
-            }
             if (!StringUtils.equals(requestBean.getUserId(), OrderDataHelper.instance().getBuyerId(requestBean.orderId))) {
                 return error("用户错误, 无法删除");
             }
