@@ -6,6 +6,7 @@ package onefengma.demo.server.model.product;
 public class SupplyBrief {
     public String sellerId;
     public float supplyPrice;
+    public float unit;
     public String supplyMsg;
     public int status;
     public int winningTimes;

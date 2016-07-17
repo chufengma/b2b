@@ -105,6 +105,9 @@ public class SellerManager extends BaseManager {
         }));
 
         post("offerIronBuy", OfferIronRequest.class, ((request, response, requestBean) -> {
+            if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
+                return error("仅商家才能进行报价");
+            }
             if(!IronDataHelper.getIronDataHelper().isIronBuyExisted(requestBean.ironId)) {
                 return error("该求购不存在");
             }
@@ -157,6 +160,9 @@ public class SellerManager extends BaseManager {
 
 
         post("offerHandingBuy", OfferHandingRequest.class, ((request, response, requestBean) -> {
+            if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
+                return error("仅商家才能进行报价");
+            }
             if(!HandingDataHelper.getHandingDataHelper().isHandingBuyExisted(requestBean.handingId)) {
                 return error("该求购不存在");
             }
@@ -167,8 +173,7 @@ public class SellerManager extends BaseManager {
             if (HandingDataHelper.getHandingDataHelper().isOffered(requestBean.getUserId(), requestBean.handingId)) {
                 return error("您已报价");
             }
-
-            HandingDataHelper.getHandingDataHelper().offerHandingBuy(requestBean.getUserId(), requestBean.handingId, requestBean.price, requestBean.msg);
+            HandingDataHelper.getHandingDataHelper().offerHandingBuy(requestBean.getUserId(), requestBean.handingId, requestBean.price, requestBean.msg, requestBean.unit);
             return success();
         }));
 

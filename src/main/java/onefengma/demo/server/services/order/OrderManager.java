@@ -11,6 +11,7 @@ import onefengma.demo.server.model.apibeans.LastRecords;
 import onefengma.demo.server.model.apibeans.order.*;
 import onefengma.demo.server.model.apibeans.order.OrderAllRequest.OrderSingle;
 import onefengma.demo.server.model.order.Order;
+import onefengma.demo.server.model.product.HandingDetail;
 import onefengma.demo.server.model.product.IronDetail;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper;
@@ -41,6 +42,11 @@ public class OrderManager extends BaseManager{
         }));
 
         post("translate", OrderRequest.class, ((request, response, requestBean) -> {
+            String checkResult = orderCheck(requestBean.productId, requestBean.productType, requestBean.getUserId());
+            if (!StringUtils.isEmpty(checkResult)) {
+                return error(checkResult);
+            }
+
             if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
                 float price = 0;
                 if (requestBean.productType == 0) {
@@ -52,6 +58,7 @@ public class OrderManager extends BaseManager{
                     return error("您不是企业用户，请前往后台点击成为商家上传公司三证等相关资料");
                 }
             }
+
             OrderDataHelper.instance().translate(requestBean.generateOrder(), requestBean.isFromCar);
             return success();
         }));
@@ -72,6 +79,10 @@ public class OrderManager extends BaseManager{
             }
             List<Order> orders = requestBean.generateOrders();
             for(Order order : orders) {
+                String checkResult = orderCheck(order.productId, order.productType, requestBean.getUserId());
+                if (!StringUtils.isEmpty(checkResult)) {
+                    return error(checkResult);
+                }
                 OrderDataHelper.instance().translate(order, true);
             }
             return success();
@@ -123,6 +134,10 @@ public class OrderManager extends BaseManager{
         }));
 
         post("addToCar", OrderCarAddRequest.class, ((request, response, requestBean) -> {
+            String checkResult = orderCheck(requestBean.proId, requestBean.productType, requestBean.getUserId());
+            if (!StringUtils.isEmpty(checkResult)) {
+                return error(checkResult);
+            }
             OrderDataHelper.instance().addToCar(requestBean.getUserId(), requestBean.proId, requestBean.productType);
             return success();
         }));
@@ -135,6 +150,28 @@ public class OrderManager extends BaseManager{
         get("myCarsCount", AuthSession.class, ((request, response, requestBean) -> {
             return success(OrderDataHelper.instance().getCarCount(requestBean.getUserId()));
         }));
+    }
+
+    private String orderCheck(String proId, int productType, String userId) throws NoSuchFieldException, IllegalAccessException {
+        if (productType == 0) {
+            IronDetail ironDetail = IronDataHelper.getIronDataHelper().getIronProductById(proId);
+            if (ironDetail == null) {
+                return "加入购物车出错, 没有该商品";
+            }
+            if (StringUtils.equals(ironDetail.userId, userId)) {
+                return "加入购物车出错, 无法购买自己店铺商品";
+            }
+        } else {
+            HandingDetail handingDetail = HandingDataHelper.getHandingDataHelper().getHandingProductById(proId);
+            if (handingDetail == null) {
+                return "加入购物车出错, 没有该商品";
+            }
+            if (StringUtils.equals(handingDetail.userId, userId)) {
+                return "加入购物车出错, 无法购买自己店铺商品";
+            }
+        }
+
+        return null;
     }
 
     @Override

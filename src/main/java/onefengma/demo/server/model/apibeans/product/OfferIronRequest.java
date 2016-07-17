@@ -1,5 +1,6 @@
 package onefengma.demo.server.model.apibeans.product;
 
+import onefengma.demo.annotation.NotRequired;
 import onefengma.demo.server.model.apibeans.AuthSession;
 
 /**

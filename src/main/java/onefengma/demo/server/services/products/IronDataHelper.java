@@ -273,6 +273,7 @@ public class IronDataHelper extends BaseDataHelper {
                 supplyBrief.supplyMsg = row.getString("supplyMsg");
                 supplyBrief.winningTimes = row.getInteger("winningTimes");
                 supplyBrief.supplyPrice = row.getFloat("supplyPrice");
+                supplyBrief.unit = row.getFloat("unit");
                 supplyBriefs.add(supplyBrief);
             }
             return supplyBriefs;
@@ -418,13 +419,20 @@ public class IronDataHelper extends BaseDataHelper {
     }
 
     public void offerIronBuy(String sellerId, String ironId, float price, String msg) {
-        String sql = "insert into iron_buy_supply set ironId=:ironId, sellerId=:sellerId, supplyPrice=:price, supplyMsg=:msg, salesmanId=0";
+        String sql = "insert into iron_buy_supply set " +
+                "ironId=:ironId, " +
+                "sellerId=:sellerId, " +
+                "supplyPrice=:price, " +
+                "supplyMsg=:msg, " +
+                "unit=:unit, " +
+                "salesmanId=0";
         try (Connection conn = getConn()) {
             conn.createQuery(sql)
                     .addParameter("ironId", ironId)
                     .addParameter("sellerId", sellerId)
                     .addParameter("price", price)
                     .addParameter("msg", msg)
+                    .addParameter("unit", "kg")
                     .executeUpdate();
         }
     }

@@ -241,6 +241,7 @@ public class HandingDataHelper extends BaseDataHelper {
                 supplyBrief.supplyMsg = row.getString("supplyMsg");
                 supplyBrief.winningTimes = row.getInteger("winningTimes");
                 supplyBrief.supplyPrice = row.getFloat("supplyPrice");
+                supplyBrief.unit = row.getFloat("unit");
                 supplyBriefs.add(supplyBrief);
             }
             return supplyBriefs;
@@ -381,13 +382,15 @@ public class HandingDataHelper extends BaseDataHelper {
         }
     }
 
-    public void offerHandingBuy(String sellerId, String handingId, float price, String msg) {
-        String sql = "insert into handing_buy_supply set handingId=:handingId, sellerId=:sellerId, supplyPrice=:price, supplyMsg=:msg, salesmanId=0";
+    public void offerHandingBuy(String sellerId, String handingId, float price, String msg, String unit) {
+        String sql = "insert into handing_buy_supply set " +
+                "handingId=:handingId, sellerId=:sellerId, supplyPrice=:price, supplyMsg=:msg, salesmanId=0, unit=:unit";
         try(Connection conn = getConn()) {
             conn.createQuery(sql)
                     .addParameter("handingId", handingId)
                     .addParameter("sellerId", sellerId)
                     .addParameter("price", price)
+                    .addParameter("unit", unit)
                     .addParameter("msg", msg)
                     .executeUpdate();
         }
