@@ -211,7 +211,7 @@ public class OrderDataHelper extends BaseDataHelper {
         String tableName = ((order.productType == 0) ? "iron_product" : "handing_product");
         String proId = ((order.productType == 0) ? tableName + ".proId" : tableName + ".id");
         String sellerIdSql = "select userId from " + tableName + " where " + proId + "=:proId";
-        String deleteCarSql = "delete from order_car where userId=:userId and proId=:proId and productType=:productType and carId=:carId";
+        String deleteCarSql = "delete from order_car where userId=:userId and proId=:proId and productType=:productType and id=:carId";
         String selectCarSql = "select count(*) from order_car where userId=:userId and proId=:proId and productType=:productType";
 
         order.salesmanId = UserDataHelper.instance().getSalesManId(order.buyerId);

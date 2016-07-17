@@ -113,7 +113,7 @@ public abstract class BaseManager {
                 }
                 if (!loginSessionCheck(requestBean)) {
                     cleanTmpFiles(requestBean.extra);
-                    return error(STATUS_NOT_LOGIN, "not login", null);
+                    return error(STATUS_NOT_LOGIN, "您还没有登录, 请登录后再试", null);
                 }
                 return route.handle(request, response, requestBean);
             } catch (Exception e) {
