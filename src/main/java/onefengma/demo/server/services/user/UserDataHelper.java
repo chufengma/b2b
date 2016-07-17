@@ -73,12 +73,13 @@ public class UserDataHelper extends BaseDataHelper {
     }
 
     public void insertUser(User user) throws NoSuchFieldException, IllegalAccessException {
-        String sql = createSql("insert into @USER_TABLE(@USER_ID, @NAME, @PASSWORD, @MOBILE) values (:id, :name, :pass, :mobile)");
+        String sql = createSql("insert into @USER_TABLE(@USER_ID, @NAME, @PASSWORD, @MOBILE, registerTime) values (:id, :name, :pass, :mobile, :registerTime)");
         try (Connection con = getConn()) {
             con.createQuery(sql).addParameter("id", user.getId())
                     .addParameter("name", user.getName())
                     .addParameter("pass", user.getPassword())
                     .addParameter("mobile", user.getMobile())
+                    .addParameter("registerTime", System.currentTimeMillis())
                     .executeUpdate();
         }
         InnerMessageDataHelper.instance().addRegisterSuccessMessage(user.getUserId());
