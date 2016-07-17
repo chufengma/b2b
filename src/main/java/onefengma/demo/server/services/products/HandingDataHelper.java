@@ -368,6 +368,7 @@ public class HandingDataHelper extends BaseDataHelper {
             } else {
                 SellerOffer sellerOffer = new SellerOffer();
                 sellerOffer.price = rows.get(0).getFloat("supplyPrice");
+                sellerOffer.unit = rows.get(0).getString("unit");
                 sellerOffer.supplyMsg = rows.get(0).getString("supplyMsg");
                 return sellerOffer;
             }
