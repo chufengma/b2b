@@ -40,7 +40,7 @@ public class IronBuyRequest extends AuthSession {
         ironBuy.height = height;
         ironBuy.tolerance = toleranceFrom + "-" + toleranceTo;
         ironBuy.numbers = numbers;
-        ironBuy.timeLimit = ironBuy.pushTime + timeLimit * 1000;
+        ironBuy.timeLimit = timeLimit;
         return ironBuy;
     }
 }

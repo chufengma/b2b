@@ -21,7 +21,7 @@ public class HandingBuyRequest extends AuthSession {
         handingBuy.souCityId = souCityId;
         handingBuy.userId = getUserId();
         handingBuy.pushTime = System.currentTimeMillis();
-        handingBuy.timeLimit =handingBuy.pushTime + timeLimit * 1000;
+        handingBuy.timeLimit = timeLimit;
         return handingBuy;
     }
 }
