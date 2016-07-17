@@ -14,4 +14,5 @@ public class SupplyBrief {
     public float score;
     public long offerTime;
     public boolean isWinner;
+    public String mobile;
 }
