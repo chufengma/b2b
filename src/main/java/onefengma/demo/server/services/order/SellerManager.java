@@ -118,6 +118,12 @@ public class SellerManager extends BaseManager {
             if (IronDataHelper.getIronDataHelper().isOffered(requestBean.getUserId(), requestBean.ironId)) {
                 return error("您已报价");
             }
+            IronBuyBrief ironBuyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.ironId);
+            if (ironBuyBrief != null) {
+                if (StringUtils.equals(ironBuyBrief.userId, requestBean.getUserId())) {
+                    return error("无法对自己的求购进行报价");
+                }
+            }
             IronDataHelper.getIronDataHelper().offerIronBuy(requestBean.getUserId(), requestBean.ironId, requestBean.price, requestBean.msg);
             return success();
         }));
@@ -172,6 +178,12 @@ public class SellerManager extends BaseManager {
             }
             if (HandingDataHelper.getHandingDataHelper().isOffered(requestBean.getUserId(), requestBean.handingId)) {
                 return error("您已报价");
+            }
+            HandingBuyBrief handingBuyBrief = HandingDataHelper.getHandingDataHelper().getHandingBrief(requestBean.handingId);
+            if (handingBuyBrief != null) {
+                if (StringUtils.equals(handingBuyBrief.userId, requestBean.getUserId())) {
+                    return error("无法对自己的求购进行报价");
+                }
             }
             HandingDataHelper.getHandingDataHelper().offerHandingBuy(requestBean.getUserId(), requestBean.handingId, requestBean.price, requestBean.msg, requestBean.unit);
             return success();
