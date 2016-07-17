@@ -154,7 +154,7 @@ public class OrderDataHelper extends BaseDataHelper {
             if (ironTable.rows().size() >= 1) {
                 Row ironRow = ironTable.rows().get(0);
                 orderBrief.cover = ironRow.getString("cover");
-                orderBrief.price = row.getFloat("price");
+                orderBrief.price = ironRow.getFloat("price");
                 orderBrief.desc = ironRow.getString("material") + " " + ironRow.getString("ironType")
                         + ironRow.getString("surface") + " "
                         + ironRow.getString("title");
