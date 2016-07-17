@@ -126,7 +126,29 @@ public abstract class BaseDataHelper {
         return stringBuilder.toString();
     }
 
-
+    public static String generateFiledStringExclude(Class clazz, String ...keys) {
+        if (clazz == null) {
+            return "";
+        }
+        Field fields[] = clazz.getFields();
+        StringBuilder stringBuilder = new StringBuilder("");
+        FIND:
+        for (int i = 0; i < fields.length; i++) {
+            Field field = fields[i];
+            if (keys != null) {
+                for(String key : keys) {
+                    if (StringUtils.equals(field.getName(), key)) {
+                        continue FIND;
+                    }
+                }
+            }
+            stringBuilder.append(field.getName());
+            if (i != fields.length -1) {
+                stringBuilder.append(", ");
+            }
+        }
+        return stringBuilder.toString();
+    }
 
     protected void transaction(Func func) throws Exception {
         try(Connection conn = getSql2o().beginTransaction()) {

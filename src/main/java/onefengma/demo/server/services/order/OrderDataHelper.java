@@ -272,8 +272,8 @@ public class OrderDataHelper extends BaseDataHelper {
     public MyCarsResponse getMyCars(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select * from order_car where " + pageBuilder.generateSql(true);
         String countSql = "select count(*) from order_car where " + pageBuilder.generateSql(false);
-        String ironSql = "select " + generateFiledString(IronProductBrief.class) + " from iron_product where proId=:id";
-        String handingSql = "select " + generateFiledString(HandingProductBrief.class) + " from handing_product where id=:id";
+        String ironSql = "select " + generateFiledStringExclude(IronProductBrief.class, "monthSellCount") + " from iron_product where proId=:id";
+        String handingSql = "select " + generateFiledStringExclude(HandingProductBrief.class, "monthSellCount") + " from handing_product where id=:id";
 
         MyCarsResponse myCarsResponse = new MyCarsResponse(pageBuilder.currentPage, pageBuilder.pageCount);
         try(Connection conn = getConn()) {
@@ -373,7 +373,7 @@ public class OrderDataHelper extends BaseDataHelper {
     }
 
     public void confirmOrder(String orderId) throws Exception {
-        String sql = "update product_orders set status = 1, finishTime=:finisTime where id=:orderId and status=0";
+        String sql = "update product_orders set status = 1, finishTime=:finishTime where id=:orderId and status=0";
 
         transaction((conn)-> {
             conn.createQuery(sql)
