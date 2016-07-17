@@ -150,11 +150,11 @@ public class OrderDataHelper extends BaseDataHelper {
         }
 
         if (productType == 0) {
-            orderBrief.price = row.getFloat("ironPrice");
             Table ironTable = conn.createQuery(ironSql).addParameter("proId", proId).executeAndFetchTable();
             if (ironTable.rows().size() >= 1) {
                 Row ironRow = ironTable.rows().get(0);
                 orderBrief.cover = ironRow.getString("cover");
+                orderBrief.price = row.getFloat("price");
                 orderBrief.desc = ironRow.getString("material") + " " + ironRow.getString("ironType")
                         + ironRow.getString("surface") + " "
                         + ironRow.getString("title");
@@ -441,7 +441,7 @@ public class OrderDataHelper extends BaseDataHelper {
     }
 
     private void deleteOrderInner(String orderId, int from) {
-        String sellerSql = "update product_orders set status=4,deleteBy=" + from + " where id=:orderId and (status=1 or status=2)";
+        String sellerSql = "update product_orders set status=4,deleteBy=" + from + " where id=:orderId";
         try(Connection conn = getConn()) {
             conn.createQuery(sellerSql).addParameter("orderId", orderId).executeUpdate();
         }
