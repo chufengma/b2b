@@ -152,7 +152,7 @@ public class SellerDataHelper extends BaseDataHelper {
                     .executeAndFetchTable().rows();
             List<ShopBrief> shopBriefs = new ArrayList<>();
             for(Row row : rows) {
-                return generateShopByRow(row, 0);
+                return generateShopByRow(row, -1);
             }
             return null;
         }

@@ -6,5 +6,6 @@ package onefengma.demo.server.model.apibeans;
 public class ForgetPasswordRequest extends BaseBean {
     public String mobile;
     public String newPassword;
+    public String newPasswordConfirm;
     public int msgCode;
 }
