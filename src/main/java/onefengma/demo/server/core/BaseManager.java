@@ -353,7 +353,7 @@ public abstract class BaseManager {
 
     }
 
-    private static String becomeUrl = "/html/view/account/seller/#!/become";
+    private static String becomeUrl = "/html/view/common/become.html";
     private static String loginUrl = "/html/view/common/login.html";
 
     private static void addFilers() {
@@ -373,6 +373,11 @@ public abstract class BaseManager {
                             AuthData clientData = new AuthData(AuthHelper.getRequestToken(request), AuthHelper.getRequestUserId(request));
                             if((serverData == null || !serverData.equals(clientData))) {
                                 response.redirect(loginUrl);
+                            }
+                            if (pathInfo.startsWith("/html/view/account/seller")) {
+                                if (!SellerDataHelper.instance().isSeller(clientData.getUserId())) {
+                                    response.redirect(becomeUrl);
+                                }
                             }
                         } else {
                             return;
