@@ -241,7 +241,7 @@ public class HandingDataHelper extends BaseDataHelper {
                 supplyBrief.supplyMsg = row.getString("supplyMsg");
                 supplyBrief.winningTimes = row.getInteger("winningTimes");
                 supplyBrief.supplyPrice = row.getFloat("supplyPrice");
-                supplyBrief.unit = row.getFloat("unit");
+                supplyBrief.unit = row.getString("unit");
                 supplyBriefs.add(supplyBrief);
             }
             return supplyBriefs;
