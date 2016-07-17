@@ -466,12 +466,13 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
-    public void updateIronProduct(String ironId, long numbers, float price) {
-        String sql = "update iron_product set numbers=:numbers, price=:price where proId=:proId";
+    public void updateIronProduct(String ironId, long numbers, float price, String spec) {
+        String sql = "update iron_product set numbers=:numbers, price=:price, title=:title where proId=:proId";
         try(Connection conn = getConn()) {
             conn.createQuery(sql)
                     .addParameter("numbers", numbers)
                     .addParameter("price", price)
+                    .addParameter("title", spec)
                     .addParameter("proId", ironId).executeUpdate();
         }
     }

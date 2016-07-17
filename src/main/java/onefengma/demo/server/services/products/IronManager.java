@@ -215,7 +215,7 @@ public class IronManager extends BaseManager {
             if(!IronDataHelper.getIronDataHelper().isUserIronRight(requestBean.getUserId(), requestBean.ironId)) {
                 return error("用户权限错误");
             }
-            IronDataHelper.getIronDataHelper().updateIronProduct(requestBean.ironId, requestBean.numbers, requestBean.price);
+            IronDataHelper.getIronDataHelper().updateIronProduct(requestBean.ironId, requestBean.numbers, requestBean.price, requestBean.title);
             return success();
         }));
 

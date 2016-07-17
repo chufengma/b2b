@@ -10,4 +10,5 @@ public class UpdateIronProductRequest extends AuthSession {
     public String ironId;
     public long numbers;
     public float price;
+    public String title;
 }
