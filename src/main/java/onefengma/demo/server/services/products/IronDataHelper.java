@@ -291,6 +291,7 @@ public class IronDataHelper extends BaseDataHelper {
                 supplyBrief.winningTimes = row.getInteger("winningTimes");
                 supplyBrief.supplyPrice = row.getFloat("supplyPrice");
                 supplyBrief.unit = row.getString("unit");
+                supplyBrief.offerTime = row.getLong("offerTime");
                 supplyBriefs.add(supplyBrief);
             }
             return supplyBriefs;
@@ -445,7 +446,8 @@ public class IronDataHelper extends BaseDataHelper {
                 "supplyPrice=:price, " +
                 "supplyMsg=:msg, " +
                 "unit=:unit, " +
-                "salesmanId=0";
+                "salesmanId=0," +
+                "offerTime=:time";
 
         transaction((conn) -> {
             conn.createQuery(sql)
@@ -453,6 +455,7 @@ public class IronDataHelper extends BaseDataHelper {
                     .addParameter("sellerId", sellerId)
                     .addParameter("price", price)
                     .addParameter("msg", msg)
+                    .addParameter("time", System.currentTimeMillis())
                     .addParameter("unit", "kg")
                     .executeUpdate();
 

@@ -259,6 +259,7 @@ public class HandingDataHelper extends BaseDataHelper {
                 supplyBrief.winningTimes = row.getInteger("winningTimes");
                 supplyBrief.supplyPrice = row.getFloat("supplyPrice");
                 supplyBrief.unit = row.getString("unit");
+                supplyBrief.offerTime = row.getLong("offerTime");
                 supplyBriefs.add(supplyBrief);
             }
             return supplyBriefs;
@@ -403,7 +404,7 @@ public class HandingDataHelper extends BaseDataHelper {
 
     public void offerHandingBuy(String sellerId, String handingId, float price, String msg, String unit) throws Exception {
         String sql = "insert into handing_buy_supply set " +
-                "handingId=:handingId, sellerId=:sellerId, supplyPrice=:price, supplyMsg=:msg, salesmanId=0, unit=:unit";
+                "handingId=:handingId, sellerId=:sellerId, supplyPrice=:price, supplyMsg=:msg, salesmanId=0, unit=:unit, offerTime=:time";
 
         transaction((conn)-> {
             conn.createQuery(sql)
@@ -411,6 +412,7 @@ public class HandingDataHelper extends BaseDataHelper {
                     .addParameter("sellerId", sellerId)
                     .addParameter("price", price)
                     .addParameter("unit", unit)
+                    .addParameter("time", System.currentTimeMillis())
                     .addParameter("msg", msg)
                     .executeUpdate();
 
