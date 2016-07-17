@@ -172,12 +172,14 @@ public class IronDataHelper extends BaseDataHelper {
         ThreadUtils.instance().post(new Runnable() {
             @Override
             public void run() {
-                String userSql = "select userId from seller where surface like '%" + ironBuy.surface + "%'" +
+                String userSql = "select userId from iron_product where (surface like '%" + ironBuy.surface + "%'" +
                         "or ironType like '%" + ironBuy.ironType + "%'" +
                         "or proPlace like '%" + ironBuy.proPlace + "%'" +
-                        "or material like '%" + ironBuy.material + "%'";
+                        "or material like '%" + ironBuy.material + "%') and userId<> :userId";
                 try(Connection conn = getConn()) {
-                    List<String> users = conn.createQuery(userSql).executeAndFetch(String.class);
+                    List<String> users = conn.createQuery(userSql)
+                            .addParameter("userId", ironBuy.userId)
+                            .executeAndFetch(String.class);
                     for(String userId : users) {
                         addInBuySeller(conn, ironBuy.id, userId);
                     }
