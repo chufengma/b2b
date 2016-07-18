@@ -28,14 +28,18 @@ import onefengma.demo.server.model.apibeans.admin.AdminSalesRequest;
 import onefengma.demo.server.model.apibeans.admin.DeleteUserRequest;
 import onefengma.demo.server.model.apibeans.admin.UpdateUserRequest;
 import onefengma.demo.server.model.apibeans.others.AddNewsRequest;
+import onefengma.demo.server.model.apibeans.others.AddRecruitRequest;
 import onefengma.demo.server.model.apibeans.others.AddSalesRequest;
 import onefengma.demo.server.model.apibeans.others.EditNewsRequest;
+import onefengma.demo.server.model.apibeans.others.EditRecruitRequest;
 import onefengma.demo.server.model.apibeans.others.InnerMessageRequest;
 import onefengma.demo.server.model.apibeans.others.NewsDetailRequest;
 import onefengma.demo.server.model.product.HandingDetail;
 import onefengma.demo.server.model.product.IronDetail;
 import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import onefengma.demo.server.services.funcs.NewsDataHelper;
+import onefengma.demo.server.services.funcs.RecruitDataManager;
+import onefengma.demo.server.services.funcs.RecruitDataManager.RecruitDetail;
 import onefengma.demo.server.services.order.OrderDataHelper;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper;
@@ -397,6 +401,41 @@ public class AdminManager extends BaseManager {
 
         post("editNews", EditNewsRequest.class, ((request, response, requestBean) -> {
             NewsDataHelper.instance().editNews(requestBean.id, requestBean.title, requestBean.content);
+            return success();
+        }));
+
+        post("addRecruit", AddRecruitRequest.class, ((request, response, requestBean) -> {
+            RecruitDetail recruitDetail = new RecruitDetail();
+            recruitDetail.companyName = requestBean.companyName;
+            recruitDetail.description = requestBean.description;
+            recruitDetail.id = IdUtils.id();
+            recruitDetail.place = requestBean.place;
+            recruitDetail.position = requestBean.position;
+            recruitDetail.salary = requestBean.salary;
+            recruitDetail.tel = requestBean.tel;
+            recruitDetail.welfare = requestBean.welfare;
+            recruitDetail.pushTime = System.currentTimeMillis();
+            RecruitDataManager.instance().pushRecruit(recruitDetail);
+            return success();
+        }));
+
+        post("deleteRecruit", NewsDetailRequest.class, ((request, response, requestBean) -> {
+            RecruitDataManager.instance().deleteRecruit(requestBean.id);
+            return success();
+        }));
+
+        post("editRecruit", EditRecruitRequest.class, ((request, response, requestBean) -> {
+            RecruitDetail recruitDetail = new RecruitDetail();
+            recruitDetail.companyName = requestBean.companyName;
+            recruitDetail.description = requestBean.description;
+            recruitDetail.id = requestBean.id;
+            recruitDetail.place = requestBean.place;
+            recruitDetail.position = requestBean.position;
+            recruitDetail.salary = requestBean.salary;
+            recruitDetail.tel = requestBean.tel;
+            recruitDetail.welfare = requestBean.welfare;
+            recruitDetail.pushTime = System.currentTimeMillis();
+            RecruitDataManager.instance().editRecruit(recruitDetail);
             return success();
         }));
     }

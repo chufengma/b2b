@@ -19,6 +19,7 @@ import onefengma.demo.server.model.apibeans.others.NewsDetailRequest;
 import onefengma.demo.server.model.news.InnerNewsDetail;
 import onefengma.demo.server.model.news.InnerNewsResponse;
 import onefengma.demo.server.model.news.NewsDetail;
+import onefengma.demo.server.services.funcs.RecruitDataManager.RecruitDetail;
 import spark.utils.IOUtils;
 
 /**
@@ -109,7 +110,7 @@ public class FuncManager extends BaseManager {
 
         // 首页招聘信息
         get("indexRecruit", BaseBean.class, ((request, response, requestBean) -> {
-            return success(RecruitDataManager.instance().getRecruits());
+            return success(RecruitDataManager.instance().getIndexRecruits());
         }));
 
         // 首页他们想对不锈钢说
@@ -144,6 +145,21 @@ public class FuncManager extends BaseManager {
             }
             return success(NewsDetail);
         }));
+
+        // 首页招聘信息
+        get("recruits", BasePageBean.class, ((request, response, requestBean) -> {
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount);
+            return success(RecruitDataManager.instance().getRecruitBriefs(pageBuilder));
+        }));
+
+        get("recruitDetail", NewsDetailRequest.class, ((request, response, requestBean) -> {
+            RecruitDetail recruitDetail = RecruitDataManager.instance().getRecruitDetail(requestBean.id);
+            if (recruitDetail == null) {
+                return error("没有找到该条新闻");
+            }
+            return success(recruitDetail);
+        }));
+
     }
 
     @Override
