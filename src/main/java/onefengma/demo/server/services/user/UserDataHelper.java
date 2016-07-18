@@ -1,19 +1,18 @@
 package onefengma.demo.server.services.user;
 
-import onefengma.demo.common.StringUtils;
-import onefengma.demo.server.config.Config;
-import onefengma.demo.server.core.UpdateBuilder;
-import onefengma.demo.server.model.SalesMan;
-import onefengma.demo.server.model.UserProfile;
-import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import org.sql2o.Connection;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import onefengma.demo.server.model.Seller;
-import onefengma.demo.server.model.User;
+import onefengma.demo.common.StringUtils;
+import onefengma.demo.server.config.Config;
 import onefengma.demo.server.core.BaseDataHelper;
+import onefengma.demo.server.core.UpdateBuilder;
+import onefengma.demo.server.model.SalesMan;
+import onefengma.demo.server.model.User;
+import onefengma.demo.server.model.UserProfile;
+import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 
 /**
  * @author yfchu
@@ -191,9 +190,10 @@ public class UserDataHelper extends BaseDataHelper {
     }
 
     public void bindSalesman(String userId, int salesmanId) {
-        String sql = "update user set salesmanId =:salesmanId where userId=:userId";
+        String sql = "update user set salesManId =:salesmanId,saleBindTime=:time  where userId=:userId";
         try(Connection conn= getConn()) {
             conn.createQuery(sql).addParameter("userId", userId)
+                    .addParameter("time", System.currentTimeMillis())
                                     .addParameter("salesmanId", salesmanId).executeUpdate();
             updateSalesmanBindTime(salesmanId, userId);
         }

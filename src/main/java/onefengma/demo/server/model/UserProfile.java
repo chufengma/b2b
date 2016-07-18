@@ -1,7 +1,6 @@
 package onefengma.demo.server.model;
 
 import onefengma.demo.annotation.NotRequired;
-import onefengma.demo.server.services.user.UserDataHelper;
 import onefengma.demo.server.services.user.UserDataHelper.UserInfo;
 
 /**
@@ -12,6 +11,7 @@ public class UserProfile {
     public String name;
     public String avator;
     public String mobile;
+    public String salesManId;
 
     @NotRequired
     public UserInfo userData;
