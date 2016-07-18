@@ -1,9 +1,5 @@
 package onefengma.demo.server.services.products;
 
-import onefengma.demo.common.DateHelper;
-import onefengma.demo.common.ThreadUtils;
-import onefengma.demo.server.model.product.*;
-import onefengma.demo.server.services.order.TransactionDataHelper;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -12,15 +8,25 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import onefengma.demo.common.DateHelper;
 import onefengma.demo.common.StringUtils;
+import onefengma.demo.common.ThreadUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.others.HelpFindProduct;
 import onefengma.demo.server.model.apibeans.product.SellerIronBuysResponse;
+import onefengma.demo.server.model.product.IronBuy;
+import onefengma.demo.server.model.product.IronBuyBrief;
+import onefengma.demo.server.model.product.IronDetail;
+import onefengma.demo.server.model.product.IronProduct;
+import onefengma.demo.server.model.product.IronProductBrief;
+import onefengma.demo.server.model.product.IronRecommend;
+import onefengma.demo.server.model.product.SupplyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import onefengma.demo.server.services.order.OrderDataHelper;
+import onefengma.demo.server.services.order.TransactionDataHelper;
 
 /**
  * @author yfchu
@@ -339,7 +345,7 @@ public class IronDataHelper extends BaseDataHelper {
             price = price == null ? 0 : price;
             float totalMoney = price * numbers;
             // 记录交易
-            TransactionDataHelper.instance().insertIronBuyTransaction(conn, supplyUserId, ironId, totalMoney, numbers);
+            TransactionDataHelper.instance().insertIronBuyTransaction(conn, buyerId, supplyUserId, ironId, totalMoney, numbers);
             // 添加积分
             OrderDataHelper.instance().addIntegralByBuy(conn, buyerId, supplyUserId, totalMoney);
             // 增加站内信

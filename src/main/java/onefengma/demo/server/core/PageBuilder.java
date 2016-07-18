@@ -5,7 +5,6 @@ import java.util.List;
 
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.model.apibeans.BasePageBean;
-import onefengma.demo.server.model.apibeans.product.ShopRequest;
 
 /**
  * Created by chufengma on 16/6/5.
@@ -166,7 +165,7 @@ public class PageBuilder {
         } else if (!StringUtils.isEmpty(basePageBean.score)) {
             return orderByScore(Boolean.parseBoolean(basePageBean.score));
         } else if (!StringUtils.isEmpty(basePageBean.productCount)) {
-            addOrderBy("productNumbers", Boolean.parseBoolean(basePageBean.productCount));
+            addOrderBy("productCount", Boolean.parseBoolean(basePageBean.productCount));
         } else if (!StringUtils.isEmpty(basePageBean.monthSellMoney)) {
             orderByList.add(new OrderBy("money", Boolean.parseBoolean(basePageBean.monthSellMoney)));
             return this;

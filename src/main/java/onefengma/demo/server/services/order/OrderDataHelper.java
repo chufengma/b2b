@@ -1,30 +1,30 @@
 package onefengma.demo.server.services.order;
 
+import org.sql2o.Connection;
+import org.sql2o.data.Row;
+import org.sql2o.data.Table;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import onefengma.demo.common.DateHelper;
 import onefengma.demo.common.StringUtils;
+import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.model.apibeans.LastRecords;
 import onefengma.demo.server.model.apibeans.order.MyCommingOrdersResponse;
 import onefengma.demo.server.model.apibeans.order.MyOrdersResponse;
-import onefengma.demo.server.model.apibeans.product.MyCarsResponse;
 import onefengma.demo.server.model.apibeans.product.CarProductBrief;
+import onefengma.demo.server.model.apibeans.product.MyCarsResponse;
+import onefengma.demo.server.model.order.Order;
 import onefengma.demo.server.model.order.OrderBrief;
+import onefengma.demo.server.model.order.OrderDynamic;
 import onefengma.demo.server.model.product.HandingProductBrief;
 import onefengma.demo.server.model.product.IronProductBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper;
 import onefengma.demo.server.services.user.UserDataHelper;
-import org.sql2o.Connection;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import onefengma.demo.common.DateHelper;
-import onefengma.demo.server.core.BaseDataHelper;
-import onefengma.demo.server.model.apibeans.LastRecords;
-import onefengma.demo.server.model.order.Order;
-import onefengma.demo.server.model.order.OrderDynamic;
-import org.sql2o.data.Row;
-import org.sql2o.data.Table;
 
 /**
  * Created by chufengma on 16/6/18.
@@ -441,7 +441,7 @@ public class OrderDataHelper extends BaseDataHelper {
     }
 
     private void deleteOrderInner(String orderId, int from) {
-        String sellerSql = "update product_orders set status=4,deleteBy=" + from + " where id=:orderId";
+        String sellerSql = "update product_orders set status=4, deleteBy=" + from + " where id=:orderId";
         try(Connection conn = getConn()) {
             conn.createQuery(sellerSql).addParameter("orderId", orderId).executeUpdate();
         }

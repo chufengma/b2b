@@ -1,25 +1,23 @@
 package onefengma.demo.server.services.user;
 
-import freemarker.template.utility.DateUtil;
-import onefengma.demo.common.DateHelper;
-import onefengma.demo.server.model.product.HandingBuyBrief;
-import onefengma.demo.server.model.product.IronBuyBrief;
-import onefengma.demo.server.services.products.HandingDataHelper;
-import onefengma.demo.server.services.products.IronDataHelper;
 import org.sql2o.Connection;
+import org.sql2o.data.Row;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import onefengma.demo.common.DateHelper;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
-import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.core.UpdateBuilder;
 import onefengma.demo.server.model.Seller;
+import onefengma.demo.server.model.product.HandingBuyBrief;
+import onefengma.demo.server.model.product.IronBuyBrief;
 import onefengma.demo.server.model.product.ShopBrief;
 import onefengma.demo.server.model.product.ShopDetail;
-import org.sql2o.data.Row;
+import onefengma.demo.server.services.products.HandingDataHelper;
+import onefengma.demo.server.services.products.IronDataHelper;
 
 /**
  * Created by chufengma on 16/6/2.
@@ -178,7 +176,7 @@ public class SellerDataHelper extends BaseDataHelper {
             shopBrief.handingTypeDesc = row.getString("handingTypeDesc");
             shopBrief.ironTypeDesc = row.getString("ironTypeDesc");
         }
-        shopBrief.productNumbers = row.getInteger("productNumbers");
+        shopBrief.productNumbers = row.getInteger("productCount");
         shopBrief.officeAddress = row.getString("officeAddress");
         shopBrief.score = row.getFloat("score") == null ? 0 : row.getFloat("score");
         return shopBrief;
@@ -339,7 +337,7 @@ public class SellerDataHelper extends BaseDataHelper {
                 shopDetail.money = row.getFloat("money") == null ? 0 : row.getFloat("money");
                 shopDetail.handingTypeDesc = row.getString("handingTypeDesc");
                 shopDetail.ironTypeDesc = row.getString("ironTypeDesc");
-                shopDetail.productNumbers = row.getInteger("productNumbers");
+                shopDetail.productNumbers = row.getInteger("productCount");
                 shopDetail.officeAddress = row.getString("officeAddress");
                 shopDetail.score = row.getFloat("score") == null ? 0 : row.getFloat("score");
                 shopDetail.regMoney = row.getInteger("regMoney");
@@ -437,7 +435,7 @@ public class SellerDataHelper extends BaseDataHelper {
     }
 
     public void updateSellerProductCount(Connection conn, int productType, String proId) throws NoSuchFieldException, IllegalAccessException {
-        String sql = "select seller set productNumbers=(productNumbers+1) where userId=:userId";
+        String sql = "select seller set productCount=(productCount+1) where userId=:userId";
         String userId = "";
         if (productType == 0) {
             IronBuyBrief buyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(proId);
