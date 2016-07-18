@@ -1,30 +1,29 @@
 package onefengma.demo.server.core;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.oreilly.servlet.MultipartRequest;
-
-import onefengma.demo.server.core.request.*;
-import onefengma.demo.server.model.apibeans.AdminAuthSession;
-import onefengma.demo.server.model.apibeans.AuthData;
-import onefengma.demo.server.services.user.SellerDataHelper;
-import org.sql2o.Connection;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
-import onefengma.demo.common.DateHelper;
 import onefengma.demo.common.FileHelper;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.config.Config;
+import onefengma.demo.server.core.request.AuthHelper;
+import onefengma.demo.server.core.request.BaseResult;
+import onefengma.demo.server.core.request.PageRoute;
+import onefengma.demo.server.core.request.ParamsMissException;
+import onefengma.demo.server.core.request.TypedRoute;
+import onefengma.demo.server.model.apibeans.AdminAuthSession;
+import onefengma.demo.server.model.apibeans.AuthData;
 import onefengma.demo.server.model.apibeans.AuthSession;
 import onefengma.demo.server.model.apibeans.BaseBean;
+import onefengma.demo.server.services.user.SellerDataHelper;
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
@@ -360,7 +359,7 @@ public abstract class BaseManager {
         Spark.before((request, response) -> {
                     String pathInfo = request.pathInfo();
                     File pageFile = null;
-                    if (pathInfo.startsWith("/auth") || pathInfo.startsWith("/html")) {
+                    if (pathInfo.startsWith("/admin") || pathInfo.startsWith("/html")) {
                         // other pages
                         if (request.pathInfo().startsWith("/auth")) {
                             pageFile = FileHelper.getFileFromPath("notLogin.html");

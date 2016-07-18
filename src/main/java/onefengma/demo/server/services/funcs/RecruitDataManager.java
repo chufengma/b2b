@@ -5,7 +5,6 @@ import org.sql2o.Connection;
 import java.util.List;
 
 import onefengma.demo.server.core.BaseDataHelper;
-import onefengma.demo.server.model.news.InnerNews;
 import onefengma.demo.server.model.recruit.Recruit;
 
 /**

@@ -11,19 +11,31 @@ import onefengma.demo.server.core.BaseAdminPageBean;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.Admin;
-import onefengma.demo.server.model.SalesMan;
 import onefengma.demo.server.model.admin.AdminDetailRequest;
 import onefengma.demo.server.model.admin.AdminOperationRequest;
 import onefengma.demo.server.model.admin.AdminSellersRequest;
 import onefengma.demo.server.model.admin.AdminSellersResponse;
 import onefengma.demo.server.model.admin.AdminUsersRequest;
 import onefengma.demo.server.model.admin.AdminUsersResponse;
-import onefengma.demo.server.model.apibeans.admin.*;
+import onefengma.demo.server.model.apibeans.admin.AdminBuysRequest;
+import onefengma.demo.server.model.apibeans.admin.AdminChangeSalesmanRequest;
+import onefengma.demo.server.model.apibeans.admin.AdminDeleteBuyRequest;
+import onefengma.demo.server.model.apibeans.admin.AdminDeleteOrderRequest;
+import onefengma.demo.server.model.apibeans.admin.AdminFindHelpRequest;
+import onefengma.demo.server.model.apibeans.admin.AdminLoginRequest;
+import onefengma.demo.server.model.apibeans.admin.AdminOrdersRequest;
+import onefengma.demo.server.model.apibeans.admin.AdminSalesRequest;
+import onefengma.demo.server.model.apibeans.admin.DeleteUserRequest;
+import onefengma.demo.server.model.apibeans.admin.UpdateUserRequest;
+import onefengma.demo.server.model.apibeans.others.AddNewsRequest;
 import onefengma.demo.server.model.apibeans.others.AddSalesRequest;
+import onefengma.demo.server.model.apibeans.others.EditNewsRequest;
 import onefengma.demo.server.model.apibeans.others.InnerMessageRequest;
+import onefengma.demo.server.model.apibeans.others.NewsDetailRequest;
 import onefengma.demo.server.model.product.HandingDetail;
 import onefengma.demo.server.model.product.IronDetail;
 import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
+import onefengma.demo.server.services.funcs.NewsDataHelper;
 import onefengma.demo.server.services.order.OrderDataHelper;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper;
@@ -356,6 +368,36 @@ public class AdminManager extends BaseManager {
             }
             AdminDataManager.instance().addNewSalesMan(requestBean.name, requestBean.tel);
             return success("添加成功");
+        }));
+
+        post("addInnerNews", AddNewsRequest.class, ((request, response, requestBean) -> {
+            NewsDataHelper.instance().pushInnerNews(requestBean.title, requestBean.content);
+            return success();
+        }));
+
+        post("deleteInnerNews", NewsDetailRequest.class, ((request, response, requestBean) -> {
+            NewsDataHelper.instance().deleteInnerNews(requestBean.id);
+            return success();
+        }));
+
+        post("editInnerNews", EditNewsRequest.class, ((request, response, requestBean) -> {
+            NewsDataHelper.instance().editInnerNews(requestBean.id, requestBean.title, requestBean.content);
+            return success();
+        }));
+
+        post("addNews", AddNewsRequest.class, ((request, response, requestBean) -> {
+            NewsDataHelper.instance().pushNews(requestBean.title, requestBean.content);
+            return success();
+        }));
+
+        post("deleteNews", NewsDetailRequest.class, ((request, response, requestBean) -> {
+            NewsDataHelper.instance().deleteNews(requestBean.id);
+            return success();
+        }));
+
+        post("editNews", EditNewsRequest.class, ((request, response, requestBean) -> {
+            NewsDataHelper.instance().editNews(requestBean.id, requestBean.title, requestBean.content);
+            return success();
         }));
     }
 

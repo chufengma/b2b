@@ -1,23 +1,24 @@
 package onefengma.demo.server.services.funcs;
 
-import com.alibaba.fastjson.JSON;
-
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.List;
 
 import onefengma.demo.common.FileHelper;
 import onefengma.demo.common.VerifyUtils;
 import onefengma.demo.server.config.Config;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.MsgCodeHelper;
+import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.core.ValidateHelper;
 import onefengma.demo.server.model.apibeans.BaseBean;
+import onefengma.demo.server.model.apibeans.BasePageBean;
 import onefengma.demo.server.model.apibeans.codes.MsgCode;
-import onefengma.demo.server.model.apibeans.codes.MsgCode.MsgCodeResponse;
 import onefengma.demo.server.model.apibeans.codes.ValidateCodeBean;
 import onefengma.demo.server.model.apibeans.meta.CityDescRequest;
-import onefengma.demo.server.model.metaData.City;
+import onefengma.demo.server.model.apibeans.others.NewsDetailRequest;
+import onefengma.demo.server.model.news.InnerNewsDetail;
+import onefengma.demo.server.model.news.InnerNewsResponse;
+import onefengma.demo.server.model.news.NewsDetail;
 import spark.utils.IOUtils;
 
 /**
@@ -114,6 +115,34 @@ public class FuncManager extends BaseManager {
         // 首页他们想对不锈钢说
         get("theySay", BaseBean.class, ((request, response, requestBean) -> {
             return success(NewsDataHelper.instance().getTheySay());
+        }));
+
+
+        get("innerNews", BasePageBean.class, ((request, response, requestBean) -> {
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount);
+            InnerNewsResponse innerNewsResponse = NewsDataHelper.instance().getInnerNews(pageBuilder);
+            return success(innerNewsResponse);
+        }));
+
+        get("innerNewsDetail", NewsDetailRequest.class, ((request, response, requestBean) -> {
+            InnerNewsDetail innerNewsDetail = NewsDataHelper.instance().getInnerNewsDetail(requestBean.id);
+            if (innerNewsDetail == null) {
+                return error("没有找到该条新闻");
+            }
+            return success(innerNewsDetail);
+        }));
+
+        get("news", BasePageBean.class, ((request, response, requestBean) -> {
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount);
+            return success(NewsDataHelper.instance().getNews(pageBuilder));
+        }));
+
+        get("newsDetail", NewsDetailRequest.class, ((request, response, requestBean) -> {
+            NewsDetail NewsDetail = NewsDataHelper.instance().getNewsDetail(requestBean.id);
+            if (NewsDetail == null) {
+                return error("没有找到该条新闻");
+            }
+            return success(NewsDetail);
         }));
     }
 
