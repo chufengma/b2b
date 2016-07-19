@@ -77,7 +77,7 @@ public class AdminManager extends BaseManager {
                     .getBuyer(new PageBuilder(requestBean.currentPage, requestBean.pageCount)
                             .setTime(timeRange.startTime, timeRange.endTime)
                             .addEqualWhere("mobile", requestBean.userTel)
-                            .addEqualWhere("salesTel", requestBean.salesTel));
+                            .addEqualWhere("tel", requestBean.salesTel));
             adminUsersResponse.currentPage = requestBean.currentPage;
             adminUsersResponse.pageCount = requestBean.pageCount;
             return success(adminUsersResponse);
@@ -127,8 +127,8 @@ public class AdminManager extends BaseManager {
 
             AdminSellersResponse adminSellersResponse = AdminDataManager.instance()
                     .getSellers(new PageBuilder(requestBean.currentPage, requestBean.pageCount)
-                            .addEqualWhere("mobile", requestBean.salesMobile)
-                            .addEqualWhere("salesMobile", requestBean.salesMobile)
+                            .addEqualWhere("mobile", requestBean.userMobile)
+                            .addEqualWhere("tel", requestBean.salesMobile)
                             .setTime(requestBean.becomeSellerTimeStart, requestBean.becomeSellerTimeEnd)
                             , dateStartTime, dateEndTime, isBuyerStart, requestBean.companyName);
 
