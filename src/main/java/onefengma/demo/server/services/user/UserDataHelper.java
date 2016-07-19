@@ -191,7 +191,7 @@ public class UserDataHelper extends BaseDataHelper {
     }
 
     public void bindSalesman(String userId, int salesmanId) {
-        String sql = "update user set salesManId =:salesmanId,saleBindTime=:time  where userId=:userId";
+        String sql = "update user set salesManId =:salesmanId,salesBindTime=:time  where userId=:userId";
         try(Connection conn= getConn()) {
             conn.createQuery(sql).addParameter("userId", userId)
                     .addParameter("time", System.currentTimeMillis())
