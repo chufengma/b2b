@@ -27,6 +27,7 @@ import onefengma.demo.server.model.apibeans.admin.AdminOrdersRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminSalesRequest;
 import onefengma.demo.server.model.apibeans.admin.DeleteUserRequest;
 import onefengma.demo.server.model.apibeans.admin.UpdateUserRequest;
+import onefengma.demo.server.model.apibeans.order.SiteInfoRequest;
 import onefengma.demo.server.model.apibeans.others.AddNewsRequest;
 import onefengma.demo.server.model.apibeans.others.AddRecruitRequest;
 import onefengma.demo.server.model.apibeans.others.AddSalesRequest;
@@ -437,6 +438,16 @@ public class AdminManager extends BaseManager {
             recruitDetail.pushTime = System.currentTimeMillis();
             RecruitDataManager.instance().editRecruit(recruitDetail);
             return success();
+        }));
+
+        get("siteInfo", SiteInfoRequest.class, ((request, response, requestBean) -> {
+            if (requestBean.type == 0) {
+                return success(AdminDataManager.instance().getSiteInfoForBuy(requestBean.startTime, requestBean.endTime));
+            } else if (requestBean.type == 1) {
+                return success(AdminDataManager.instance().getSiteInfoForOrder(requestBean.startTime, requestBean.endTime));
+            } else {
+                return success(AdminDataManager.instance().getSiteInfoAllTrans(requestBean.startTime, requestBean.endTime));
+            }
         }));
     }
 

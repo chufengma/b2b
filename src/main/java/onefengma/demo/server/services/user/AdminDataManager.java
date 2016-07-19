@@ -594,6 +594,121 @@ public class AdminDataManager extends BaseDataHelper {
         }
     }
 
+    public SiteInfo getSiteInfoAllTrans(long startTime, long endTime) {
+        SiteInfo orderSiteInfo = getSiteInfoForOrder(startTime, endTime);
+        SiteInfo buySiteInfo = getSiteInfoForBuy(startTime, endTime);
+        orderSiteInfo.count += buySiteInfo.count;
+        orderSiteInfo.money += buySiteInfo.money;
+        return orderSiteInfo;
+    }
+
+    public SiteInfo getSiteInfoForOrder(long startTime, long endTime) {
+        String ironSql = "select count(*) count, sum(count*price) as money " +
+                         "from product_orders,iron_product " +
+                         "where productType=0 and iron_product.proId=product_orders.productId and finishTime<:endTime and finishTime>=:startTime ";
+
+        String handingSql = "select count(*) count, sum(count*price) as money " +
+                "from product_orders,handing_product " +
+                "where productType=1 and handing_product.id=product_orders.productId and finishTime<:endTime and finishTime>=:startTime  ";
+
+        try(Connection conn = getConn()) {
+            float money = 0;
+            float count = 0;
+            List<Row> ironRows = conn.createQuery(ironSql).addParameter("startTime", startTime)
+                    .addParameter("endTime", endTime).executeAndFetchTable().rows();
+            if (ironRows.size() > 0) {
+                Row row = ironRows.get(0);
+                Float moneyTmp = row.getFloat("money");
+                moneyTmp = moneyTmp == null ? 0 : moneyTmp;
+
+                Float countTmp = row.getFloat("count");
+                countTmp = countTmp == null ? 0 : countTmp;
+
+                money += moneyTmp;
+                count += countTmp;
+            }
+
+            List<Row> handingRows = conn.createQuery(handingSql).addParameter("startTime", startTime)
+                    .addParameter("endTime", endTime).executeAndFetchTable().rows();
+            if (handingRows.size() > 0) {
+                Row row = handingRows.get(0);
+                Float moneyTmp = row.getFloat("money");
+                moneyTmp = moneyTmp == null ? 0 : moneyTmp;
+
+                Float countTmp = row.getFloat("count");
+                countTmp = countTmp == null ? 0 : countTmp;
+
+                money += moneyTmp;
+                count += countTmp;
+            }
+
+            SiteInfo siteInfo = new SiteInfo();
+            siteInfo.startTime = startTime;
+            siteInfo.endTime = endTime;
+            siteInfo.money = money;
+            siteInfo.count = count;
+            return siteInfo;
+        }
+    }
+
+    public SiteInfo getSiteInfoForBuy(long startTime, long endTime) {
+        String ironSql = "select sum(supplyPrice*numbers) as money, count(iron_buy.id) as count " +
+                        "from iron_buy left join iron_buy_supply " +
+                        "on iron_buy_supply.sellerId=iron_buy.supplyUserId and supplyWinTime>=:startTime and supplyWinTime<:endTime " +
+                        "where iron_buy.status=1 ";
+
+        String handingSql = "select sum(supplyPrice) as money, count(handing_buy.id) as count " +
+                "from handing_buy left join handing_buy_supply " +
+                "on handing_buy_supply.sellerId=handing_buy.supplyUserId  and supplyWinTime>=:startTime and supplyWinTime<:endTime " +
+                "where handing_buy.status=1 ";
+
+        try(Connection conn = getConn()) {
+            float money = 0;
+            float count = 0;
+            List<Row> ironRows = conn.createQuery(ironSql).addParameter("startTime", startTime)
+                    .addParameter("endTime", endTime).executeAndFetchTable().rows();
+            if (ironRows.size() > 0) {
+                Row row = ironRows.get(0);
+                Float moneyTmp = row.getFloat("money");
+                moneyTmp = moneyTmp == null ? 0 : moneyTmp;
+
+                Float countTmp = row.getFloat("count");
+                countTmp = countTmp == null ? 0 : countTmp;
+
+                money += moneyTmp;
+                count += countTmp;
+            }
+
+            List<Row> handingRows = conn.createQuery(handingSql).addParameter("startTime", startTime)
+                    .addParameter("endTime", endTime).executeAndFetchTable().rows();
+            if (handingRows.size() > 0) {
+                Row row = handingRows.get(0);
+                Float moneyTmp = row.getFloat("money");
+                moneyTmp = moneyTmp == null ? 0 : moneyTmp;
+
+                Float countTmp = row.getFloat("count");
+                countTmp = countTmp == null ? 0 : countTmp;
+
+                money += moneyTmp;
+                count += countTmp;
+            }
+
+            SiteInfo siteInfo = new SiteInfo();
+            siteInfo.startTime = startTime;
+            siteInfo.endTime = endTime;
+            siteInfo.money = money;
+            siteInfo.count = count;
+            return siteInfo;
+        }
+    }
+
+    public static class SiteInfo {
+        public long startTime;
+        public long endTime;
+        public float count;
+        public float money;
+    }
+
     public static class ProductVerify {
         public String productId;
         public String productType;
