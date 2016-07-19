@@ -78,7 +78,7 @@ public class SellerDataHelper extends BaseDataHelper {
     }
 
     public Seller getSellerByUserId(String userId) throws NoSuchFieldException, IllegalAccessException {
-        String sql = createSql("select " + generateFiledString(Seller.class) +  " from @TABLE where @USER_ID = :userId;");
+        String sql = createSql("select " + generateFiledString(Seller.class) +  " from @TABLE where @USER_ID = :userId and passed=true");
         try (Connection conn = getConn()){
             List<Seller> sellerList = conn.createQuery(sql).addParameter("userId", userId).executeAndFetch(Seller.class);
             if (sellerList.isEmpty()) {
@@ -120,7 +120,7 @@ public class SellerDataHelper extends BaseDataHelper {
                 "(select sellerId, sum(count) as count, sum(money) as money " +
                 "from seller_transactions where productType = 0 and finishTime < :endTime and finishTime >= :startTime " +
                 "group by sellerId) as trans " +
-                "on seller.userId = trans.sellerId " +
+                "on seller.userId = trans.sellerId where passed=true " +
                 "order by count desc limit 0, 10 ";
             try(Connection conn = getConn()) {
                 List<Row> rows = conn.createQuery(sql)
@@ -253,7 +253,7 @@ public class SellerDataHelper extends BaseDataHelper {
                 "(select sellerId, sum(count) as count, sum(money) as money " +
                 "from seller_transactions where productType = 1 and finishTime < :endTime and finishTime >= :startTime " +
                 "group by sellerId) as trans " +
-                "on seller.userId = trans.sellerId " +
+                "on seller.userId = trans.sellerId where passed=true " +
                 "order by count desc limit 0, 10 ";
 
         try(Connection conn = getConn()) {
@@ -290,7 +290,7 @@ public class SellerDataHelper extends BaseDataHelper {
 
         String sqlShop = "select * from seller where seller.userId=:userId";
         String transSql = "select sum(money) as money , sum(count) as count " +
-                "from seller_transactions where sellerId=:userId";
+                "from seller_transactions where sellerId=:userId  ";
 
         try(Connection conn = getConn()) {
             String userId = conn.createQuery(sqlUser).addParameter("proId", proId).executeScalar(String.class);
@@ -400,7 +400,7 @@ public class SellerDataHelper extends BaseDataHelper {
     }
 
     public Seller getSeller(String sellerId) {
-        String sql = "select " + generateFiledString(Seller.class) + " from seller where userId=:userId";
+        String sql = "select " + generateFiledString(Seller.class) + " from seller where userId=:userId where passed=true ";
         try(Connection conn = getConn()) {
             return conn.createQuery(sql).addParameter("userId", sellerId).executeAndFetchFirst(Seller.class);
         }
@@ -428,7 +428,7 @@ public class SellerDataHelper extends BaseDataHelper {
     }
 
     public List<String> getUserIdsByCompanyName(String companyName) {
-        String sql = "select userId from seller where companyName like '%" + companyName + "%' ";
+        String sql = "select userId from seller where companyName like '%" + companyName + "%'  where passed=true ";
         try(Connection conn = getConn()) {
             return  conn.createQuery(sql).executeAndFetch(String.class);
         }
