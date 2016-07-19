@@ -543,7 +543,7 @@ public class IronDataHelper extends BaseDataHelper {
 
     public void insertFindHelpProduct(HelpFindProduct helpFindProduct) throws InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException, IllegalAccessException {
         try(Connection conn = getConn()) {
-            createInsertQuery(conn, "help_find_product", helpFindProduct);
+            createInsertQuery(conn, "help_find_product", helpFindProduct).executeUpdate();
         }
     }
 
