@@ -11,10 +11,11 @@ public class UserProfile {
     public String name;
     public String avator;
     public String mobile;
-    public String salesManId;
 
     @NotRequired
     public UserInfo userData;
     @NotRequired
     public UserInfo sellerData;
+    @NotRequired
+    public SalesMan salesMan;
 }
