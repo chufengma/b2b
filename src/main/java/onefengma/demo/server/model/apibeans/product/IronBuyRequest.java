@@ -1,9 +1,9 @@
 package onefengma.demo.server.model.apibeans.product;
 
+import onefengma.demo.annotation.NotRequired;
 import onefengma.demo.common.IdUtils;
 import onefengma.demo.server.model.apibeans.AuthSession;
 import onefengma.demo.server.model.product.IronBuy;
-import onefengma.demo.server.services.user.UserDataHelper;
 
 /**
  * Created by chufengma on 16/6/5.
@@ -14,6 +14,7 @@ public class IronBuyRequest extends AuthSession {
     public String surface;
     public String proPlace;
     public String locationCityId;
+    @NotRequired
     public String message;
     public long length;
     public long width;

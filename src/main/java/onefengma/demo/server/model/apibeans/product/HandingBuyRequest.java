@@ -1,5 +1,6 @@
 package onefengma.demo.server.model.apibeans.product;
 
+import onefengma.demo.annotation.NotRequired;
 import onefengma.demo.common.IdUtils;
 import onefengma.demo.server.model.apibeans.AuthSession;
 import onefengma.demo.server.model.product.HandingBuy;
@@ -10,6 +11,7 @@ import onefengma.demo.server.model.product.HandingBuy;
 public class HandingBuyRequest extends AuthSession {
     public String handingType;
     public String souCityId;
+    @NotRequired
     public String message;
     public long timeLimit;
 
