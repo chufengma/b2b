@@ -146,7 +146,6 @@ public class IronManager extends BaseManager {
                     .addEqualWhere("proPlace", requestBean.proPlace)
                     .addInWhere("locationCityId", CityDataHelper.instance().getCitiesById(new ArrayList<>(), requestBean.cityId))
                     .addEqualWhere("userId", requestBean.userId)
-                    .addEqualWhere("status", 0)
                     .addOrderBy("pushTime", true);
 
             ironBuyResponse.maxCount = IronDataHelper.getIronDataHelper().getMaxIronBuyCounts(pageBuilder);

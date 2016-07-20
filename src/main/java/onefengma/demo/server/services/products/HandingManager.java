@@ -86,7 +86,6 @@ public class HandingManager extends BaseManager{
                     .addEqualWhere("handingType", requestBean.handingType)
                     .addInWhere("souCityId", CityDataHelper.instance().getCitiesById(new ArrayList<>(), requestBean.cityId))
                     .addEqualWhere("userId", requestBean.userId)
-                    .addEqualWhere("status", 0)
                     .addOrderBy("pushTime", true);
             handingGetResponse.handings = HandingDataHelper.getHandingDataHelper().getHandingBuys(pageBuilder);
             handingGetResponse.maxCount = HandingDataHelper.getHandingDataHelper().getMaxBuyCount(pageBuilder);
