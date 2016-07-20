@@ -547,7 +547,11 @@ public class AdminDataManager extends BaseDataHelper {
             response.maxCount = count;
             if (response.requests != null) {
                 for(HelpFindProduct helpFindProduct : response.requests) {
-                    helpFindProduct.city = CityDataHelper.instance().getCityDescById(helpFindProduct.city);
+                    try {
+                        helpFindProduct.city = CityDataHelper.instance().getCityDescById(helpFindProduct.city);
+                    } catch (Exception e) {
+
+                    }
                 }
             }
         }

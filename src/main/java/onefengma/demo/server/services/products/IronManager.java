@@ -100,12 +100,9 @@ public class IronManager extends BaseManager {
             if (requestBean.price <= 0) {
                 return errorAndClear(requestBean, "发布价格不正确");
             }
-            try {
-                IronDataHelper.getIronDataHelper().pushIronProduct(requestBean.generateIconProduct());
-                SellerDataHelper.instance().addIronType(requestBean.getUserId(), requestBean.ironType);
-            } finally {
-                cleanTmpFiles(requestBean.extra);
-            }
+
+            IronDataHelper.getIronDataHelper().pushIronProduct(requestBean.generateIconProduct());
+            SellerDataHelper.instance().addIronType(requestBean.getUserId(), requestBean.ironType);
 
             return success();
         }));
