@@ -236,11 +236,8 @@ public class IronDataHelper extends BaseDataHelper {
                 IronRecommend ironRecommend = new IronRecommend();
                 ironRecommend.id = row.getString("id");
                 ironRecommend.time = row.getLong("pushTime");
-                ironRecommend.title = "求购" +  row.getString("ironType") + " " + row.getString("material")
-                + " " + row.getString("surface") + " " + CityDataHelper.instance().getCityDescById(row.getString("locationCityId")) + row.getInteger("numbers") + "";
-                if (ironRecommend.title != null) {
-                    ironRecommend.title = ironRecommend.title.length() > 11 ? (ironRecommend.title.substring(0, 11) + "...") : ironRecommend.title;
-                }
+                ironRecommend.title = row.getString("ironType") + " " + row.getString("material")
+                + " " + row.getString("surface") + " " + CityDataHelper.instance().getCityDescById(row.getString("locationCityId"));
                 ironRecommends.add(ironRecommend);
             }
             return ironRecommends;
