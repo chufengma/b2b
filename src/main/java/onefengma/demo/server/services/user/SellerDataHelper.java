@@ -165,10 +165,14 @@ public class SellerDataHelper extends BaseDataHelper {
         if (productType == 0) {
             shopBrief.ironCount = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
             shopBrief.ironMoney = row.getFloat("money") == null ? 0 : row.getFloat("money");
+            shopBrief.count = shopBrief.ironCount;
+            shopBrief.money = shopBrief.ironMoney;
             shopBrief.ironTypeDesc = row.getString("ironTypeDesc");
         } else if (productType == 1){
             shopBrief.handingCount = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
             shopBrief.handingMoney = row.getFloat("money") == null ? 0 : row.getFloat("money");
+            shopBrief.count = shopBrief.handingCount;
+            shopBrief.money = shopBrief.handingMoney;
             shopBrief.handingTypeDesc = row.getString("handingTypeDesc");
         } else {
             shopBrief.count = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
