@@ -1,12 +1,11 @@
 package onefengma.demo.server.model.apibeans.product;
 
-import org.apache.commons.io.FileUtils;
-
 import java.io.File;
 
 import onefengma.demo.annotation.NotRequired;
 import onefengma.demo.common.FileHelper;
 import onefengma.demo.common.IdUtils;
+import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.model.apibeans.AuthSession;
 import onefengma.demo.server.model.product.IronProduct;
 
@@ -30,7 +29,9 @@ public class IronPushRequest extends AuthSession {
     public File image2;
     @NotRequired
     public File image3;
-    public boolean isSpec;
+
+    @NotRequired
+    public String isSpec;
 
     public IronProduct generateIconProduct() {
         IronProduct ironProduct = new IronProduct();
@@ -44,7 +45,13 @@ public class IronPushRequest extends AuthSession {
         ironProduct.price = price;
         ironProduct.cover = FileHelper.generateRelativeInternetUri(cover.getPath());
         ironProduct.surface = surface;
-        ironProduct.isSpec = isSpec;
+        if (!StringUtils.isEmpty(isSpec)) {
+            if (StringUtils.equalsIngcase("false", isSpec)) {
+                ironProduct.isSpec = false;
+            } else {
+                ironProduct.isSpec = true;
+            }
+        }
         ironProduct.pushTime = System.currentTimeMillis();
         ironProduct.numbers = numbers;
         if (image1 != null) {
