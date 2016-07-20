@@ -400,7 +400,7 @@ public class SellerDataHelper extends BaseDataHelper {
     }
 
     public Seller getSeller(String sellerId) {
-        String sql = "select " + generateFiledString(Seller.class) + " from seller where userId=:userId where passed=true ";
+        String sql = "select " + generateFiledString(Seller.class) + " from seller where userId=:userId and passed=true ";
         try(Connection conn = getConn()) {
             return conn.createQuery(sql).addParameter("userId", sellerId).executeAndFetchFirst(Seller.class);
         }
@@ -428,7 +428,7 @@ public class SellerDataHelper extends BaseDataHelper {
     }
 
     public List<String> getUserIdsByCompanyName(String companyName) {
-        String sql = "select userId from seller where companyName like '%" + companyName + "%'  where passed=true ";
+        String sql = "select userId from seller where companyName like '%" + companyName + "%'  and passed=true ";
         try(Connection conn = getConn()) {
             return  conn.createQuery(sql).executeAndFetch(String.class);
         }

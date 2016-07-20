@@ -1,5 +1,7 @@
 package onefengma.demo.server.model.product;
 
+import onefengma.demo.annotation.NotRequired;
+
 /**
  * Created by chufengma on 16/6/5.
  */
@@ -17,6 +19,7 @@ public class HandingProduct {
     public String userId;
     public long pushTime;
 
+    @NotRequired
     private String sourceCity;
 
     public String getSourceCity() {

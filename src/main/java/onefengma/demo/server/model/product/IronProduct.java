@@ -26,6 +26,7 @@ public class IronProduct {
     public long numbers;
     public boolean reviewed = false;
 
+    @NotRequired
     private String sourceCity;
 
     public String getSourceCity() {
