@@ -495,6 +495,22 @@ public class HandingDataHelper extends BaseDataHelper {
         }
     }
 
+    public void voteHanding(String id, float vote) {
+        String currentScoreSql = "select score from handing_product where id=:id";
+        String updateScoreSql = "update handing_product set score=:score where id=:id";
+        try(Connection conn = getConn()) {
+            Float currentScore = conn.createQuery(currentScoreSql).addParameter("id", id).executeScalar(Float.class);
+            currentScore = currentScore == null ? 0: currentScore;
+            float newScore = 0;
+            if (currentScore != 0) {
+                newScore = (vote + currentScore) / 2;
+            } else {
+                newScore = vote;
+            }
+            conn.createQuery(updateScoreSql).addParameter("score", newScore).addParameter("id", id).executeUpdate();
+        }
+    }
+
     public static class HandingBuyOfferDetail {
         public String id;
         public String handingId;

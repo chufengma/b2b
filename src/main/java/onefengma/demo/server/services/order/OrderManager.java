@@ -1,6 +1,5 @@
 package onefengma.demo.server.services.order;
 
-import com.alibaba.fastjson.JSON;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
@@ -8,17 +7,19 @@ import onefengma.demo.server.model.apibeans.AuthSession;
 import onefengma.demo.server.model.apibeans.BaseAuthPageBean;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.LastRecords;
-import onefengma.demo.server.model.apibeans.order.*;
+import onefengma.demo.server.model.apibeans.order.CarDeleteRequest;
+import onefengma.demo.server.model.apibeans.order.MyOrderRequest;
+import onefengma.demo.server.model.apibeans.order.OrderAllRequest;
 import onefengma.demo.server.model.apibeans.order.OrderAllRequest.OrderSingle;
-import onefengma.demo.server.model.order.Order;
+import onefengma.demo.server.model.apibeans.order.OrderCarAddRequest;
+import onefengma.demo.server.model.apibeans.order.OrderDeleteRequest;
+import onefengma.demo.server.model.apibeans.order.OrderRequest;
+import onefengma.demo.server.model.apibeans.order.VoteOrderRequest;
 import onefengma.demo.server.model.product.HandingDetail;
 import onefengma.demo.server.model.product.IronDetail;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
-import onefengma.demo.server.services.user.UserDataHelper;
-
-import java.util.List;
 
 /**
  * Created by chufengma on 16/6/18.

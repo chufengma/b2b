@@ -551,6 +551,22 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
+    public void voteIron(String ironId, float vote) {
+        String currentScoreSql = "select score from iron_product where proId=:proId";
+        String updateScoreSql = "update iron_product set score=:score where proId=:proId";
+        try(Connection conn = getConn()) {
+            Float currentScore = conn.createQuery(currentScoreSql).addParameter("proId", ironId).executeScalar(Float.class);
+            currentScore = currentScore == null ? 0: currentScore;
+            float newScore = 0;
+            if (currentScore != 0) {
+                newScore = (vote + currentScore) / 2;
+            } else {
+                newScore = vote;
+            }
+            conn.createQuery(updateScoreSql).addParameter("score", newScore).addParameter("proId", ironId).executeUpdate();
+        }
+    }
+
     public static class IronBuyOfferDetail {
         public String id;
         public String ironId;

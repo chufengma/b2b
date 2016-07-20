@@ -481,4 +481,20 @@ public class SellerDataHelper extends BaseDataHelper {
             return ironCount + handingCount;
         }
     }
+
+    public void voteSeller(String userId, float vote) {
+        String currentScoreSql = "select score from seller where userId=:userId";
+        String updateScoreSql = "update seller set score=:score where userId=:userId";
+        try(Connection conn = getConn()) {
+            Float currentScore = conn.createQuery(currentScoreSql).addParameter("userId", userId).executeScalar(Float.class);
+            currentScore = currentScore == null ? 0: currentScore;
+            float newScore = 0;
+            if (currentScore != 0) {
+                newScore = (vote + currentScore) / 2;
+            } else {
+                newScore = vote;
+            }
+            conn.createQuery(updateScoreSql).addParameter("score", newScore).addParameter("userId", userId).executeUpdate();
+        }
+    }
 }

@@ -24,6 +24,7 @@ import onefengma.demo.server.model.product.IronProductBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper;
+import onefengma.demo.server.services.user.SellerDataHelper;
 import onefengma.demo.server.services.user.UserDataHelper;
 
 /**
@@ -93,7 +94,27 @@ public class OrderDataHelper extends BaseDataHelper {
         String sql = "update product_orders set singleScore=:score,status=2 where id=:id";
         try(Connection conn = getConn()) {
             conn.createQuery(sql).addParameter("score", vote).addParameter("id", orderId).executeUpdate();
+            // 更新用户评分
+            SellerDataHelper.instance().voteSeller(OrderDataHelper.instance().getSellerUserId(conn, orderId), vote);
+            // 更新产品评分
+            int productType = getOrderProductType(conn, orderId);
+            if (productType == 0) {
+                IronDataHelper.getIronDataHelper().voteIron(getOrderProductId(conn, orderId), vote);
+            } else {
+                HandingDataHelper.getHandingDataHelper().voteHanding(getOrderProductId(conn, orderId), vote);
+            }
         }
+    }
+
+    public int getOrderProductType(Connection conn, String orderId) {
+        String orderSql = "select productType from product_orders where id=:id";
+        Integer type = conn.createQuery(orderSql).addParameter("id", orderId).executeScalar(Integer.class);
+        return type == null ? -1 : type;
+    }
+
+    public String getOrderProductId(Connection conn, String orderId) {
+        String orderSql = "select productId from product_orders where id=:id";
+        return conn.createQuery(orderSql).addParameter("id", orderId).executeScalar(String.class);
     }
 
     public MyOrdersResponse getMyOrders(PageBuilder pageBuilder, String userId) throws NoSuchFieldException, IllegalAccessException {
@@ -193,7 +214,7 @@ public class OrderDataHelper extends BaseDataHelper {
     }
 
     public String getSellerUserId(Connection conn, String orderId) {
-        String mobileSql = "select sellerId from user where id=:id";
+        String mobileSql = "select sellerId from product_orders where id=:id";
         return conn.createQuery(mobileSql).addParameter("id", orderId).executeScalar(String.class);
     }
 
