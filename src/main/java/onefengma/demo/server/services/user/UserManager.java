@@ -129,7 +129,6 @@ public class UserManager extends BaseManager {
             }
             Seller seller = requestBean.generateSeller();
             getSellerDataHelper().insertSeller(seller);
-            getUserDataHelper().setSeller(seller.userId, true);
             return success(seller);
         }));
 
