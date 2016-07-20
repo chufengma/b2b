@@ -268,10 +268,14 @@ public class SellerDataHelper extends BaseDataHelper {
                 shopBrief.companyName = row.getString("companyName");
                 shopBrief.cover = row.getString("cover");
                 shopBrief.handingCount = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
+                shopBrief.count = shopBrief.handingCount;
                 shopBrief.handingMoney = row.getFloat("money") == null ? 0 : row.getFloat("money");
+                shopBrief.money = shopBrief.handingMoney;
                 shopBrief.handingTypeDesc = row.getString("handingTypeDesc");
                 shopBrief.officeAddress = row.getString("officeAddress");
                 shopBrief.score = row.getFloat("score") == null ? 0 : row.getFloat("score");
+                Integer count = row.getInteger("productCount");
+                shopBrief.productNumbers = count == null ? 0 : count;
                 shopBriefs.add(shopBrief);
             }
             return shopBriefs;
