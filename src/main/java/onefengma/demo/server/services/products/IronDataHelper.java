@@ -12,7 +12,6 @@ import onefengma.demo.common.DateHelper;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.ThreadUtils;
 import onefengma.demo.server.core.BaseDataHelper;
-import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.others.HelpFindProduct;
 import onefengma.demo.server.model.apibeans.product.SellerIronBuysResponse;
@@ -76,7 +75,7 @@ public class IronDataHelper extends BaseDataHelper {
     public List<IronProductBrief> getIronProducts(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(IronProductBrief.class) +
                 " from iron_product " +
-                "left join (select productId, sum(count) as monthSellCount from product_orders where productType=0 and  finishTime<:endTime and finishTime>=:startTime) as orders " +
+                "left join (select productId, sum(totalMoney) as monthSellCount from product_orders where productType=0 and (status=1 or status=2) and finishTime<:endTime and finishTime>=:startTime) as orders " +
                 " on orders.productId = iron_product.proId " + generateWhereKey(pageBuilder, true);
 
         try (Connection conn = getConn()) {
@@ -95,7 +94,6 @@ public class IronDataHelper extends BaseDataHelper {
         String sql = "select count(*)" +
                 " from iron_buy " + generateWhereKey(pageBuilder, false);
 
-        LogUtils.i("------" + sql);
         try (Connection conn = getConn()) {
             return conn.createQuery(sql).executeScalar(Integer.class);
         }
