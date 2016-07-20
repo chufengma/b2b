@@ -1,5 +1,6 @@
 package onefengma.demo.server.services.user;
 
+import onefengma.demo.server.model.product.*;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -12,10 +13,6 @@ import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.core.UpdateBuilder;
 import onefengma.demo.server.model.Seller;
-import onefengma.demo.server.model.product.HandingBuyBrief;
-import onefengma.demo.server.model.product.IronBuyBrief;
-import onefengma.demo.server.model.product.ShopBrief;
-import onefengma.demo.server.model.product.ShopDetail;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper;
 
@@ -446,14 +443,14 @@ public class SellerDataHelper extends BaseDataHelper {
         String sql = "update seller set productCount=(productCount+1) where userId=:userId";
         String userId = "";
         if (productType == 0) {
-            IronBuyBrief buyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(proId);
-            if (buyBrief != null) {
-                userId = buyBrief.userId;
+            IronDetail ironDetail = IronDataHelper.getIronDataHelper().getIronProductById(proId);
+            if (ironDetail != null) {
+                userId = ironDetail.userId;
             }
         } else {
-            HandingBuyBrief handingBuyBrief = HandingDataHelper.getHandingDataHelper().getHandingBrief(proId);
-            if (handingBuyBrief != null) {
-                userId = handingBuyBrief.userId;
+            HandingDetail handingDetail = HandingDataHelper.getHandingDataHelper().getHandingProductById(proId);
+            if (handingDetail != null) {
+                userId = handingDetail.userId;
             }
         }
         conn.createQuery(sql).addParameter("userId", userId).executeUpdate();
