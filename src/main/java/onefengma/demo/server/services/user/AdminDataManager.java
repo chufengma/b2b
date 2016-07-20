@@ -372,7 +372,7 @@ public class AdminDataManager extends BaseDataHelper {
     }
 
     public AdminSellerVerifyResponse getSellerVerify(PageBuilder pageBuilder) {
-        String sql = "select * from seller where passed=false " + pageBuilder.generateLimit();
+        String sql = "select * from seller where passed=false order by applyTime desc " + pageBuilder.generateLimit();
         String countSql = "select count(*) from seller where passed=false ";
         AdminSellerVerifyResponse adminSellerVerifyResponse = new AdminSellerVerifyResponse();
         adminSellerVerifyResponse.currentPage = pageBuilder.currentPage;
@@ -443,7 +443,7 @@ public class AdminDataManager extends BaseDataHelper {
     }
 
     public AdminIronVerifyResponse getIronVerify(PageBuilder pageBuilder) {
-        String sql = "select * from iron_product where reviewed=false " + pageBuilder.generateLimit();
+        String sql = "select * from iron_product where reviewed=false order by pushTime desc " + pageBuilder.generateLimit();
         String countSql = "select count(*) from iron_product where reviewed=false ";
         AdminIronVerifyResponse adminIronVerifyResponse = new AdminIronVerifyResponse();
         adminIronVerifyResponse.currentPage = pageBuilder.currentPage;
@@ -503,7 +503,7 @@ public class AdminDataManager extends BaseDataHelper {
     }
 
     public AdminHandingVerifyResponse getHandingVerify(PageBuilder pageBuilder) {
-        String sql = "select * from handing_product where reviewed=false " + pageBuilder.generateLimit();
+        String sql = "select * from handing_product where reviewed=false order by pushTime desc " + pageBuilder.generateLimit();
         String countSql = "select count(*) from handing_product where reviewed=false ";
         AdminHandingVerifyResponse adminHandingVerifyResponse = new AdminHandingVerifyResponse();
         adminHandingVerifyResponse.currentPage = pageBuilder.currentPage;
