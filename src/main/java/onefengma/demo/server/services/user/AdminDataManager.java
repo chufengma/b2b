@@ -435,6 +435,13 @@ public class AdminDataManager extends BaseDataHelper {
         }
     }
 
+    public Seller getAdminSeller(String sellerId) {
+        String sql = "select " + generateFiledString(Seller.class) + " from seller where userId=:userId";
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql).addParameter("userId", sellerId).executeAndFetchFirst(Seller.class);
+        }
+    }
+
     public AdminIronVerifyResponse getIronVerify(PageBuilder pageBuilder) {
         String sql = "select * from iron_product where reviewed=false " + pageBuilder.generateLimit();
         String countSql = "select count(*) from iron_product where reviewed=false ";
