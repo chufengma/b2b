@@ -37,6 +37,7 @@ import onefengma.demo.server.model.apibeans.others.InnerMessageRequest;
 import onefengma.demo.server.model.apibeans.others.NewsDetailRequest;
 import onefengma.demo.server.model.product.HandingDetail;
 import onefengma.demo.server.model.product.IronDetail;
+import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import onefengma.demo.server.services.funcs.NewsDataHelper;
 import onefengma.demo.server.services.funcs.RecruitDataManager;
@@ -300,6 +301,7 @@ public class AdminManager extends BaseManager {
             if (ironDetail == null) {
                 return error("找不到该产品信息");
             }
+            ironDetail.setCityName(CityDataHelper.instance().getCityDescById(ironDetail.sourceCityId));
             return success(ironDetail);
         }));
 
@@ -327,6 +329,7 @@ public class AdminManager extends BaseManager {
             if (handingDetail == null) {
                 return error("找不到该产品信息");
             }
+            handingDetail.setCityName(CityDataHelper.instance().getCityDescById(handingDetail.souCityId));
             return success(handingDetail);
         }));
 
