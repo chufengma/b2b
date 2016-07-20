@@ -1,6 +1,5 @@
 package onefengma.demo.server.services.user;
 
-import onefengma.demo.server.services.funcs.CityDataHelper;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -24,6 +23,7 @@ import onefengma.demo.server.model.apibeans.admin.AdminOrdersResponse;
 import onefengma.demo.server.model.apibeans.admin.AdminSalessResponse;
 import onefengma.demo.server.model.apibeans.admin.AdminSellerVerifyResponse;
 import onefengma.demo.server.model.apibeans.others.HelpFindProduct;
+import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.HandingDataHelper.HandingBuyOfferDetail;
@@ -489,8 +489,9 @@ public class AdminDataManager extends BaseDataHelper {
             conn.createQuery(sql).addParameter("proId", proId)
                     .addParameter("message", message)
                     .addParameter("pass", pass).executeUpdate();
-
-           SellerDataHelper.instance().updateSellerProductCount(conn, 0, proId);
+            if (pass == 1) {
+                SellerDataHelper.instance().updateSellerProductCount(conn, 0, proId);
+            }
         });
     }
 
@@ -575,8 +576,9 @@ public class AdminDataManager extends BaseDataHelper {
             conn.createQuery(sql).addParameter("proId", proId)
                     .addParameter("message", message)
                     .addParameter("pass", pass).executeUpdate();
-
-            SellerDataHelper.instance().updateSellerProductCount(conn, 1, proId);
+            if (pass == 1) {
+                SellerDataHelper.instance().updateSellerProductCount(conn, 1, proId);
+            }
         }
     }
 

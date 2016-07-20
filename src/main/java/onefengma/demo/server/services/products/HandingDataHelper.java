@@ -1,9 +1,5 @@
 package onefengma.demo.server.services.products;
 
-import onefengma.demo.common.DateHelper;
-import onefengma.demo.common.ThreadUtils;
-import onefengma.demo.server.model.product.*;
-import onefengma.demo.server.services.order.TransactionDataHelper;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -12,14 +8,22 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import onefengma.demo.common.DateHelper;
 import onefengma.demo.common.StringUtils;
+import onefengma.demo.common.ThreadUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.product.SellerHandingBuysResponse;
+import onefengma.demo.server.model.product.HandingBuy;
+import onefengma.demo.server.model.product.HandingBuyBrief;
+import onefengma.demo.server.model.product.HandingDetail;
+import onefengma.demo.server.model.product.HandingProduct;
+import onefengma.demo.server.model.product.HandingProductBrief;
+import onefengma.demo.server.model.product.SupplyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
-import onefengma.demo.server.services.order.OrderDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper.SellerOffer;
+import onefengma.demo.server.services.user.SellerDataHelper;
 
 /**
  * Created by chufengma on 16/6/5.
@@ -474,12 +478,13 @@ public class HandingDataHelper extends BaseDataHelper {
         }
     }
 
-    public void deleteHandingProduct(String ironId) {
+    public void deleteHandingProduct(String ironId) throws Exception {
         String sql = "delete from handing_product where id=:proId";
-        try(Connection conn = getConn()) {
+        transaction((conn) -> {
             conn.createQuery(sql)
                     .addParameter("proId", ironId).executeUpdate();
-        }
+            SellerDataHelper.instance().deSellerProductCount(conn, 1, ironId);
+        });
     }
 
     public HandingBuyOfferDetail getWinSellerOffer(String handingBuyId, String userId) {

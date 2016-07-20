@@ -435,7 +435,7 @@ public class SellerDataHelper extends BaseDataHelper {
     }
 
     public void updateSellerProductCount(Connection conn, int productType, String proId) throws NoSuchFieldException, IllegalAccessException {
-        String sql = "select seller set productCount=(productCount+1) where userId=:userId";
+        String sql = "update seller set productCount=(productCount+1) where userId=:userId";
         String userId = "";
         if (productType == 0) {
             IronBuyBrief buyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(proId);
@@ -450,4 +450,22 @@ public class SellerDataHelper extends BaseDataHelper {
         }
         conn.createQuery(sql).addParameter("userId", userId).executeUpdate();
     }
+
+    public void deSellerProductCount(Connection conn, int productType, String proId) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "update seller set productCount=(productCount-1) where userId=:userId";
+        String userId = "";
+        if (productType == 0) {
+            IronBuyBrief buyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(proId);
+            if (buyBrief != null) {
+                userId = buyBrief.userId;
+            }
+        } else {
+            HandingBuyBrief handingBuyBrief = HandingDataHelper.getHandingDataHelper().getHandingBrief(proId);
+            if (handingBuyBrief != null) {
+                userId = handingBuyBrief.userId;
+            }
+        }
+        conn.createQuery(sql).addParameter("userId", userId).executeUpdate();
+    }
+
 }

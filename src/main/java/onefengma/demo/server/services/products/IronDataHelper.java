@@ -27,6 +27,7 @@ import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import onefengma.demo.server.services.order.OrderDataHelper;
 import onefengma.demo.server.services.order.TransactionDataHelper;
+import onefengma.demo.server.services.user.SellerDataHelper;
 
 /**
  * @author yfchu
@@ -526,11 +527,12 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
-    public void deleteIronProduct(String ironId) {
+    public void deleteIronProduct(String ironId) throws NoSuchFieldException, IllegalAccessException {
         String sql = "delete from iron_product where proId=:proId";
         try(Connection conn = getConn()) {
             conn.createQuery(sql)
                     .addParameter("proId", ironId).executeUpdate();
+            SellerDataHelper.instance().deSellerProductCount(conn, 0, ironId);
         }
     }
 

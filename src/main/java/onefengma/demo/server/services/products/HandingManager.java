@@ -1,22 +1,33 @@
 package onefengma.demo.server.services.products;
 
+import java.util.ArrayList;
+
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.BaseAuthPageBean;
-import onefengma.demo.server.model.apibeans.product.*;
 import onefengma.demo.server.model.apibeans.BaseBean;
+import onefengma.demo.server.model.apibeans.product.DeleteHandingProductRequest;
+import onefengma.demo.server.model.apibeans.product.HandingBuyRequest;
+import onefengma.demo.server.model.apibeans.product.HandingBuysResponse;
+import onefengma.demo.server.model.apibeans.product.HandingDetailRequest;
+import onefengma.demo.server.model.apibeans.product.HandingGetRequest;
+import onefengma.demo.server.model.apibeans.product.HandingGetResponse;
+import onefengma.demo.server.model.apibeans.product.HandingPushRequest;
+import onefengma.demo.server.model.apibeans.product.MyHandingBuyDetail;
+import onefengma.demo.server.model.apibeans.product.MyHandingBuysResponse;
+import onefengma.demo.server.model.apibeans.product.MyHandingDetailResponse;
+import onefengma.demo.server.model.apibeans.product.MyHandingProductResponse;
+import onefengma.demo.server.model.apibeans.product.SelectHandingSupply;
+import onefengma.demo.server.model.apibeans.product.UpdateHandingProductRequest;
 import onefengma.demo.server.model.metaData.HandingDataCategory;
 import onefengma.demo.server.model.product.HandingBuy;
 import onefengma.demo.server.model.product.HandingDetail;
-import onefengma.demo.server.model.product.HandingProduct;
 import onefengma.demo.server.model.product.SupplyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.order.OrderDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
 import onefengma.demo.server.services.user.UserDataHelper;
-
-import java.util.ArrayList;
 
 /**
  * Created by chufengma on 16/6/5.
@@ -75,6 +86,7 @@ public class HandingManager extends BaseManager{
                     .addEqualWhere("handingType", requestBean.handingType)
                     .addInWhere("souCityId", CityDataHelper.instance().getCitiesById(new ArrayList<>(), requestBean.cityId))
                     .addEqualWhere("userId", requestBean.userId)
+                    .addEqualWhere("status", 0)
                     .addOrderBy("pushTime", true);
             handingGetResponse.handings = HandingDataHelper.getHandingDataHelper().getHandingBuys(pageBuilder);
             handingGetResponse.maxCount = HandingDataHelper.getHandingDataHelper().getMaxBuyCount(pageBuilder);

@@ -1,12 +1,26 @@
 package onefengma.demo.server.services.products;
 
+import java.util.ArrayList;
+
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.config.Config;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.BaseAuthPageBean;
 import onefengma.demo.server.model.apibeans.BaseBean;
-import onefengma.demo.server.model.apibeans.product.*;
+import onefengma.demo.server.model.apibeans.product.DeleteIronProductRequest;
+import onefengma.demo.server.model.apibeans.product.IronBuyRequest;
+import onefengma.demo.server.model.apibeans.product.IronBuyResponse;
+import onefengma.demo.server.model.apibeans.product.IronDetailRequest;
+import onefengma.demo.server.model.apibeans.product.IronPushRequest;
+import onefengma.demo.server.model.apibeans.product.IronsGetRequest;
+import onefengma.demo.server.model.apibeans.product.IronsGetResponse;
+import onefengma.demo.server.model.apibeans.product.MyIronBuyDetail;
+import onefengma.demo.server.model.apibeans.product.MyIronBuyDetailResponse;
+import onefengma.demo.server.model.apibeans.product.MyIronBuysResponse;
+import onefengma.demo.server.model.apibeans.product.MyIronProductResponse;
+import onefengma.demo.server.model.apibeans.product.SelectIronSupply;
+import onefengma.demo.server.model.apibeans.product.UpdateIronProductRequest;
 import onefengma.demo.server.model.metaData.IconDataCategory;
 import onefengma.demo.server.model.product.IronBuy;
 import onefengma.demo.server.model.product.IronDetail;
@@ -15,8 +29,6 @@ import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.order.OrderDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
 import onefengma.demo.server.services.user.UserDataHelper;
-
-import java.util.ArrayList;
 
 /**
  * @author yfchu
@@ -137,6 +149,7 @@ public class IronManager extends BaseManager {
                     .addEqualWhere("proPlace", requestBean.proPlace)
                     .addInWhere("locationCityId", CityDataHelper.instance().getCitiesById(new ArrayList<>(), requestBean.cityId))
                     .addEqualWhere("userId", requestBean.userId)
+                    .addEqualWhere("status", 0)
                     .addOrderBy("pushTime", true);
 
             ironBuyResponse.maxCount = IronDataHelper.getIronDataHelper().getMaxIronBuyCounts(pageBuilder);
