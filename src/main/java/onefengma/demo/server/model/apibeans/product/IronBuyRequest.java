@@ -15,7 +15,7 @@ public class IronBuyRequest extends AuthSession {
     public String proPlace;
     public String locationCityId;
     @NotRequired
-    public String message;
+    public String message = "";
     public long length;
     public long width;
     public long height;

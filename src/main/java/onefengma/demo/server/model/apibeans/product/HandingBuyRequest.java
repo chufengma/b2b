@@ -12,7 +12,7 @@ public class HandingBuyRequest extends AuthSession {
     public String handingType;
     public String souCityId;
     @NotRequired
-    public String message;
+    public String message = "";
     public long timeLimit;
 
     public HandingBuy generateBuy() {

@@ -433,10 +433,11 @@ public class HandingDataHelper extends BaseDataHelper {
     }
 
     public boolean isOffered(String sellerId, String handingId) {
-        String sql = "select count(*) from handing_buy_supply where handingId=:handingId";
+        String sql = "select count(*) from handing_buy_supply where handingId=:handingId and sellerId=:sellerId";
         try(Connection conn = getConn()) {
-            Integer count = conn.createQuery(sql).addParameter("handingId", handingId).executeScalar(Integer.class);
-            return count != null && count != 0;
+            Integer count = conn.createQuery(sql).addParameter("handingId", handingId)
+                    .addParameter("sellerId", sellerId).executeScalar(Integer.class);
+            return count != null && count > 0;
         }
     }
 
