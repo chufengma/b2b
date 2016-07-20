@@ -1,5 +1,6 @@
 package onefengma.demo.server.services.user;
 
+import onefengma.demo.server.services.funcs.CityDataHelper;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -532,7 +533,7 @@ public class AdminDataManager extends BaseDataHelper {
         return adminHandingVerifyResponse;
     }
 
-    public AdminHelpFindProductResponse getHelpFindProducts(PageBuilder pageBuilder) {
+    public AdminHelpFindProductResponse getHelpFindProducts(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(HelpFindProduct.class) + " from help_find_product " + pageBuilder.generateLimit();
         String countSql = "select count(*) from help_find_product";
         AdminHelpFindProductResponse response = new AdminHelpFindProductResponse();
@@ -543,6 +544,11 @@ public class AdminDataManager extends BaseDataHelper {
             Integer count = conn.createQuery(countSql).executeScalar(Integer.class);
             count = count == null ? 0 : count;
             response.maxCount = count;
+            if (response.requests != null) {
+                for(HelpFindProduct helpFindProduct : response.requests) {
+                    helpFindProduct.city = CityDataHelper.instance().getCityDescById(helpFindProduct.city);
+                }
+            }
         }
         return response;
     }
