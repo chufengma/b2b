@@ -295,7 +295,7 @@ public class IronDataHelper extends BaseDataHelper {
                 supplyBrief.sellerId = row.getString("userId");
                 supplyBrief.status = row.getInteger("status");
                 supplyBrief.supplyMsg = row.getString("supplyMsg");
-                supplyBrief.winningTimes = row.getInteger("winningTimes");
+                supplyBrief.winningTimes = SellerDataHelper.instance().getUserSupplyWinnerTimes(supplyBrief.sellerId);
                 supplyBrief.supplyPrice = row.getFloat("supplyPrice");
                 supplyBrief.unit = row.getString("unit");
                 supplyBrief.offerTime = row.getLong("offerTime");

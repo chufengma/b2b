@@ -468,4 +468,17 @@ public class SellerDataHelper extends BaseDataHelper {
         conn.createQuery(sql).addParameter("userId", userId).executeUpdate();
     }
 
+    public int getUserSupplyWinnerTimes(String userId) {
+        String handingSql = "SELECT count(*) FROM handing_buy where supplyUserId = :userId";
+        String ironSql = "SELECT count(*) FROM iron_buy where supplyUserId = :userId";
+        try(Connection conn = getConn()) {
+            Integer handingCount = conn.createQuery(handingSql).addParameter("userId", userId).executeScalar(Integer.class);
+            handingCount = handingCount == null ? 0 : handingCount;
+
+            Integer ironCount = conn.createQuery(ironSql).addParameter("userId", userId).executeScalar(Integer.class);
+            ironCount = ironCount == null ? 0 : ironCount;
+
+            return ironCount + handingCount;
+        }
+    }
 }
