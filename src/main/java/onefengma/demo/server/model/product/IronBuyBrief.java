@@ -18,6 +18,7 @@ public class IronBuyBrief {
     public long width;
     public long height;
     public String tolerance;
+    public String unit;
     public long numbers;
     public long timeLimit;
     public int status; // 0 待报价, 1 交易完成 , 2 过期, 3 已报价候选中, 4 我已中标

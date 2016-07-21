@@ -4,9 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 
 import onefengma.demo.common.DateHelper.TimeRange;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.sql2o.Connection;
 import org.sql2o.Query;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -37,7 +41,13 @@ public class ReDemo {
     private String ccc = "fengma2";
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException, UnsupportedEncodingException {
-        System.out.println("----" + (long)((long)1908 / 1000) * 0.3f);
+        try {
+            Document doc = Jsoup.connect("http://www.banksteel.com/").get();
+            Elements items = doc.select(".slide-items");
+            System.out.println("----" + items.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     protected  static  String createInsertSql(String table, Class clazz) {

@@ -23,6 +23,7 @@ public class IronBuyRequest extends AuthSession {
     public String toleranceTo;
     public long numbers;
     public long timeLimit;
+    public String unit;
 
     public IronBuy generateIronBug() {
         IronBuy ironBuy = new IronBuy();
@@ -42,6 +43,7 @@ public class IronBuyRequest extends AuthSession {
         ironBuy.tolerance = toleranceFrom + "-" + toleranceTo;
         ironBuy.numbers = numbers;
         ironBuy.timeLimit = timeLimit;
+        ironBuy.unit = unit;
         return ironBuy;
     }
 }

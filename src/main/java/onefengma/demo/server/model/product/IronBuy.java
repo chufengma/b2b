@@ -21,4 +21,5 @@ public class IronBuy {
     public long numbers;
     public long timeLimit;
     public int salesmanId;
+    public String unit;
 }
