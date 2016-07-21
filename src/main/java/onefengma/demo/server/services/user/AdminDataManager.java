@@ -313,12 +313,14 @@ public class AdminDataManager extends BaseDataHelper {
         String maxCountSql = "select count(*) from salesman where id<>0 " + (pageBuilder.hasWhere() ? " and " : " ") + pageBuilder.generateWhere() + " ";
         String userCountSql = "select userId from user where salesManId=:id and salesBindTime<:endTime and salesBindTime>=:startTime  ";
 
-        String orderMoneySql = "select sum(totalMoney) from product_orders where buyerId=:buyerId and status=1 and finishTime<:endTime and finishTime>=:startTime";
+        String orderMoneySql = "select sum(totalMoney) from product_orders " +
+                "where buyerId=:buyerId and (status=1 or status=2) and finishTime<:endTime and finishTime>=:startTime";
+
         String handingBuyMoneySql = "select sum(supplyPrice) from handing_buy,handing_buy_supply " +
                 "where handing_buy.supplyUserId = handing_buy_supply.sellerId and handing_buy_supply.sellerId=:userId" +
                 " and supplyWinTime<:endTime and supplyWinTime>=:startTime ";
-        String ironBuyMoneySql = "select sum(supplyPrice*numbers) from iron_buy,iron_buy_supply " +
-                "where iron_buy.supplyUserId = iron_buy_supply.sellerId and iron_buy_supply.sellerId=:userId" +
+
+        String ironBuyMoneySql = "select sum(supplyPrice*numbers) from iron_buy where status=1 and userId=:userId " +
                 " and supplyWinTime<:endTime and supplyWinTime>=:startTime ";
 
         AdminSalessResponse adminSalessResponse = new AdminSalessResponse();
@@ -347,11 +349,11 @@ public class AdminDataManager extends BaseDataHelper {
                             .addParameter("buyerId", userId).executeScalar(Float.class);
                     orderTotal = orderTotal == null ? 0 : orderTotal;
 
-                    Float handingBuyTotal = conn.createQuery(handingBuyMoneySql)
-                            .addParameter("startTime", startTime)
-                            .addParameter("endTime", endTime)
-                            .addParameter("userId", userId).executeScalar(Float.class);
-                    handingBuyTotal = handingBuyTotal == null ? 0 : handingBuyTotal;
+//                    Float handingBuyTotal = conn.createQuery(handingBuyMoneySql)
+//                            .addParameter("startTime", startTime)
+//                            .addParameter("endTime", endTime)
+//                            .addParameter("userId", userId).executeScalar(Float.class);
+//                    handingBuyTotal = handingBuyTotal == null ? 0 : handingBuyTotal;
 
                     Float ironBuyTotal = conn.createQuery(ironBuyMoneySql)
                             .addParameter("startTime", startTime)
@@ -359,7 +361,7 @@ public class AdminDataManager extends BaseDataHelper {
                             .addParameter("userId", userId).executeScalar(Float.class);
                     ironBuyTotal = ironBuyTotal == null ? 0 : ironBuyTotal;
 
-                    salesManAdmin.totalMoney += handingBuyTotal + ironBuyTotal + orderTotal;
+                    salesManAdmin.totalMoney += ironBuyTotal + orderTotal;
                 }
                 admins.add(salesManAdmin);
             }
