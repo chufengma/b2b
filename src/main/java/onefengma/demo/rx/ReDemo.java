@@ -52,11 +52,11 @@ public class ReDemo {
                 String name = element.select("h4").first().html();
                 System.out.println("-----" + title + ":" + name);
             }
-            Elements full = items.select("full");
-            for(Element element : infos) {
+            Elements full = items.select(".full");
+            for(Element element : full) {
                 Elements ps = element.select("p");
                 String compairValue = ps.get(1).html();
-                String rightValue = ps.get(3).html();
+                String rightValue = ps.get(2).html();
                 System.out.println("-----" + compairValue + ":" + rightValue);
             }
         } catch (IOException e) {
