@@ -202,8 +202,8 @@ public class IronManager extends BaseManager {
                 for(SupplyBrief supplyBrief : myIronBuyDetailResponse.supplies) {
                     if (StringUtils.equals(myIronBuyDetailResponse.buy.supplyUserId, supplyBrief.sellerId)) {
                         supplyBrief.isWinner = true;
-                        supplyBrief.mobile = UserDataHelper.instance().getUserMobile(supplyBrief.sellerId);
                     }
+                    supplyBrief.mobile = UserDataHelper.instance().getUserMobile(supplyBrief.sellerId);
                 }
             }
 

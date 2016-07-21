@@ -119,8 +119,8 @@ public class HandingManager extends BaseManager{
                 for(SupplyBrief supplyBrief : myHandingDetailResponse.supplies) {
                     if (StringUtils.equals(myHandingDetailResponse.buy.supplyUserId, supplyBrief.sellerId)) {
                         supplyBrief.isWinner = true;
-                        supplyBrief.mobile = UserDataHelper.instance().getUserMobile(supplyBrief.sellerId);
                     }
+                    supplyBrief.mobile = UserDataHelper.instance().getUserMobile(supplyBrief.sellerId);
                 }
             }
 
