@@ -6,6 +6,7 @@ import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import onefengma.demo.common.DateHelper.TimeRange;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.sql2o.Connection;
 import org.sql2o.Query;
@@ -43,8 +44,21 @@ public class ReDemo {
     public static void main(String[] args) throws IllegalAccessException, InstantiationException, UnsupportedEncodingException {
         try {
             Document doc = Jsoup.connect("http://www.banksteel.com/").get();
-            Elements items = doc.select(".slide-items");
-            System.out.println("----" + items.toString());
+            Elements items = doc.select(".mod");
+            Elements infos = items.select(".info");
+            System.out.println("-----" + items);
+            for(Element element : infos) {
+                String title = element.select(".price-tit").first().attr("title");
+                String name = element.select("h4").first().html();
+                System.out.println("-----" + title + ":" + name);
+            }
+            Elements full = items.select("full");
+            for(Element element : infos) {
+                Elements ps = element.select("p");
+                String compairValue = ps.get(1).html();
+                String rightValue = ps.get(3).html();
+                System.out.println("-----" + compairValue + ":" + rightValue);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
