@@ -83,6 +83,7 @@ public class OrderManager extends BaseManager{
                 if (!StringUtils.isEmpty(checkResult)) {
                     return error(checkResult);
                 }
+
                 OrderDataHelper.instance().translate(requestBean.generateOrder(order), true, order.carId);
             }
             return success();

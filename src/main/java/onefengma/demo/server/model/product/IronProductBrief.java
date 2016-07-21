@@ -14,6 +14,7 @@ public class IronProductBrief {
     public float score;
     public String title;
     public boolean isSpec;
+    public String unit;
 
     public String sourceCityId;
     private String sourceCity;

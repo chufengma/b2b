@@ -179,6 +179,7 @@ public class OrderDataHelper extends BaseDataHelper {
                 orderBrief.desc = ironRow.getString("material") + " " + ironRow.getString("ironType")
                         + ironRow.getString("surface") + " "
                         + ironRow.getString("title");
+                orderBrief.unit = ironRow.getString("unit");
                 orderBrief.city = CityDataHelper.instance().getCityDescById(ironRow.getString("sourceCityId"));
             }
         } else {
@@ -187,6 +188,7 @@ public class OrderDataHelper extends BaseDataHelper {
                 Row ironRow = handingTable.rows().get(0);
                 orderBrief.price = ironRow.getFloat("price");
                 orderBrief.cover = ironRow.getString("cover");
+                orderBrief.unit = ironRow.getString("unit");
                 orderBrief.desc = ironRow.getString("type");
                 orderBrief.city = CityDataHelper.instance().getCityDescById(ironRow.getString("souCityId"));
             }
@@ -318,6 +320,7 @@ public class OrderDataHelper extends BaseDataHelper {
                                 + ironProductBrief.ironType + " "
                                 + ironProductBrief.surface + " "
                                 + ironProductBrief.title;
+                        brief.unit = ironProductBrief.unit;
                     }
                 } else if (brief.productType == 1) {
                     HandingProductBrief handingProductBrief = conn.createQuery(handingSql).addParameter("id", brief.proId).executeAndFetchFirst(HandingProductBrief.class);
@@ -326,6 +329,7 @@ public class OrderDataHelper extends BaseDataHelper {
                         brief.price = handingProductBrief.price;
                         brief.sourceCity = CityDataHelper.instance().getCityDescById(handingProductBrief.souCityId);
                         brief.desc = handingProductBrief.type;
+                        brief.unit = handingProductBrief.unit;
                     }
                 }
                 productBriefs.add(brief);

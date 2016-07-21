@@ -1,12 +1,11 @@
 package onefengma.demo.server.model.apibeans.order;
 
-import com.sun.org.apache.xpath.internal.operations.Or;
+import java.util.ArrayList;
+import java.util.List;
+
 import onefengma.demo.annotation.NotRequired;
 import onefengma.demo.server.model.apibeans.AuthSession;
 import onefengma.demo.server.model.order.Order;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by chufengma on 16/6/18.
@@ -14,6 +13,8 @@ import java.util.List;
 public class OrderAllRequest extends AuthSession {
 
     public long timeLimit;
+    @NotRequired
+    public String message = "";
     public List<OrderSingle> orders;
 
     @NotRequired
@@ -36,6 +37,7 @@ public class OrderAllRequest extends AuthSession {
         order.status = 0;
         order.sellTime = System.currentTimeMillis();
         order.timeLimit = timeLimit;
+        order.message = message;
         return order;
     }
 

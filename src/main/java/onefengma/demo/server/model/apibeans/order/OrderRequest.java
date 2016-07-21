@@ -14,6 +14,8 @@ public class OrderRequest extends AuthSession {
     public long timeLimit;
 
     @NotRequired
+    public String message;
+    @NotRequired
     public boolean isFromCar = false;
     @NotRequired
     public int carId;
@@ -27,6 +29,7 @@ public class OrderRequest extends AuthSession {
         order.status = 0;
         order.sellTime = System.currentTimeMillis();
         order.timeLimit = timeLimit;
+        order.message = message;
         return order;
     }
 }

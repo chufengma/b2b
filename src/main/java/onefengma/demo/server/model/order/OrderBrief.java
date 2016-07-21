@@ -20,6 +20,8 @@ public class OrderBrief {
 
     public float score;
 
+    public String unit;
+
     public String sellerMobile;
     public String buyerMobile;
 }

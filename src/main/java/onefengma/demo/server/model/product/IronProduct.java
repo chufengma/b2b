@@ -25,6 +25,7 @@ public class IronProduct {
     public long pushTime;
     public long numbers;
     public boolean reviewed = false;
+    public String unit;
 
     @NotRequired
     private String sourceCity;

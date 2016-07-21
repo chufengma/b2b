@@ -92,7 +92,9 @@ public class IronManager extends BaseManager {
             if (!CityDataHelper.instance().isCityExist(requestBean.sourceCityId)) {
                 return errorAndClear(requestBean, "货源产地不存在");
             }
-
+            if (!IconDataCategory.get().units.contains(requestBean.unit)) {
+                return errorAndClear(requestBean, "单位选整卷油磨择有误");
+            }
             if (requestBean.cover == null) {
                 return errorAndClear(requestBean, "产品封面必须填写");
             }

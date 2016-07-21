@@ -1,6 +1,5 @@
 package onefengma.demo.server.model.apibeans.product;
 
-import onefengma.demo.annotation.NotRequired;
 import onefengma.demo.server.model.apibeans.AuthSession;
 
 /**
@@ -10,4 +9,5 @@ public class OfferIronRequest extends AuthSession {
     public String ironId;
     public float price;
     public String msg;
+    public String unit;
 }

@@ -15,4 +15,5 @@ public class Order {
     public long sellTime;
     public int status;
     public float totalMoney;
+    public String message = "";
 }

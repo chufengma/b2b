@@ -29,7 +29,8 @@ public class IronPushRequest extends AuthSession {
     public File image2;
     @NotRequired
     public File image3;
-
+    @NotRequired
+    public String unit = "kg";
     @NotRequired
     public String isSpec;
 
@@ -45,6 +46,7 @@ public class IronPushRequest extends AuthSession {
         ironProduct.price = price;
         ironProduct.cover = FileHelper.generateRelativeInternetUri(cover.getPath());
         ironProduct.surface = surface;
+        ironProduct.unit = unit;
         if (!StringUtils.isEmpty(isSpec)) {
             if (StringUtils.equalsIngcase("false", isSpec)) {
                 ironProduct.isSpec = false;

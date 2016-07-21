@@ -445,7 +445,7 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
-    public void offerIronBuy(String sellerId, String ironId, float price, String msg) throws Exception {
+    public void offerIronBuy(String sellerId, String ironId, float price, String msg, String unit) throws Exception {
         String sql = "insert into iron_buy_supply set " +
                 "ironId=:ironId, " +
                 "sellerId=:sellerId, " +
@@ -462,7 +462,7 @@ public class IronDataHelper extends BaseDataHelper {
                     .addParameter("price", price)
                     .addParameter("msg", msg)
                     .addParameter("time", System.currentTimeMillis())
-                    .addParameter("unit", "kg")
+                    .addParameter("unit", unit)
                     .executeUpdate();
 
             addInBuySeller(conn, ironId, sellerId);

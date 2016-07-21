@@ -11,15 +11,20 @@ import onefengma.demo.server.model.apibeans.AuthSession;
 import onefengma.demo.server.model.apibeans.BaseAuthPageBean;
 import onefengma.demo.server.model.apibeans.UpdateSellerRequest;
 import onefengma.demo.server.model.apibeans.order.ConfirmSellerOrder;
-import onefengma.demo.server.model.apibeans.product.*;
+import onefengma.demo.server.model.apibeans.product.OfferHandingRequest;
+import onefengma.demo.server.model.apibeans.product.OfferIronRequest;
+import onefengma.demo.server.model.apibeans.product.SellerHandingBuyDetailRequest;
+import onefengma.demo.server.model.apibeans.product.SellerHandingBuyDetailResponse;
+import onefengma.demo.server.model.apibeans.product.SellerIronBuyDetailRequest;
+import onefengma.demo.server.model.apibeans.product.SellerIronBuyDetailResponse;
 import onefengma.demo.server.model.metaData.City;
 import onefengma.demo.server.model.product.HandingBuyBrief;
 import onefengma.demo.server.model.product.IronBuyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper;
-import onefengma.demo.server.services.products.IronManager;
-import onefengma.demo.server.services.user.*;
+import onefengma.demo.server.services.user.SellerDataHelper;
+import onefengma.demo.server.services.user.UserDataHelper;
 
 /**
  * Created by chufengma on 16/7/7.
@@ -124,7 +129,7 @@ public class SellerManager extends BaseManager {
                     return error("无法对自己的求购进行报价");
                 }
             }
-            IronDataHelper.getIronDataHelper().offerIronBuy(requestBean.getUserId(), requestBean.ironId, requestBean.price, requestBean.msg);
+            IronDataHelper.getIronDataHelper().offerIronBuy(requestBean.getUserId(), requestBean.ironId, requestBean.price, requestBean.msg, requestBean.unit);
             return success();
         }));
 

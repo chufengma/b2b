@@ -11,4 +11,5 @@ public class CarProductBrief {
     public int productType;
     public float price;
     public String sourceCity;
+    public String unit;
 }

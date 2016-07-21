@@ -1,7 +1,5 @@
 package onefengma.demo.server.model.product;
 
-import onefengma.demo.annotation.NotRequired;
-
 /**
  * Created by chufengma on 16/7/3.
  */
@@ -27,6 +25,7 @@ public class IronDetail {
     public boolean reviewed;
     public float monthSellCount;
     public float score;
+    public String unit;
 
 
     private String cityName;
