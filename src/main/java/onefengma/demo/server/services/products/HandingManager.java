@@ -68,6 +68,11 @@ public class HandingManager extends BaseManager{
         }));
 
         post("buy", HandingBuyRequest.class, ((request, response, requestBean) -> {
+
+            if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
+                return error("您不是企业用户，不能发布求购, 请前往后台点击成为商家上传公司三证等相关资料");
+            }
+
             if (!HandingDataCategory.get().handingTypes.contains(requestBean.handingType)) {
                 return errorAndClear(requestBean, "加工种类选择有误");
             }

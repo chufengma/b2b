@@ -239,7 +239,7 @@ public class AdminDataManager extends BaseDataHelper {
         return adminOrdersResponse;
     }
 
-    public AdminBuysResponse getBuysForAdmin(PageBuilder pageBuilder, int productType) {
+    public AdminBuysResponse getBuysForAdmin(PageBuilder pageBuilder, int productType) throws NoSuchFieldException, IllegalAccessException {
         String tableName = "";
         if (productType == 0) {
             tableName = "iron_buy";
@@ -270,12 +270,17 @@ public class AdminDataManager extends BaseDataHelper {
                         buyForAdmin.supplyPrice = detail.supplyPrice;
                         buyForAdmin.totalMoney = buyForAdmin.supplyPrice * buyForAdmin.count;
                     }
+                    buyForAdmin.desc = row.getString("ironType") + " " + row.getString("material")
+                            + " " + row.getString("surface") + " " + CityDataHelper.instance().getCityDescById(row.getString("locationCityId"));
+
                 } else {
                     HandingBuyOfferDetail detail = HandingDataHelper.getHandingDataHelper().getWinSellerOffer(buyForAdmin.buyId, supplyUserId);
                     if (detail != null) {
                         buyForAdmin.supplyPrice = detail.supplyPrice;
                         buyForAdmin.totalMoney = buyForAdmin.supplyPrice * buyForAdmin.count;
                     }
+
+                    buyForAdmin.desc = row.getString("handingType") + " " + CityDataHelper.instance().getCityDescById(row.getString("souCityId"));
                 }
                 buyForAdmin.pushTime = row.getLong("pushTime");
                 buyForAdmin.outDateTime = buyForAdmin.pushTime + row.getLong("timeLimit");
@@ -773,6 +778,8 @@ public class AdminDataManager extends BaseDataHelper {
         public int status;   // ok
         public int salesManId;   // ok
         public String salesManMobile; // ok
+
+        public String desc;
     }
 
     public static class OrderForAdmin {
