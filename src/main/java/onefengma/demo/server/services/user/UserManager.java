@@ -19,6 +19,7 @@ import onefengma.demo.server.model.innermessage.InnerMessagesResponse;
 import onefengma.demo.server.model.metaData.City;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
+import onefengma.demo.server.services.user.UserMessageDataHelper.UserMessage;
 
 /**
  * @author yfchu
@@ -206,6 +207,13 @@ public class UserManager extends BaseManager {
             UserDataHelper.instance().changeUserPassword(userId, IdUtils.md5(requestBean.newPassword));
             return success();
         }));
+
+        get("message", AuthSession.class, (request, response, requestBean) -> {
+            UserMessage userMessage = new UserMessage();
+            userMessage.message = UserMessageDataHelper.instance().getUserMessage(requestBean.getUserId());
+            userMessage.userId = requestBean.getUserId();
+            return success(userMessage);
+        });
 
         // just for test
         multiPost("upload", UploadDemo.class, (request, response, requestBean) -> {
