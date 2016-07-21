@@ -125,7 +125,7 @@ public class AdminDataManager extends BaseDataHelper {
         String companySql = StringUtils.isEmpty(companyName) ? "" :  "and companyName like '%" + companyName +"%' ";
 
         String maxCountSql = "select count(*) from user,seller,salesman where user.userId=seller.userId and user.salesManId=salesman.id "
-                + " and registerTime<:registerEndTime and registerTime>=:registerStartTime "
+                + " and registerTime<:registerEndTime and registerTime>=:registerStartTime " + companySql
                 + ((StringUtils.isEmpty(whereSql)) ? "" : " and " + whereSql);
 
         String sellerSql = "select userId,integral,companyName, " +

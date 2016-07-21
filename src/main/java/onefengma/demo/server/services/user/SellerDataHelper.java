@@ -1,5 +1,6 @@
 package onefengma.demo.server.services.user;
 
+import onefengma.demo.server.model.product.*;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -12,10 +13,6 @@ import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.core.UpdateBuilder;
 import onefengma.demo.server.model.Seller;
-import onefengma.demo.server.model.product.HandingBuyBrief;
-import onefengma.demo.server.model.product.IronBuyBrief;
-import onefengma.demo.server.model.product.ShopBrief;
-import onefengma.demo.server.model.product.ShopDetail;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper;
 
@@ -165,10 +162,14 @@ public class SellerDataHelper extends BaseDataHelper {
         if (productType == 0) {
             shopBrief.ironCount = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
             shopBrief.ironMoney = row.getFloat("money") == null ? 0 : row.getFloat("money");
+            shopBrief.count = shopBrief.ironCount;
+            shopBrief.money = shopBrief.ironMoney;
             shopBrief.ironTypeDesc = row.getString("ironTypeDesc");
         } else if (productType == 1){
             shopBrief.handingCount = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
             shopBrief.handingMoney = row.getFloat("money") == null ? 0 : row.getFloat("money");
+            shopBrief.count = shopBrief.handingCount;
+            shopBrief.money = shopBrief.handingMoney;
             shopBrief.handingTypeDesc = row.getString("handingTypeDesc");
         } else {
             shopBrief.count = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
@@ -268,10 +269,14 @@ public class SellerDataHelper extends BaseDataHelper {
                 shopBrief.companyName = row.getString("companyName");
                 shopBrief.cover = row.getString("cover");
                 shopBrief.handingCount = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
+                shopBrief.count = shopBrief.handingCount;
                 shopBrief.handingMoney = row.getFloat("money") == null ? 0 : row.getFloat("money");
+                shopBrief.money = shopBrief.handingMoney;
                 shopBrief.handingTypeDesc = row.getString("handingTypeDesc");
                 shopBrief.officeAddress = row.getString("officeAddress");
                 shopBrief.score = row.getFloat("score") == null ? 0 : row.getFloat("score");
+                Integer count = row.getInteger("productCount");
+                shopBrief.productNumbers = count == null ? 0 : count;
                 shopBriefs.add(shopBrief);
             }
             return shopBriefs;
@@ -438,14 +443,14 @@ public class SellerDataHelper extends BaseDataHelper {
         String sql = "update seller set productCount=(productCount+1) where userId=:userId";
         String userId = "";
         if (productType == 0) {
-            IronBuyBrief buyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(proId);
-            if (buyBrief != null) {
-                userId = buyBrief.userId;
+            IronDetail ironDetail = IronDataHelper.getIronDataHelper().getIronProductById(proId);
+            if (ironDetail != null) {
+                userId = ironDetail.userId;
             }
         } else {
-            HandingBuyBrief handingBuyBrief = HandingDataHelper.getHandingDataHelper().getHandingBrief(proId);
-            if (handingBuyBrief != null) {
-                userId = handingBuyBrief.userId;
+            HandingDetail handingDetail = HandingDataHelper.getHandingDataHelper().getHandingProductById(proId);
+            if (handingDetail != null) {
+                userId = handingDetail.userId;
             }
         }
         conn.createQuery(sql).addParameter("userId", userId).executeUpdate();

@@ -227,8 +227,8 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
-    public List<IronRecommend> getIronBuyRecommend() {
-        String sql = "select * from iron_buy order by pushTime limit 0,10";
+    public List<IronRecommend> getIronBuyRecommend() throws NoSuchFieldException, IllegalAccessException {
+        String sql = "select * from iron_buy order by pushTime desc limit 0,10";
         try (Connection conn = getConn()) {
             List<IronRecommend> ironRecommends = new ArrayList<>();
             List<Row> rows = conn.createQuery(sql).executeAndFetchTable().rows();
@@ -236,7 +236,8 @@ public class IronDataHelper extends BaseDataHelper {
                 IronRecommend ironRecommend = new IronRecommend();
                 ironRecommend.id = row.getString("id");
                 ironRecommend.time = row.getLong("pushTime");
-                ironRecommend.title = "求购" +  row.getString("ironType");
+                ironRecommend.title = row.getString("ironType") + " " + row.getString("material")
+                + " " + row.getString("surface") + " " + CityDataHelper.instance().getCityDescById(row.getString("locationCityId"));
                 ironRecommends.add(ironRecommend);
             }
             return ironRecommends;
