@@ -441,7 +441,7 @@ public class OrderDataHelper extends BaseDataHelper {
                 .executeUpdate();
 
         conn.createQuery(sellerIntegralSql)
-                .addParameter("userId", buyerId)
+                .addParameter("userId", sellerId)
                 .addParameter("add", sellerIntegral)
                 .executeUpdate();
     }
