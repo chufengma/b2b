@@ -205,7 +205,7 @@ public class HandingDataHelper extends BaseDataHelper {
     public HandingDetail getHandingProductById(String id) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(HandingDetail.class) +
                 " from handing_product " +
-                "left join (select productId, sum(count) as monthSellCount from product_orders where productType=1 and  finishTime<:endTime and finishTime>=:startTime) as orders " +
+                "left join (select productId, sum(totalMoney) as monthSellCount from product_orders where productType=1 and  finishTime<:endTime and finishTime>=:startTime group by productId) as orders " +
                 " on orders.productId = handing_product.id where handing_product.id=:id";
 
         try (Connection conn = getConn()) {

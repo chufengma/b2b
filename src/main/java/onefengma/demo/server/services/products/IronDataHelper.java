@@ -205,7 +205,7 @@ public class IronDataHelper extends BaseDataHelper {
     public IronDetail getIronProductById(String proId) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(IronDetail.class) +
                 " from iron_product " +
-                "left join (select productId, sum(count) as monthSellCount from product_orders where productType=0 and  finishTime<:endTime and finishTime>=:startTime) as orders " +
+                "left join (select productId, sum(totalMoney) as monthSellCount from product_orders where productType=0 and  finishTime<:endTime and finishTime>=:startTime group by productId) as orders " +
                 " on orders.productId = iron_product.proId where iron_product.proId=:proId";
 
         try (Connection conn = getConn()) {
