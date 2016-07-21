@@ -321,7 +321,7 @@ public class AdminDataManager extends BaseDataHelper {
                 " and supplyWinTime<:endTime and supplyWinTime>=:startTime ";
 
         String ironBuyMoneySql = "select sum(supplyPrice*numbers) from iron_buy,iron_buy_supply " +
-                "where iron_buy.supplyUserId = iron_buy_supply.sellerId and status=1 and userId=:userId " +
+                "where iron_buy.supplyUserId = iron_buy_supply.sellerId and iron_buy.status=1 and userId=:userId " +
                 " and supplyWinTime<:endTime and supplyWinTime>=:startTime ";
 
         AdminSalessResponse adminSalessResponse = new AdminSalessResponse();
