@@ -25,6 +25,7 @@ import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
 import onefengma.demo.server.services.user.UserDataHelper;
+import onefengma.demo.server.services.user.UserMessageDataHelper;
 
 /**
  * Created by chufengma on 16/7/7.
@@ -130,6 +131,7 @@ public class SellerManager extends BaseManager {
                 }
             }
             IronDataHelper.getIronDataHelper().offerIronBuy(requestBean.getUserId(), requestBean.ironId, requestBean.price, requestBean.msg, requestBean.unit);
+            UserMessageDataHelper.instance().setUserMessage(ironBuyBrief.userId, "有人报价您的不锈钢求购 请去xx刷新查看。");
             return success();
         }));
 

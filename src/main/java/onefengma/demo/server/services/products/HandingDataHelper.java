@@ -24,6 +24,7 @@ import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper.SellerOffer;
 import onefengma.demo.server.services.user.SellerDataHelper;
+import onefengma.demo.server.services.user.UserMessageDataHelper;
 
 /**
  * Created by chufengma on 16/6/5.
@@ -150,8 +151,8 @@ public class HandingDataHelper extends BaseDataHelper {
     }
 
     public String generateKeyword(String keyword) {
-        return "where title like \"%" + keyword + "%\"" +
-                "or type like \"%" + keyword + "%\"";
+        return "where (title like \"%" + keyword + "%\"" +
+                "or type like \"%" + keyword + "%\")";
     }
 
     public void pushHandingBuy(HandingBuy handingBuy) throws InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException, IllegalAccessException {
@@ -170,6 +171,7 @@ public class HandingDataHelper extends BaseDataHelper {
                     List<String> users = conn.createQuery(userSql).executeAndFetch(String.class);
                     for(String userId : users) {
                         addInBuySeller(conn, handingBuy.id, userId);
+                        UserMessageDataHelper.instance().setUserMessage(userId, "有您匹配感兴趣的加工求购，请去【后台管理-加工报价管理】 刷新查看。");
                     }
                 }
             }
@@ -313,6 +315,8 @@ public class HandingDataHelper extends BaseDataHelper {
             // OrderDataHelper.instance().addIntegralByBuy(conn, buyerId, supplyUserId, totalMoney);
             // 增加站内信
             InnerMessageDataHelper.instance().addInnerMessage(supplyUserId, "恭喜您成功中标", "您已经被买家加工求购中标");
+            // 增加推送消息
+            UserMessageDataHelper.instance().setUserMessage(supplyUserId, "您的加工报价已中标，请去【后台管理--加工报价管理】刷新查看");
         }));
     }
 
@@ -442,7 +446,7 @@ public class HandingDataHelper extends BaseDataHelper {
     }
 
     public List<HandingProduct> getMyHandingProduct(PageBuilder pageBuilder, String userId) throws NoSuchFieldException, IllegalAccessException {
-        String sql = "select " + generateFiledString(HandingProduct.class) + " from handing_product where userId=:userId order by pushTime desc " + pageBuilder.generateLimit();
+        String sql = "select " + generateFiledString(HandingProduct.class) + " from handing_product where userId=:userId and reviewed=true order by pushTime desc " + pageBuilder.generateLimit();
         try (Connection conn = getConn()) {
             List<HandingProduct> handingProducts = conn.createQuery(sql)
                     .addParameter("userId", userId).executeAndFetch(HandingProduct.class);
@@ -454,7 +458,7 @@ public class HandingDataHelper extends BaseDataHelper {
     }
 
     public int getMyHandingProductCount(String userId) {
-        String sql = "select count(*) from handing_product where userId=:userId";
+        String sql = "select count(*) from handing_product where userId=:userId  and reviewed=true ";
         try (Connection conn = getConn()) {
             Integer count = conn.createQuery(sql)
                     .addParameter("userId", userId).executeScalar(Integer.class);

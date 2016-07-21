@@ -27,6 +27,7 @@ import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import onefengma.demo.server.services.order.OrderDataHelper;
 import onefengma.demo.server.services.order.TransactionDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
+import onefengma.demo.server.services.user.UserMessageDataHelper;
 
 /**
  * @author yfchu
@@ -129,11 +130,11 @@ public class IronDataHelper extends BaseDataHelper {
     }
 
     private String generateKeyword(String keyword) {
-        return StringUtils.isEmpty(keyword) ? "" : ("where surface like \"%" + keyword + "%\" " +
+        return StringUtils.isEmpty(keyword) ? "" : ("where (surface like \"%" + keyword + "%\" " +
                 "or ironType like \"%" + keyword + "%\" " +
                 "or proPlace like \"%" + keyword + "%\" " +
                 "or material like \"%" + keyword + "%\" " +
-                "or title like  \"%" + keyword + "%\" ");
+                "or title like  \"%" + keyword + "%\") ");
     }
 
     public List<IronProductBrief> searchIronProducts(String keyword, PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
@@ -187,6 +188,7 @@ public class IronDataHelper extends BaseDataHelper {
                             .executeAndFetch(String.class);
                     for(String userId : users) {
                         addInBuySeller(conn, ironBuy.id, userId);
+                        UserMessageDataHelper.instance().setUserMessage(userId, "有您匹配感兴趣的不锈钢求购，请去【后台管理-不锈钢报价管理】 刷新查看。");
                     }
                 }
             }
@@ -350,6 +352,8 @@ public class IronDataHelper extends BaseDataHelper {
             OrderDataHelper.instance().addIntegralByBuy(conn, buyerId, supplyUserId, totalMoney);
             // 增加站内信
             InnerMessageDataHelper.instance().addInnerMessage(supplyUserId, "恭喜您成功中标", "您已经被买家不锈钢求购中标");
+            // 增加推送消息
+            UserMessageDataHelper.instance().setUserMessage(supplyUserId, "您的不锈钢报价已中标，请去【后台管理--不锈钢报价管理】刷新查看");
         });
 
     }
@@ -489,7 +493,7 @@ public class IronDataHelper extends BaseDataHelper {
 
     public List<IronProduct> getMyIronProduct(PageBuilder pageBuilder, String userId) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(IronProduct.class) + " " +
-                "from iron_product where userId=:userId order by pushTime desc " + pageBuilder.generateLimit();
+                "from iron_product where userId=:userId and reviewed=true order by pushTime desc " + pageBuilder.generateLimit();
         try (Connection conn = getConn()) {
             List<IronProduct> ironProducts = conn.createQuery(sql)
                     .addParameter("userId", userId).executeAndFetch(IronProduct.class);
@@ -501,7 +505,7 @@ public class IronDataHelper extends BaseDataHelper {
     }
 
     public int getMyIronProductCount(String userId) {
-        String sql = "select count(*) from iron_product where userId=:userId";
+        String sql = "select count(*) from iron_product where userId=:userId and reviewed=true ";
         try (Connection conn = getConn()) {
             Integer count = conn.createQuery(sql)
                     .addParameter("userId", userId).executeScalar(Integer.class);
