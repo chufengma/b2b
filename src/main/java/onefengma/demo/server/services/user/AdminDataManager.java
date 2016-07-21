@@ -673,12 +673,12 @@ public class AdminDataManager extends BaseDataHelper {
     public SiteInfo getSiteInfoForBuy(long startTime, long endTime) {
         String ironSql = "select sum(supplyPrice*numbers) as money, count(iron_buy.id) as count " +
                         "from iron_buy left join iron_buy_supply " +
-                        "on iron_buy_supply.sellerId=iron_buy.supplyUserId and supplyWinTime>=:startTime and supplyWinTime<:endTime " +
+                        "on iron_buy_supply.sellerId=iron_buy.supplyUserId and supplyWinTime>=:startTime and supplyWinTime<:endTime and iron_buy.id = iron_buy_supply.ironId " +
                         "where iron_buy.status=1 ";
 
         String handingSql = "select sum(supplyPrice) as money, count(handing_buy.id) as count " +
                 "from handing_buy left join handing_buy_supply " +
-                "on handing_buy_supply.sellerId=handing_buy.supplyUserId  and supplyWinTime>=:startTime and supplyWinTime<:endTime " +
+                "on handing_buy_supply.sellerId=handing_buy.supplyUserId  and supplyWinTime>=:startTime and supplyWinTime<:endTime and handing_buy_supply.handingId = handing_buy.id " +
                 "where handing_buy.status=1 ";
 
         try(Connection conn = getConn()) {
