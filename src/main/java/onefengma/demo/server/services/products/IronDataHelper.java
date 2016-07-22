@@ -185,7 +185,7 @@ public class IronDataHelper extends BaseDataHelper {
                 String userSql = "select userId from iron_product where (surface like '%" + ironBuy.surface + "%'" +
                         "or ironType like '%" + ironBuy.ironType + "%'" +
                         "or proPlace like '%" + ironBuy.proPlace + "%'" +
-                        "or material like '%" + ironBuy.material + "%') and userId<> :userId";
+                        "or material like '%" + ironBuy.material + "%') and userId<> :userId group by userId";
                 try (Connection conn = getConn()) {
                     List<String> users = conn.createQuery(userSql)
                             .addParameter("userId", ironBuy.userId)

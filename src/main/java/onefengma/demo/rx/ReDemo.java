@@ -59,7 +59,7 @@ public class ReDemo {
         BigDecimal value = new BigDecimal(219890700);
         Test test = new Test();
         test.name = "asdfasdfasdf";
-        test.value = new BigDecimal(0);
+        test.value = value;
 
         String json = "{\"name\":\"asdfasdfasdf\",\"value\":219890700}";
 
