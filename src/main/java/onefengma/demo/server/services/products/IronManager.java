@@ -142,6 +142,8 @@ public class IronManager extends BaseManager {
         }));
 
         get("buy", IronsGetRequest.class, ((request, response, requestBean) -> {
+            IronDataHelper.getIronDataHelper().updateBuyStatus();
+
             IronBuyResponse ironBuyResponse = new IronBuyResponse(requestBean.currentPage, requestBean.pageCount);
             ironBuyResponse.currentPage = requestBean.currentPage;
             ironBuyResponse.pageCount = requestBean.pageCount;
@@ -183,7 +185,7 @@ public class IronManager extends BaseManager {
         }));
 
         get("myBuy", BaseAuthPageBean.class, ((request, response, requestBean) -> {
-            IronDataHelper.getIronDataHelper().updateCancledStatis(requestBean.getUserId());
+            IronDataHelper.getIronDataHelper().updateBuyStatusByUserId(requestBean.getUserId());
             MyIronBuysResponse handingGetResponse = new MyIronBuysResponse(requestBean.currentPage, requestBean.pageCount);
             PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
                     .addEqualWhere("userId", requestBean.getUserId())
@@ -196,7 +198,7 @@ public class IronManager extends BaseManager {
         }));
 
         get("myBuyDetail", MyIronBuyDetail.class, ((request, response, requestBean) -> {
-            IronDataHelper.getIronDataHelper().updateCancledStatis(requestBean.getUserId());
+            IronDataHelper.getIronDataHelper().updateBuyStatusByUserId(requestBean.getUserId());
 
             MyIronBuyDetailResponse myIronBuyDetailResponse = new MyIronBuyDetailResponse();
             myIronBuyDetailResponse.buy = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.ironId);
@@ -218,7 +220,7 @@ public class IronManager extends BaseManager {
         }));
 
         post("selectSupply", SelectIronSupply.class, ((request, response, requestBean) -> {
-            IronDataHelper.getIronDataHelper().updateCancledStatis(requestBean.getUserId());
+            IronDataHelper.getIronDataHelper().updateBuyStatusByUserId(requestBean.getUserId());
 
             if (IronDataHelper.getIronDataHelper().getIronBuyStatus(requestBean.ironBuyId) != 0) {
                 return error("此次求购已经结束");

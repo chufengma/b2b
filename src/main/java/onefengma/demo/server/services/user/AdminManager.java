@@ -139,6 +139,8 @@ public class AdminManager extends BaseManager {
 
         get("orders", AdminOrdersRequest.class, ((request, response, requestBean) -> {
 
+            OrderDataHelper.instance().updateOrderStatus();
+
             PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
                     .addEqualWhere("status", requestBean.status)
                     .addEqualWhere("id", requestBean.orderId);
@@ -194,6 +196,9 @@ public class AdminManager extends BaseManager {
 
 
         get("buys", AdminBuysRequest.class, ((request, response, requestBean) -> {
+            IronDataHelper.getIronDataHelper().updateBuyStatus();
+            HandingDataHelper.getHandingDataHelper().updateBuyStatus();
+
             PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
                     .addEqualWhere("status", requestBean.status)
                     .addEqualWhere("id", requestBean.buyId);

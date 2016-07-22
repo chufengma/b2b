@@ -1,6 +1,5 @@
 package onefengma.demo.server.services.user;
 
-import onefengma.demo.server.model.product.*;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -13,6 +12,12 @@ import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.core.UpdateBuilder;
 import onefengma.demo.server.model.Seller;
+import onefengma.demo.server.model.product.HandingBuyBrief;
+import onefengma.demo.server.model.product.HandingDetail;
+import onefengma.demo.server.model.product.IronBuyBrief;
+import onefengma.demo.server.model.product.IronDetail;
+import onefengma.demo.server.model.product.ShopBrief;
+import onefengma.demo.server.model.product.ShopDetail;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper;
 
@@ -118,7 +123,7 @@ public class SellerDataHelper extends BaseDataHelper {
                 "from seller_transactions where productType = 0 and finishTime < :endTime and finishTime >= :startTime " +
                 "group by sellerId) as trans " +
                 "on seller.userId = trans.sellerId where passed=true " +
-                "order by count desc limit 0, 10 ";
+                "order by money desc limit 0, 10 ";
             try(Connection conn = getConn()) {
                 List<Row> rows = conn.createQuery(sql)
                         .addParameter("startTime", DateHelper.getLastMonthStartTimestamp())
@@ -255,7 +260,7 @@ public class SellerDataHelper extends BaseDataHelper {
                 "from seller_transactions where productType = 1 and finishTime < :endTime and finishTime >= :startTime " +
                 "group by sellerId) as trans " +
                 "on seller.userId = trans.sellerId where passed=true " +
-                "order by count desc limit 0, 10 ";
+                "order by money desc limit 0, 10 ";
 
         try(Connection conn = getConn()) {
             List<Row> rows = conn.createQuery(sql)

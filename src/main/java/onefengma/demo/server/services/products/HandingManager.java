@@ -55,6 +55,7 @@ public class HandingManager extends BaseManager{
         }));
 
         get("handing", HandingGetRequest.class, ((request, response, requestBean) -> {
+
             HandingGetResponse handingGetResponse = new HandingGetResponse(requestBean.currentPage, requestBean.pageCount);
             PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
                     .addEqualWhere("type", requestBean.handingType)
@@ -86,6 +87,8 @@ public class HandingManager extends BaseManager{
         }));
 
         get("buy", HandingGetRequest.class, ((request, response, requestBean) -> {
+            HandingDataHelper.getHandingDataHelper().updateBuyStatus();
+
             HandingBuysResponse handingGetResponse = new HandingBuysResponse(requestBean.currentPage, requestBean.pageCount);
             PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
                     .addEqualWhere("handingType", requestBean.handingType)
@@ -98,7 +101,9 @@ public class HandingManager extends BaseManager{
         }));
 
         get("myBuy", BaseAuthPageBean.class, ((request, response, requestBean) -> {
-            HandingDataHelper.getHandingDataHelper().updateCancledStatis(requestBean.getUserId());
+            HandingDataHelper.getHandingDataHelper().updateBuyStatusByUserId(requestBean.getUserId());
+
+            HandingDataHelper.getHandingDataHelper().updateBuyStatusByUserId(requestBean.getUserId());
             MyHandingBuysResponse handingGetResponse = new MyHandingBuysResponse(requestBean.currentPage, requestBean.pageCount);
             PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
                     .addEqualWhere("userId", requestBean.getUserId())
@@ -111,7 +116,7 @@ public class HandingManager extends BaseManager{
         }));
 
         get("myBuyDetail", MyHandingBuyDetail.class, ((request, response, requestBean) -> {
-            HandingDataHelper.getHandingDataHelper().updateCancledStatis(requestBean.getUserId());
+            HandingDataHelper.getHandingDataHelper().updateBuyStatusByUserId(requestBean.getUserId());
 
             MyHandingDetailResponse myHandingDetailResponse = new MyHandingDetailResponse();
             myHandingDetailResponse.buy = HandingDataHelper.getHandingDataHelper().getHandingBrief(requestBean.handingId);
@@ -142,7 +147,7 @@ public class HandingManager extends BaseManager{
         }));
 
         post("selectSupply", SelectHandingSupply.class, ((request, response, requestBean) -> {
-            HandingDataHelper.getHandingDataHelper().updateCancledStatis(requestBean.getUserId());
+            HandingDataHelper.getHandingDataHelper().updateBuyStatusByUserId(requestBean.getUserId());
 
             if (HandingDataHelper.getHandingDataHelper().getHandingBuyStatus(requestBean.handingBuyId) != 0) {
                 return error("此次求购已经结束");

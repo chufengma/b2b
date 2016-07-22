@@ -98,6 +98,8 @@ public class OrderManager extends BaseManager{
         }));
 
         get("myOrders", MyOrderRequest.class, ((request, response, requestBean) -> {
+            OrderDataHelper.instance().updateOrderStatusByBuyer(requestBean.getUserId());
+
             return success(OrderDataHelper.instance()
                     .getMyOrders(new PageBuilder(requestBean.currentPage, requestBean.pageCount), requestBean.getUserId()));
         }));

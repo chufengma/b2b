@@ -110,13 +110,41 @@ public class HandingDataHelper extends BaseDataHelper {
         }
     }
 
-    public void updateCancledStatis(String userId) {
+    public void updateBuyStatusByUserId(String userId) {
         String sql = "update handing_buy " +
                 "set status = 2 where (pushTime+timeLimit) < :currentTime and status = 0 " +
                 "and userId=:userId";
         try(Connection conn = getConn()) {
             conn.createQuery(sql).addParameter("currentTime", System.currentTimeMillis())
                     .addParameter("userId", userId).executeUpdate();
+        }
+    }
+
+    public void updateBuyStatusByHandingId(String handingId) {
+        String sql = "update handing_buy " +
+                "set status = 2 where (pushTime+timeLimit) < :currentTime and status = 0 " +
+                "and id=:id";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("currentTime", System.currentTimeMillis())
+                    .addParameter("id", handingId).executeUpdate();
+        }
+    }
+
+    public void updateBuyStatusBySellerId(String sellerId) {
+        String sql = "update handing_buy " +
+                "set status = 2 where (pushTime+timeLimit) < :currentTime and status = 0 " +
+                "and id in (select handingId from handing_buy_seller where sellerId=:sellerId)";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("currentTime", System.currentTimeMillis())
+                    .addParameter("sellerId", sellerId).executeUpdate();
+        }
+    }
+
+    public void updateBuyStatus() {
+        String sql = "update handing_buy " +
+                "set status = 2 where (pushTime+timeLimit) < :currentTime and status = 0 ";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("currentTime", System.currentTimeMillis()).executeUpdate();
         }
     }
 
