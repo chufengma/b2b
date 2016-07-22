@@ -167,19 +167,19 @@ public class SellerDataHelper extends BaseDataHelper {
 
         if (productType == 0) {
             shopBrief.ironCount = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
-            shopBrief.ironMoney = row.getFloat("money") == null ? 0 : row.getFloat("money");
+            shopBrief.ironMoney = row.getBigDecimal("money") == null ? 0 : row.getBigDecimal("money").floatValue();
             shopBrief.count = shopBrief.ironCount;
             shopBrief.money = shopBrief.ironMoney;
             shopBrief.ironTypeDesc = row.getString("ironTypeDesc");
         } else if (productType == 1){
             shopBrief.handingCount = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
-            shopBrief.handingMoney = row.getFloat("money") == null ? 0 : row.getFloat("money");
+            shopBrief.handingMoney = row.getBigDecimal("money") == null ? 0 : row.getBigDecimal("money").floatValue();
             shopBrief.count = shopBrief.handingCount;
             shopBrief.money = shopBrief.handingMoney;
             shopBrief.handingTypeDesc = row.getString("handingTypeDesc");
         } else {
             shopBrief.count = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
-            shopBrief.money = row.getFloat("money") == null ? 0 : row.getFloat("money");
+            shopBrief.money = row.getBigDecimal("money") == null ? 0 : row.getBigDecimal("money").floatValue();
             shopBrief.handingTypeDesc = row.getString("handingTypeDesc");
             shopBrief.ironTypeDesc = row.getString("ironTypeDesc");
         }
