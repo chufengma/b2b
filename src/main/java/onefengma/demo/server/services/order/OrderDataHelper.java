@@ -232,7 +232,7 @@ public class OrderDataHelper extends BaseDataHelper {
 
         try (Connection conn = getConn()) {
             conn.createQuery(sql).addParameter("currentTime", System.currentTimeMillis())
-                    .addParameter("buyerId", sellerId).executeUpdate();
+                    .addParameter("sellerId", sellerId).executeUpdate();
         }
     }
 
