@@ -15,13 +15,13 @@ public class ShopBrief {
     public String cover;
     public String ironTypeDesc;
     public String handingTypeDesc;
-    public BigDecimal ironCount;
-    public BigDecimal handingCount;
-    public BigDecimal ironMoney;
-    public BigDecimal handingMoney;
+    public BigDecimal ironCount = new BigDecimal(0);
+    public BigDecimal handingCount = new BigDecimal(0);
+    public BigDecimal ironMoney = new BigDecimal(0);
+    public BigDecimal handingMoney = new BigDecimal(0);
 
-    public BigDecimal money;
-    public BigDecimal count;
+    public BigDecimal money = new BigDecimal(0);
+    public BigDecimal count = new BigDecimal(0);
     public float score;
 
     public int productNumbers;

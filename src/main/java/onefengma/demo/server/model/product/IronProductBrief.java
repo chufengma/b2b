@@ -11,8 +11,8 @@ public class IronProductBrief {
     public String surface;
     public String ironType;
     public String material;
-    public BigDecimal price;
-    public BigDecimal monthSellCount;
+    public BigDecimal price = new BigDecimal(0);
+    public BigDecimal monthSellCount = new BigDecimal(0);
     public float score;
     public String title;
     public boolean isSpec;

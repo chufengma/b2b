@@ -10,10 +10,10 @@ public class HandingProductBrief {
     public String type;
     public String souCityId;
     public String title;
-    public BigDecimal price;
+    public BigDecimal price = new BigDecimal(0);
     public String unit;
     public String cover;
-    public BigDecimal monthSellCount;
+    public BigDecimal monthSellCount = new BigDecimal(0);
     public float score;
 
     private String sourceCity;

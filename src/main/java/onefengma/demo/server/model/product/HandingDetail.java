@@ -1,5 +1,7 @@
 package onefengma.demo.server.model.product;
 
+import java.math.BigDecimal;
+
 /**
  * Created by chufengma on 16/7/3.
  */
@@ -8,7 +10,7 @@ public class HandingDetail {
     public String type;
     public String souCityId;
     public String title;
-    public float price;
+    public BigDecimal price = new BigDecimal(0);
     public String unit;
     public String cover;
     public String image1;
@@ -18,7 +20,7 @@ public class HandingDetail {
 
 
     public boolean reviewed;
-    public float monthSellCount;
+    public BigDecimal monthSellCount = new BigDecimal(0);
     public float score;
 
     private String cityName;

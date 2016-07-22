@@ -25,7 +25,7 @@ public class IronDetail {
     public long numbers;
 
     public boolean reviewed;
-    public BigDecimal monthSellCount;
+    public BigDecimal monthSellCount = new BigDecimal(0);
     public float score;
     public String unit;
 
