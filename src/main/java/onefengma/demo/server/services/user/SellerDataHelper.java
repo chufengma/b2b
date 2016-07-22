@@ -212,7 +212,7 @@ public class SellerDataHelper extends BaseDataHelper {
         }
 
         String sql = "select * from seller left join " +
-                "(select sellerId, sum(count) as count, sum(money) as money " +
+                "(select sellerId, sum(count) as count, convert(sum(money), decimal) " +
                 "from seller_transactions where " + productTypeSql + " and finishTime < :endTime and finishTime >= :startTime " +
                 "group by sellerId) as trans " +
                 "on seller.userId = trans.sellerId " +

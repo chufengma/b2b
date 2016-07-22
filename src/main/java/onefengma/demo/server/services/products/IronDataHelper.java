@@ -80,7 +80,7 @@ public class IronDataHelper extends BaseDataHelper {
     public List<IronProductBrief> getIronProducts(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(IronProductBrief.class) +
                 " from iron_product " +
-                "left join (select productId, sum(totalMoney) as monthSellCount from product_orders where productType=0 and (status=1 or status=2) and finishTime<:endTime and finishTime>=:startTime group by productId) as orders " +
+                "left join (select productId, convert(sum(totalMoney), decimal) as monthSellCount from product_orders where productType=0 and (status=1 or status=2) and finishTime<:endTime and finishTime>=:startTime group by productId) as orders " +
                 " on orders.productId = iron_product.proId " + generateWhereKey(pageBuilder, true);
 
         try (Connection conn = getConn()) {
