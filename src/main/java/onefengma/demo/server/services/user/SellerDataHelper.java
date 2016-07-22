@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import onefengma.demo.common.DateHelper;
+import onefengma.demo.common.NumberUtils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
@@ -504,6 +505,7 @@ public class SellerDataHelper extends BaseDataHelper {
             } else {
                 newScore = vote;
             }
+            newScore = NumberUtils.round(newScore, 1);
             conn.createQuery(updateScoreSql).addParameter("score", newScore).addParameter("userId", userId).executeUpdate();
         }
     }

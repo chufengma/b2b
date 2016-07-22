@@ -41,8 +41,8 @@ public class TransactionDataHelper extends BaseDataHelper {
             String proId = row.getString("productId");
             float count = row.getFloat("count");
             int proType = row.getInteger("productType");
-            float price = proType == 0 ? IronDataHelper.getIronDataHelper().getIronBuySupplyPrice(proId)
-                    : HandingDataHelper.getHandingDataHelper().getHandingBuySupplyPrice(proId);
+            float price = proType == 0 ? IronDataHelper.getIronDataHelper().getIronPrice(proId)
+                    : HandingDataHelper.getHandingDataHelper().getHandingPrice(proId);
             insertTransaction(conn, buyerId, sellerId, orderId, 2, price * count, count);
         }
     }

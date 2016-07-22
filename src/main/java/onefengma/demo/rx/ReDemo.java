@@ -1,14 +1,9 @@
 package onefengma.demo.rx;
 
-import com.alibaba.fastjson.JSON;
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
-
-import onefengma.demo.common.DateHelper.TimeRange;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.sql2o.Connection;
 import org.sql2o.Query;
 
 import java.io.IOException;
@@ -16,20 +11,12 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URLDecoder;
-import java.util.Date;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import onefengma.demo.common.DateHelper;
-import onefengma.demo.common.IdUtils;
+import onefengma.demo.common.NumberUtils;
 import onefengma.demo.common.StringUtils;
-import onefengma.demo.common.VerifyUtils;
 import onefengma.demo.server.core.LogUtils;
-import onefengma.demo.server.core.PageBuilder;
-import onefengma.demo.server.model.product.IronProduct;
-import onefengma.demo.server.services.products.IronDataHelper;
 
 /**
  * @author yfchu
@@ -62,6 +49,8 @@ public class ReDemo {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        System.out.println("------out:" + NumberUtils.round(123123.12345667f, 1));
     }
 
     protected  static  String createInsertSql(String table, Class clazz) {
