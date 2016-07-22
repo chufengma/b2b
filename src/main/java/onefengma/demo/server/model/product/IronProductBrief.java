@@ -1,5 +1,7 @@
 package onefengma.demo.server.model.product;
 
+import java.math.BigDecimal;
+
 /**
  * Created by chufengma on 16/6/25.
  */
@@ -9,8 +11,8 @@ public class IronProductBrief {
     public String surface;
     public String ironType;
     public String material;
-    public float price;
-    public float monthSellCount;
+    public BigDecimal price;
+    public BigDecimal monthSellCount;
     public float score;
     public String title;
     public boolean isSpec;

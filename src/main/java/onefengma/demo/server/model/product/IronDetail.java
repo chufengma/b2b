@@ -1,5 +1,7 @@
 package onefengma.demo.server.model.product;
 
+import java.math.BigDecimal;
+
 /**
  * Created by chufengma on 16/7/3.
  */
@@ -13,7 +15,7 @@ public class IronDetail {
     public String material;
     public String sourceCityId;
     public String title;
-    public float price;
+    public BigDecimal price;
     public String cover;
     public String image1 = "";
     public String image2 = "";
@@ -23,7 +25,7 @@ public class IronDetail {
     public long numbers;
 
     public boolean reviewed;
-    public float monthSellCount;
+    public BigDecimal monthSellCount;
     public float score;
     public String unit;
 
