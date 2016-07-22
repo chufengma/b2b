@@ -204,18 +204,21 @@ public class SellerDataHelper extends BaseDataHelper {
 
     public List<ShopBrief> getShops(PageBuilder pageBuilder, int productType) {
         String productTypeSql = "";
-        if (productType == 0 || productType == 1) {
-            productTypeSql = " productType=" + productType + " and ";
-        };
+        if (productType == 0) {
+            productTypeSql = " productType in (1, 3) ";
+        } else {
+            productTypeSql = " productType in (0, 2) ";
+        }
 
         String sql = "select * from seller left join " +
                 "(select sellerId, sum(count) as count, sum(money) as money " +
-                "from seller_transactions where " + productTypeSql + " finishTime < :endTime and finishTime >= :startTime " +
+                "from seller_transactions where " + productTypeSql + " and finishTime < :endTime and finishTime >= :startTime " +
                 "group by sellerId) as trans " +
                 "on seller.userId = trans.sellerId " +
                 "where passed = true "
                 + genereateProductTypeSql(productType)
                 + generateWhereKey(pageBuilder, true);
+
         try (Connection connection = getConn()){
             List<Row> rows = connection.createQuery(sql)
                     .addParameter("startTime", DateHelper.getThisMonthStartTimestamp())

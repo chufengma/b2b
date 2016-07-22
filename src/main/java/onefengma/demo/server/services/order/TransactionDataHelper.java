@@ -42,7 +42,8 @@ public class TransactionDataHelper extends BaseDataHelper {
             float totalMoney = row.getFloat("totalMoney");
 //            float price = proType == 0 ? IronDataHelper.getIronDataHelper().getIronPrice(proId)
 //                    : HandingDataHelper.getHandingDataHelper().getHandingPrice(proId);
-            insertTransaction(conn, buyerId, sellerId, orderId, 2, totalMoney, count);
+            int transType = proType == 0 ? 2 : 3;
+            insertTransaction(conn, buyerId, sellerId, orderId, transType, totalMoney, count);
         }
     }
 
