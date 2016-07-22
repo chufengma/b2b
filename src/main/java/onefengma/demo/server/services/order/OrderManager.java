@@ -30,12 +30,7 @@ public class OrderManager extends BaseManager{
     public void init() {
         get("lastRecords", BaseBean.class, ((request, response, requestBean) -> {
             // just for test
-            // return success(OrderDataHelper.instance().getLastRecords());
-            LastRecords lastRecords = new LastRecords();
-            lastRecords.weight = 12440889;
-            lastRecords.count = 1231;
-            lastRecords.sellingMoney = 198823;
-            return  success(lastRecords);
+            return success(OrderDataHelper.instance().getLastRecords());
         }));
 
         get("orderDynamic", BaseBean.class, ((request, response, requestBean) -> {
@@ -98,6 +93,8 @@ public class OrderManager extends BaseManager{
         }));
 
         get("myOrders", MyOrderRequest.class, ((request, response, requestBean) -> {
+            OrderDataHelper.instance().updateOrderStatusByBuyer(requestBean.getUserId());
+
             return success(OrderDataHelper.instance()
                     .getMyOrders(new PageBuilder(requestBean.currentPage, requestBean.pageCount), requestBean.getUserId()));
         }));

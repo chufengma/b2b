@@ -6,8 +6,6 @@ import org.sql2o.data.Row;
 import java.util.List;
 
 import onefengma.demo.server.core.BaseDataHelper;
-import onefengma.demo.server.services.products.HandingDataHelper;
-import onefengma.demo.server.services.products.IronDataHelper;
 
 /**
  * Created by chufengma on 16/6/18.
@@ -41,9 +39,11 @@ public class TransactionDataHelper extends BaseDataHelper {
             String proId = row.getString("productId");
             float count = row.getFloat("count");
             int proType = row.getInteger("productType");
-            float price = proType == 0 ? IronDataHelper.getIronDataHelper().getIronBuySupplyPrice(proId)
-                    : HandingDataHelper.getHandingDataHelper().getHandingBuySupplyPrice(proId);
-            insertTransaction(conn, buyerId, sellerId, orderId, 2, price * count, count);
+            float totalMoney = row.getFloat("totalMoney");
+//            float price = proType == 0 ? IronDataHelper.getIronDataHelper().getIronPrice(proId)
+//                    : HandingDataHelper.getHandingDataHelper().getHandingPrice(proId);
+            int transType = proType == 0 ? 2 : 3;
+            insertTransaction(conn, buyerId, sellerId, orderId, transType, totalMoney, count);
         }
     }
 

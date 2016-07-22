@@ -1,5 +1,6 @@
 package onefengma.demo.server.services.user;
 
+import onefengma.demo.rx.UserMessageServer;
 import org.sql2o.Connection;
 
 import onefengma.demo.server.core.BaseDataHelper;
@@ -33,6 +34,7 @@ public class UserMessageDataHelper extends BaseDataHelper {
         try(Connection conn = getConn()) {
             conn.createQuery(sql).addParameter("userId", userId).addParameter("message", message).executeUpdate();
         }
+        UserMessageServer.getInstance().sendUserMessage(userId, message);
     }
 
     public static class UserMessage {

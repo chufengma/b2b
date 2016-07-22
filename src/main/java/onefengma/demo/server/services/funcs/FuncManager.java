@@ -5,7 +5,9 @@ import java.io.FileInputStream;
 
 import onefengma.demo.common.FileHelper;
 import onefengma.demo.common.VerifyUtils;
+import onefengma.demo.rx.MetaDataFetcher;
 import onefengma.demo.server.config.Config;
+import onefengma.demo.server.config.MetaDataHelper;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.MsgCodeHelper;
 import onefengma.demo.server.core.PageBuilder;
@@ -45,6 +47,10 @@ public class FuncManager extends BaseManager {
             } else {
                 return error("验证失败");
             }
+        }));
+
+        get("quotations", BaseBean.class, ((request, response, requestBean) -> {
+            return success(MetaDataFetcher.getQuotations());
         }));
 
         //  获取手机号码

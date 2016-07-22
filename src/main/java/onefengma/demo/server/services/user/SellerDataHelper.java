@@ -1,6 +1,5 @@
 package onefengma.demo.server.services.user;
 
-import onefengma.demo.server.model.product.*;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -8,11 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import onefengma.demo.common.DateHelper;
+import onefengma.demo.common.NumberUtils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.core.UpdateBuilder;
 import onefengma.demo.server.model.Seller;
+import onefengma.demo.server.model.product.HandingBuyBrief;
+import onefengma.demo.server.model.product.HandingDetail;
+import onefengma.demo.server.model.product.IronBuyBrief;
+import onefengma.demo.server.model.product.IronDetail;
+import onefengma.demo.server.model.product.ShopBrief;
+import onefengma.demo.server.model.product.ShopDetail;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper;
 
@@ -118,7 +124,7 @@ public class SellerDataHelper extends BaseDataHelper {
                 "from seller_transactions where productType = 0 and finishTime < :endTime and finishTime >= :startTime " +
                 "group by sellerId) as trans " +
                 "on seller.userId = trans.sellerId where passed=true " +
-                "order by count desc limit 0, 10 ";
+                "order by money desc limit 0, 10 ";
             try(Connection conn = getConn()) {
                 List<Row> rows = conn.createQuery(sql)
                         .addParameter("startTime", DateHelper.getLastMonthStartTimestamp())
@@ -198,18 +204,21 @@ public class SellerDataHelper extends BaseDataHelper {
 
     public List<ShopBrief> getShops(PageBuilder pageBuilder, int productType) {
         String productTypeSql = "";
-        if (productType == 0 || productType == 1) {
-            productTypeSql = " productType=" + productType + " and ";
-        };
+        if (productType == 0) {
+            productTypeSql = " productType in (0, 2) ";
+        } else {
+            productTypeSql = " productType in (1, 3) ";
+        }
 
         String sql = "select * from seller left join " +
                 "(select sellerId, sum(count) as count, sum(money) as money " +
-                "from seller_transactions where " + productTypeSql + " finishTime < :endTime and finishTime >= :startTime " +
+                "from seller_transactions where " + productTypeSql + " and finishTime < :endTime and finishTime >= :startTime " +
                 "group by sellerId) as trans " +
                 "on seller.userId = trans.sellerId " +
                 "where passed = true "
                 + genereateProductTypeSql(productType)
                 + generateWhereKey(pageBuilder, true);
+
         try (Connection connection = getConn()){
             List<Row> rows = connection.createQuery(sql)
                     .addParameter("startTime", DateHelper.getThisMonthStartTimestamp())
@@ -255,7 +264,7 @@ public class SellerDataHelper extends BaseDataHelper {
                 "from seller_transactions where productType = 1 and finishTime < :endTime and finishTime >= :startTime " +
                 "group by sellerId) as trans " +
                 "on seller.userId = trans.sellerId where passed=true " +
-                "order by count desc limit 0, 10 ";
+                "order by money desc limit 0, 10 ";
 
         try(Connection conn = getConn()) {
             List<Row> rows = conn.createQuery(sql)
@@ -499,6 +508,7 @@ public class SellerDataHelper extends BaseDataHelper {
             } else {
                 newScore = vote;
             }
+            newScore = NumberUtils.round(newScore, 1);
             conn.createQuery(updateScoreSql).addParameter("score", newScore).addParameter("userId", userId).executeUpdate();
         }
     }

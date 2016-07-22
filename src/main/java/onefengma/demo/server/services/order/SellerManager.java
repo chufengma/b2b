@@ -36,10 +36,13 @@ public class SellerManager extends BaseManager {
     public void init() {
 
         get("commingOrders", BaseAuthPageBean.class, ((request, response, requestBean) -> {
+            OrderDataHelper.instance().updateOrderStatusBySeller(requestBean.getUserId());
             return success(OrderDataHelper.instance().getCommingOrders(new PageBuilder(requestBean.currentPage, requestBean.pageCount), requestBean.getUserId()));
         }));
 
         post("confirmOrder", ConfirmSellerOrder.class, ((request, response, requestBean) -> {
+            OrderDataHelper.instance().updateOrderStatusByOrderId(requestBean.orderId);
+
             if (!OrderDataHelper.instance().isOrderSellerRight(requestBean.orderId, requestBean.getUserId())) {
                 return error("用户权限错误");
             }
@@ -76,6 +79,8 @@ public class SellerManager extends BaseManager {
         }));
 
         get("myIronBuys", BaseAuthPageBean.class, ((request, response, requestBean) -> {
+            IronDataHelper.getIronDataHelper().updateBuyStatusBySellerId(requestBean.getUserId());
+
             if(!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
                 return error("非商家用户");
             }
@@ -84,6 +89,8 @@ public class SellerManager extends BaseManager {
         }));
 
         get("myIronBuyDetail", SellerIronBuyDetailRequest.class, ((request, response, requestBean) -> {
+            IronDataHelper.getIronDataHelper().updateBuyStatusBySellerId(requestBean.getUserId());
+
             SellerIronBuyDetailResponse sellerIronBuyDetailResponse = new SellerIronBuyDetailResponse();
             IronBuyBrief ironBuyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.ironId);
             sellerIronBuyDetailResponse.buy = ironBuyBrief;
@@ -111,6 +118,8 @@ public class SellerManager extends BaseManager {
         }));
 
         post("offerIronBuy", OfferIronRequest.class, ((request, response, requestBean) -> {
+            IronDataHelper.getIronDataHelper().updateBuyStatusByIronId(requestBean.ironId);
+
             if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
                 return error("仅商家才能进行报价");
             }
@@ -119,7 +128,7 @@ public class SellerManager extends BaseManager {
             }
             int status = IronDataHelper.getIronDataHelper().getIronBuyStatus(requestBean.ironId);
             if (status != 0) {
-                return error("该订单无法报价");
+                return error("该求购已取消，无法报价");
             }
             if (IronDataHelper.getIronDataHelper().isOffered(requestBean.getUserId(), requestBean.ironId)) {
                 return error("您已报价");
@@ -131,11 +140,13 @@ public class SellerManager extends BaseManager {
                 }
             }
             IronDataHelper.getIronDataHelper().offerIronBuy(requestBean.getUserId(), requestBean.ironId, requestBean.price, requestBean.msg, requestBean.unit);
-            UserMessageDataHelper.instance().setUserMessage(ironBuyBrief.userId, "有人报价您的不锈钢求购 请去xx刷新查看。");
+            UserMessageDataHelper.instance().setUserMessage(ironBuyBrief.userId, "有人报价您的不锈钢求购 请去【后台管理--不锈钢报价管理】刷新查看。");
             return success();
         }));
 
         get("myHandingBuys", BaseAuthPageBean.class, ((request, response, requestBean) -> {
+            HandingDataHelper.getHandingDataHelper().updateBuyStatusBySellerId(requestBean.getUserId());
+
             if(!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
                 return error("非商家用户");
             }
@@ -145,6 +156,8 @@ public class SellerManager extends BaseManager {
 
 
         get("myHandingBuyDetail", SellerHandingBuyDetailRequest.class, ((request, response, requestBean) -> {
+            HandingDataHelper.getHandingDataHelper().updateBuyStatusBySellerId(requestBean.getUserId());
+
             SellerHandingBuyDetailResponse sellerHandingBuyDetailResponse = new SellerHandingBuyDetailResponse();
             HandingBuyBrief buyBrief = HandingDataHelper.getHandingDataHelper().getHandingBrief(requestBean.handingId);
             sellerHandingBuyDetailResponse.buy = buyBrief;
@@ -173,6 +186,8 @@ public class SellerManager extends BaseManager {
 
 
         post("offerHandingBuy", OfferHandingRequest.class, ((request, response, requestBean) -> {
+            HandingDataHelper.getHandingDataHelper().updateBuyStatusByHandingId(requestBean.handingId);
+
             if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
                 return error("仅商家才能进行报价");
             }

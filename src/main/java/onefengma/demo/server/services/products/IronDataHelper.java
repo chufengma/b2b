@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import onefengma.demo.common.DateHelper;
+import onefengma.demo.common.NumberUtils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.ThreadUtils;
 import onefengma.demo.server.core.BaseDataHelper;
@@ -255,13 +256,41 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
-    public void updateCancledStatis(String userId) {
+    public void updateBuyStatusByUserId(String userId) {
         String sql = "update iron_buy " +
                 "set status = 2 where (pushTime+timeLimit) < :currentTime and status = 0 " +
                 "and userId=:userId";
         try (Connection conn = getConn()) {
             conn.createQuery(sql).addParameter("currentTime", System.currentTimeMillis())
                     .addParameter("userId", userId).executeUpdate();
+        }
+    }
+
+    public void updateBuyStatusByIronId(String ironBuyId) {
+        String sql = "update iron_buy " +
+                "set status = 2 where (pushTime+timeLimit) < :currentTime and status = 0 " +
+                "and id=:id";
+        try (Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("currentTime", System.currentTimeMillis())
+                    .addParameter("id", ironBuyId).executeUpdate();
+        }
+    }
+
+    public void updateBuyStatusBySellerId(String sellerId) {
+        String sql = "update iron_buy " +
+                "set status = 2 where (pushTime+timeLimit) < :currentTime and status = 0 " +
+                "and id in (select ironId from iron_buy_seller where sellerId=:sellerId)";
+        try (Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("currentTime", System.currentTimeMillis())
+                    .addParameter("sellerId", sellerId).executeUpdate();
+        }
+    }
+
+    public void updateBuyStatus() {
+        String sql = "update iron_buy " +
+                "set status = 2 where (pushTime+timeLimit) < :currentTime and status = 0 ";
+        try (Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("currentTime", System.currentTimeMillis()).executeUpdate();
         }
     }
 
@@ -566,6 +595,7 @@ public class IronDataHelper extends BaseDataHelper {
             } else {
                 newScore = vote;
             }
+            newScore = NumberUtils.round(newScore, 1);
             conn.createQuery(updateScoreSql).addParameter("score", newScore).addParameter("proId", ironId).executeUpdate();
         }
     }

@@ -9,6 +9,7 @@ import onefengma.demo.server.model.apibeans.AuthSession;
 public class OfferHandingRequest extends AuthSession {
     public String handingId;
     public float price;
+    @NotRequired
     public String msg;
     public String unit;
 }

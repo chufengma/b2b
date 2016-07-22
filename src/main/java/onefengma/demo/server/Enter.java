@@ -1,12 +1,16 @@
 package onefengma.demo.server;
 
 import java.io.File;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 
 import onefengma.demo.common.FileHelper;
+import onefengma.demo.rx.MetaDataFetcher;
+import onefengma.demo.rx.UserMessageServer;
 import onefengma.demo.server.config.Config;
 import onefengma.demo.server.core.BaseManager;
+import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.services.funcs.FuncManager;
 import onefengma.demo.server.services.order.OrderManager;
 import onefengma.demo.server.services.order.SellerManager;
@@ -51,6 +55,9 @@ public class Enter {
             }
             return null;
         });
+
+        UserMessageServer.getInstance().start();
+        MetaDataFetcher.startFetch();
     }
 
 }
