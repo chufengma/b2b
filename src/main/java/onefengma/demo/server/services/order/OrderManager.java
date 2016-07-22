@@ -1,5 +1,6 @@
 package onefengma.demo.server.services.order;
 
+import onefengma.demo.common.DateHelper;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
@@ -17,9 +18,12 @@ import onefengma.demo.server.model.apibeans.order.OrderRequest;
 import onefengma.demo.server.model.apibeans.order.VoteOrderRequest;
 import onefengma.demo.server.model.product.HandingDetail;
 import onefengma.demo.server.model.product.IronDetail;
+import onefengma.demo.server.model.product.IronProduct;
+import onefengma.demo.server.model.product.IronProductBrief;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
+import onefengma.demo.server.services.user.UserMessageDataHelper;
 
 /**
  * Created by chufengma on 16/6/18.
@@ -56,6 +60,23 @@ public class OrderManager extends BaseManager{
             }
 
             OrderDataHelper.instance().translate(requestBean.generateOrder(), requestBean.isFromCar, requestBean.carId);
+            String sellerId = "";
+            if (requestBean.productType == 0) {
+                IronDetail ironDetail = IronDataHelper.getIronDataHelper().getIronProductById(requestBean.productId);
+                if (ironDetail != null) {
+                    sellerId = ironDetail.userId;
+                }
+            } else if (requestBean.productType == 1) {
+                HandingDetail handingDetail = HandingDataHelper.getHandingDataHelper().getHandingProductById(requestBean.productId);
+                if (handingDetail != null) {
+                    sellerId = handingDetail.userId;
+                }
+            }
+            if (!StringUtils.isEmpty(sellerId)) {
+                UserMessageDataHelper.instance().setUserMessage(sellerId, "有人在您店铺下单 去卖家订单刷新查看，请在" +
+                        DateHelper.getDataStr(System.currentTimeMillis() + requestBean.timeLimit)
+                        + "前确认");
+            }
             return success();
         }));
 
@@ -80,6 +101,24 @@ public class OrderManager extends BaseManager{
                 }
 
                 OrderDataHelper.instance().translate(requestBean.generateOrder(order), true, order.carId);
+                String sellerId = "";
+                if (order.productType == 0) {
+                    IronDetail ironDetail = IronDataHelper.getIronDataHelper().getIronProductById(order.productId);
+                    if (ironDetail != null) {
+                        sellerId = ironDetail.userId;
+                    }
+                } else if (order.productType == 1) {
+                    HandingDetail handingDetail = HandingDataHelper.getHandingDataHelper().getHandingProductById(order.productId);
+                    if (handingDetail != null) {
+                        sellerId = handingDetail.userId;
+                    }
+                }
+                if (!StringUtils.isEmpty(sellerId)) {
+                    UserMessageDataHelper.instance().setUserMessage(sellerId, "有人在您店铺下单 去卖家订单刷新查看，请在" +
+                            DateHelper.getDataStr(System.currentTimeMillis() + requestBean.timeLimit)
+                            + "前确认");
+                }
+                return success();
             }
             return success();
         }));
