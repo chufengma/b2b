@@ -3,6 +3,7 @@ package onefengma.demo.server.services.user;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -166,21 +167,20 @@ public class SellerDataHelper extends BaseDataHelper {
         shopBrief.cover = row.getString("cover");
 
         if (productType == 0) {
-            shopBrief.ironCount = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
-            shopBrief.ironMoney = row.getBigDecimal("money") == null ? 0 : row.getBigDecimal("money").intValue();
-            System.out.println("-----:" + shopBrief.ironMoney + ":" + row.getInteger("money") + "---" + row.getFloat("money"));
+            shopBrief.ironCount = (row.getBigDecimal("count") == null ? new BigDecimal(0) : row.getBigDecimal("count"));
+            shopBrief.ironMoney = row.getBigDecimal("money") == null ? new BigDecimal(0) : row.getBigDecimal("money");
             shopBrief.count = shopBrief.ironCount;
             shopBrief.money = shopBrief.ironMoney;
             shopBrief.ironTypeDesc = row.getString("ironTypeDesc");
         } else if (productType == 1){
-            shopBrief.handingCount = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
-            shopBrief.handingMoney = row.getBigDecimal("money") == null ? 0 : row.getBigDecimal("money").floatValue();
+            shopBrief.handingCount = row.getBigDecimal("money") == null ? new BigDecimal(0) : row.getBigDecimal("money");
+            shopBrief.handingMoney = row.getBigDecimal("money");
             shopBrief.count = shopBrief.handingCount;
             shopBrief.money = shopBrief.handingMoney;
             shopBrief.handingTypeDesc = row.getString("handingTypeDesc");
         } else {
-            shopBrief.count = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
-            shopBrief.money = row.getBigDecimal("money") == null ? 0 : row.getBigDecimal("money").floatValue();
+            shopBrief.count = (row.getBigDecimal("count") == null ? new BigDecimal(0) : row.getBigDecimal("count"));
+            shopBrief.money = row.getBigDecimal("money") == null ? new BigDecimal(0) : row.getBigDecimal("money");
             shopBrief.handingTypeDesc = row.getString("handingTypeDesc");
             shopBrief.ironTypeDesc = row.getString("ironTypeDesc");
         }
@@ -278,9 +278,9 @@ public class SellerDataHelper extends BaseDataHelper {
                 shopBrief.userId = row.getString("userId");
                 shopBrief.companyName = row.getString("companyName");
                 shopBrief.cover = row.getString("cover");
-                shopBrief.handingCount = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
+                shopBrief.handingCount = (row.getBigDecimal("count") == null ? new BigDecimal(0) : row.getBigDecimal("count"));
                 shopBrief.count = shopBrief.handingCount;
-                shopBrief.handingMoney = row.getFloat("money") == null ? 0 : row.getFloat("money");
+                shopBrief.handingMoney = row.getBigDecimal("money") == null ? new BigDecimal(0) : row.getBigDecimal("money");
                 shopBrief.money = shopBrief.handingMoney;
                 shopBrief.handingTypeDesc = row.getString("handingTypeDesc");
                 shopBrief.officeAddress = row.getString("officeAddress");
@@ -319,8 +319,8 @@ public class SellerDataHelper extends BaseDataHelper {
                 List<Row> handinRows = conn.createQuery(transSql).addParameter("userId", shopBrief.userId).executeAndFetchTable().rows();
                 if (!handinRows.isEmpty()) {
                     Row handingRow = handinRows.get(0);
-                    shopBrief.money = (handingRow.getFloat("money") == null ? 0 : handingRow.getFloat("money"));
-                    shopBrief.count = (handingRow.getFloat("count") == null ? 0 : handingRow.getFloat("count"));
+                    shopBrief.count = (row.getBigDecimal("count") == null ? new BigDecimal(0) : row.getBigDecimal("count"));
+                    shopBrief.money = row.getBigDecimal("money") == null ? new BigDecimal(0) : row.getBigDecimal("money");
                 }
 
                 shopBrief.handingTypeDesc = row.getString("handingTypeDesc");
