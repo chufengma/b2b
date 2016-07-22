@@ -17,7 +17,7 @@ public class DateHelper {
 
     public static String getDataStr(long time) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        return dateFormat.format(new Date());
+        return dateFormat.format(time);
     }
 
     public static String getDataStrWithOut() {

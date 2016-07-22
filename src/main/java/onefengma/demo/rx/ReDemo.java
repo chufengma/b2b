@@ -1,5 +1,6 @@
 package onefengma.demo.rx;
 
+import onefengma.demo.common.DateHelper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -21,6 +22,8 @@ import java.util.regex.Pattern;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.LogUtils;
 
+import javax.activation.DataHandler;
+
 /**
  * @author yfchu
  * @date 2016/5/26
@@ -32,19 +35,22 @@ public class ReDemo {
     private String ccc = "fengma2";
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException, UnsupportedEncodingException {
-        try {
-            UserMessageServer userMessageServer = new UserMessageServer();
-            userMessageServer.start();
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    userMessageServer.sendUserMessage("527cec6a380046b5b813537e10d065e9", "纱布" + System.currentTimeMillis());
-                }
-            }, 0, 1000);
-
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            UserMessageServer userMessageServer = new UserMessageServer();
+//            userMessageServer.start();
+//            new Timer().schedule(new TimerTask() {
+//                @Override
+//                public void run() {
+//                    userMessageServer.sendUserMessage("527cec6a380046b5b813537e10d065e9", "纱布" + System.currentTimeMillis());
+//                }
+//            }, 0, 1000);
+//
+//        } catch (UnknownHostException e) {
+//            e.printStackTrace();
+//        }
+        System.out.println(":" + DateHelper.getDataStr(1469290942982l));
+        System.out.println(":" + DateHelper.getLastDayTimestamp());
+        System.out.println(":" + DateHelper.getNextDayTimestamp());
     }
 
     private void jsoup() {
