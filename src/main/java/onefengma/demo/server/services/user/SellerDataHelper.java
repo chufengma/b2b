@@ -167,7 +167,8 @@ public class SellerDataHelper extends BaseDataHelper {
 
         if (productType == 0) {
             shopBrief.ironCount = (row.getFloat("count") == null ? 0 : row.getFloat("count"));
-            shopBrief.ironMoney = row.getBigDecimal("money") == null ? 0 : row.getBigDecimal("money").floatValue();
+            shopBrief.ironMoney = row.getBigDecimal("money") == null ? 0 : row.getBigDecimal("money").intValue();
+            System.out.println("-----:" + shopBrief.ironMoney + ":" + row.getInteger("money") + "---" + row.getFloat("money"));
             shopBrief.count = shopBrief.ironCount;
             shopBrief.money = shopBrief.ironMoney;
             shopBrief.ironTypeDesc = row.getString("ironTypeDesc");
