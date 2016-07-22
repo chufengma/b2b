@@ -51,6 +51,8 @@ public class ReDemo {
         System.out.println(":" + DateHelper.getDataStr(1469290942982l));
         System.out.println(":" + DateHelper.getLastDayTimestamp());
         System.out.println(":" + DateHelper.getNextDayTimestamp());
+        System.out.println(":" + DateHelper.getThisMonthStartTimestamp());
+        System.out.println(":" + DateHelper.getNextMonthStatimestamp());
     }
 
     private void jsoup() {

@@ -7,6 +7,7 @@ import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.core.UpdateBuilder;
 import onefengma.demo.server.model.SalesMan;
+import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.apibeans.AuthSession;
 import onefengma.demo.server.model.apibeans.BaseAuthPageBean;
 import onefengma.demo.server.model.apibeans.UpdateSellerRequest;
@@ -18,6 +19,7 @@ import onefengma.demo.server.model.apibeans.product.SellerHandingBuyDetailRespon
 import onefengma.demo.server.model.apibeans.product.SellerIronBuyDetailRequest;
 import onefengma.demo.server.model.apibeans.product.SellerIronBuyDetailResponse;
 import onefengma.demo.server.model.metaData.City;
+import onefengma.demo.server.model.order.Order;
 import onefengma.demo.server.model.product.HandingBuyBrief;
 import onefengma.demo.server.model.product.IronBuyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
@@ -51,6 +53,11 @@ public class SellerManager extends BaseManager {
                 return error("该订单无法确认");
             }
             OrderDataHelper.instance().confirmOrder(requestBean.orderId);
+            String buyerId = OrderDataHelper.instance().getBuyerId(requestBean.orderId);
+            if (!StringUtils.isEmpty(buyerId)) {
+                Seller seller = SellerDataHelper.instance().getSeller(requestBean.getUserId());
+                UserMessageDataHelper.instance().setUserMessage(buyerId, seller.companyName + "公司已经确认接单，订单号：" + requestBean.orderId + " 已成交，请联系对方");
+            }
             return success();
         }));
 
