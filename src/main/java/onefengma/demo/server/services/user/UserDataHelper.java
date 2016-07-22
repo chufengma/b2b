@@ -36,6 +36,14 @@ public class UserDataHelper extends BaseDataHelper {
         return userDataHelper;
     }
 
+    public boolean isUserExisted(String userId) {
+        String sql = "select count(*) from user where userId=:userId";
+        try(Connection conn = getConn()) {
+            Integer integer = conn.createQuery(sql).addParameter("userId", userId).executeScalar(Integer.class);
+            return integer != null && integer > 0;
+        }
+    }
+
     public User findUserByMobile(String mobile) throws NoSuchFieldException, IllegalAccessException {
         String sql = createSql("select " + generateFiledString(User.class) + " from @USER_TABLE where @MOBILE=:mobile");
         List<User> users;

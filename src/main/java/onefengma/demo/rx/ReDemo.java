@@ -11,10 +11,12 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.UnknownHostException;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import onefengma.demo.common.NumberUtils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.LogUtils;
 
@@ -30,17 +32,33 @@ public class ReDemo {
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException, UnsupportedEncodingException {
         try {
+            UserMessageServer userMessageServer = new UserMessageServer();
+            userMessageServer.start();
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    userMessageServer.sendUserMessage("527cec6a380046b5b813537e10d065e9", "纱布" + System.currentTimeMillis());
+                }
+            }, 0, 1000);
+
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void jsoup() {
+        try {
             Document doc = Jsoup.connect("http://www.banksteel.com/").get();
             Elements items = doc.select(".mod");
             Elements infos = items.select(".info");
             System.out.println("-----" + items);
-            for(Element element : infos) {
+            for (Element element : infos) {
                 String title = element.select(".price-tit").first().attr("title");
                 String name = element.select("h4").first().html();
                 System.out.println("-----" + title + ":" + name);
             }
             Elements full = items.select(".full");
-            for(Element element : full) {
+            for (Element element : full) {
                 Elements ps = element.select("p");
                 String compairValue = ps.get(1).html();
                 String rightValue = ps.get(2).html();
@@ -49,11 +67,9 @@ public class ReDemo {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        System.out.println("------out:" + NumberUtils.round(123123.12345667f, 1));
     }
 
-    protected  static  String createInsertSql(String table, Class clazz) {
+    protected static String createInsertSql(String table, Class clazz) {
         Field[] fields = clazz.getDeclaredFields();
         StringBuffer sqlBuilder = new StringBuffer("insert into " + table + "(");
         StringBuffer valueBuilder = new StringBuffer(" values (");
@@ -72,21 +88,21 @@ public class ReDemo {
         return sqlBuilder.toString();
     }
 
-    public Query bind(Query query, Object bean){
+    public Query bind(Query query, Object bean) {
         Class clazz = bean.getClass();
         Method[] methods = clazz.getDeclaredMethods();
-        for(Method method : methods){
-            try{
+        for (Method method : methods) {
+            try {
                 method.setAccessible(true);
                 String methodName = method.getName();
                 /*
                 It looks in the class for all the methods that start with get
                 */
-                if(methodName.startsWith("get") && method.getParameterTypes().length == 0){
+                if (methodName.startsWith("get") && method.getParameterTypes().length == 0) {
                     String param = methodName.substring(3);//remove the get prefix
                     param = param.substring(0, 1).toLowerCase() + param.substring(1);//set the first letter in Lowercase => so getItem produces item
                     Object res = method.invoke(bean);
-                    if( res!= null){
+                    if (res != null) {
                         try {
                             Method addParam = this.getClass().getDeclaredMethod("addParameter", param.getClass(), method.getReturnType());
                             addParam.invoke(this, param, res);
@@ -94,12 +110,12 @@ public class ReDemo {
                             LogUtils.e(ex, ex.getMessage());
                             query.addParameter(param, res);
                         }
-                    }else
+                    } else
                         query.addParameter(param, res);
                 }
-            }catch(IllegalArgumentException ex){
+            } catch (IllegalArgumentException ex) {
                 LogUtils.e(ex, ex.getMessage());
-            }catch(IllegalAccessException ex){
+            } catch (IllegalAccessException ex) {
                 throw new RuntimeException(ex);
             } catch (SecurityException ex) {
                 throw new RuntimeException(ex);
@@ -121,7 +137,7 @@ public class ReDemo {
 
 
     public static class AsciiID {
-        private static final String alphabet=
+        private static final String alphabet =
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
         private int currentId;
@@ -131,7 +147,7 @@ public class ReDemo {
             StringBuilder b = new StringBuilder();
             do {
                 b.append(alphabet.charAt(id % alphabet.length()));
-            } while((id /=alphabet.length()) != 0);
+            } while ((id /= alphabet.length()) != 0);
 
             return b.toString();
         }
@@ -144,7 +160,7 @@ public class ReDemo {
         Pattern pattern = Pattern.compile("@\\w*");
         Matcher m = pattern.matcher(sql);
         try {
-            while(m.find()) {
+            while (m.find()) {
                 String findStr = m.group();
                 String filedStr = findStr.replace("@", "");
                 Field field = this.getClass().getDeclaredField(filedStr);
