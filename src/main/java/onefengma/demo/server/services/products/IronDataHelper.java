@@ -1,5 +1,7 @@
 package onefengma.demo.server.services.products;
 
+import onefengma.demo.server.model.Seller;
+import onefengma.demo.server.services.user.UserDataHelper;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -68,7 +70,7 @@ public class IronDataHelper extends BaseDataHelper {
         String sql = "select count(*)" +
                 " from iron_product " +
                 " left join (select productId, sum(count) as monthSellCount from product_orders) as orders " +
-                " on orders.productId = iron_product.proId "  + generateWhereKey(pageBuilder, false);
+                " on orders.productId = iron_product.proId " + generateWhereKey(pageBuilder, false);
         try (Connection conn = getConn()) {
             return conn.createQuery(sql).executeScalar(Integer.class);
         }
@@ -183,17 +185,30 @@ public class IronDataHelper extends BaseDataHelper {
                         "or ironType like '%" + ironBuy.ironType + "%'" +
                         "or proPlace like '%" + ironBuy.proPlace + "%'" +
                         "or material like '%" + ironBuy.material + "%') and userId<> :userId";
-                try(Connection conn = getConn()) {
+                try (Connection conn = getConn()) {
                     List<String> users = conn.createQuery(userSql)
                             .addParameter("userId", ironBuy.userId)
                             .executeAndFetch(String.class);
-                    for(String userId : users) {
+                    for (String userId : users) {
                         addInBuySeller(conn, ironBuy.id, userId);
-                        UserMessageDataHelper.instance().setUserMessage(userId, "有您匹配感兴趣的不锈钢求购，请去【后台管理-不锈钢报价管理】 刷新查看。");
+                        String message = "有人求购" + generateIroBuyMessage(ironBuy) + "，请前往淘求购或后台报价管理页面刷新查看";
+                        UserMessageDataHelper.instance().setUserMessage(userId, message);
                     }
                 }
             }
         });
+    }
+
+    private String generateIroBuyMessage(IronBuy ironBuy) {
+        return ironBuy.ironType + " " + ironBuy.surface + "" + ironBuy.material + " "
+                + ironBuy.length + "*" + +ironBuy.width + "*" + ironBuy.height + " "
+                + ironBuy.numbers + " " + ironBuy.unit;
+    }
+
+    private String generateIronBuyMessage(IronBuyBrief ironBuy) {
+        return ironBuy.ironType + " " + ironBuy.surface + "" + ironBuy.material + " "
+                + ironBuy.length + "*" + +ironBuy.width + "*" + ironBuy.height + " "
+                + ironBuy.numbers + " " + ironBuy.unit;
     }
 
 
@@ -240,7 +255,7 @@ public class IronDataHelper extends BaseDataHelper {
                 ironRecommend.id = row.getString("id");
                 ironRecommend.time = row.getLong("pushTime");
                 ironRecommend.title = row.getString("ironType") + " " + row.getString("material")
-                + " " + row.getString("surface") + " " + CityDataHelper.instance().getCityDescById(row.getString("locationCityId"));
+                        + " " + row.getString("surface") + " " + CityDataHelper.instance().getCityDescById(row.getString("locationCityId"));
                 ironRecommends.add(ironRecommend);
             }
             return ironRecommends;
@@ -362,7 +377,7 @@ public class IronDataHelper extends BaseDataHelper {
         String numberSql = "select numbers from iron_buy where id=:ironId";
         String supplyPriceSql = "select supplyPrice from iron_buy_supply where ironId=:ironId and sellerId=:sellerId";
 
-        transaction ((conn)-> {
+        transaction((conn) -> {
             conn.createQuery(sql)
                     .addParameter("ironId", ironId)
                     .addParameter("time", System.currentTimeMillis())
@@ -382,7 +397,11 @@ public class IronDataHelper extends BaseDataHelper {
             // 增加站内信
             InnerMessageDataHelper.instance().addInnerMessage(supplyUserId, "恭喜您成功中标", "您已经被买家不锈钢求购中标");
             // 增加推送消息
-            UserMessageDataHelper.instance().setUserMessage(supplyUserId, "您的不锈钢报价已中标，请去【后台管理--不锈钢报价管理】刷新查看");
+            IronBuyBrief ironBuyBrief = getIronBuyBrief(ironId);
+            if (ironBuyBrief != null) {
+                String message = "恭喜您！您报价的 " + generateIronBuyMessage(ironBuyBrief) + " 已中标，请联系对方吧 : " + UserDataHelper.instance().getUserMobile(supplyUserId);
+                UserMessageDataHelper.instance().setUserMessage(supplyUserId, message);
+            }
         });
 
     }
@@ -499,6 +518,17 @@ public class IronDataHelper extends BaseDataHelper {
                     .executeUpdate();
 
             addInBuySeller(conn, ironId, sellerId);
+
+            IronBuyBrief ironBuyBrief = getIronBuyBrief(ironId);
+            if (ironBuyBrief != null) {
+                String message = generateIronBuyMessage(ironBuyBrief);
+                Seller seller = SellerDataHelper.instance().getSeller(sellerId);
+                if (seller != null) {
+                    message = seller.companyName + "公司 已对您的" + message + "求购进行报价，请前往求购管理进行刷新查看";
+                    UserMessageDataHelper.instance().setUserMessage(ironBuyBrief.userId, message);
+                }
+            }
+
         });
     }
 
@@ -552,7 +582,7 @@ public class IronDataHelper extends BaseDataHelper {
 
     public void updateIronProduct(String ironId, long numbers, float price, String spec) {
         String sql = "update iron_product set numbers=:numbers, price=:price, title=:title where proId=:proId";
-        try(Connection conn = getConn()) {
+        try (Connection conn = getConn()) {
             conn.createQuery(sql)
                     .addParameter("numbers", numbers)
                     .addParameter("price", price)
@@ -563,7 +593,7 @@ public class IronDataHelper extends BaseDataHelper {
 
     public void deleteIronProduct(String ironId) throws NoSuchFieldException, IllegalAccessException {
         String sql = "delete from iron_product where proId=:proId";
-        try(Connection conn = getConn()) {
+        try (Connection conn = getConn()) {
             conn.createQuery(sql)
                     .addParameter("proId", ironId).executeUpdate();
             SellerDataHelper.instance().deSellerProductCount(conn, 0, ironId);
@@ -572,13 +602,13 @@ public class IronDataHelper extends BaseDataHelper {
 
     public IronBuyOfferDetail getWinSellerOffer(String ironBuyId, String userId) {
         String sql = "select " + generateFiledString(IronBuyOfferDetail.class) + " from iron_buy_supply where ironId=:id and sellerId=:userId";
-        try(Connection conn = getConn()) {
+        try (Connection conn = getConn()) {
             return conn.createQuery(sql).addParameter("id", ironBuyId).addParameter("userId", userId).executeAndFetchFirst(IronBuyOfferDetail.class);
         }
     }
 
     public void insertFindHelpProduct(HelpFindProduct helpFindProduct) throws InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException, IllegalAccessException {
-        try(Connection conn = getConn()) {
+        try (Connection conn = getConn()) {
             createInsertQuery(conn, "help_find_product", helpFindProduct).executeUpdate();
         }
     }
@@ -586,9 +616,9 @@ public class IronDataHelper extends BaseDataHelper {
     public void voteIron(String ironId, float vote) {
         String currentScoreSql = "select score from iron_product where proId=:proId";
         String updateScoreSql = "update iron_product set score=:score where proId=:proId";
-        try(Connection conn = getConn()) {
+        try (Connection conn = getConn()) {
             Float currentScore = conn.createQuery(currentScoreSql).addParameter("proId", ironId).executeScalar(Float.class);
-            currentScore = currentScore == null ? 0: currentScore;
+            currentScore = currentScore == null ? 0 : currentScore;
             float newScore = 0;
             if (currentScore != 0) {
                 newScore = (vote + currentScore) / 2;

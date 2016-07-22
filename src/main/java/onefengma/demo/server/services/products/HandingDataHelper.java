@@ -1,5 +1,8 @@
 package onefengma.demo.server.services.products;
 
+import onefengma.demo.server.model.Seller;
+import onefengma.demo.server.model.product.*;
+import onefengma.demo.server.services.user.UserDataHelper;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -15,12 +18,6 @@ import onefengma.demo.common.ThreadUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.product.SellerHandingBuysResponse;
-import onefengma.demo.server.model.product.HandingBuy;
-import onefengma.demo.server.model.product.HandingBuyBrief;
-import onefengma.demo.server.model.product.HandingDetail;
-import onefengma.demo.server.model.product.HandingProduct;
-import onefengma.demo.server.model.product.HandingProductBrief;
-import onefengma.demo.server.model.product.SupplyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper.SellerOffer;
@@ -200,7 +197,8 @@ public class HandingDataHelper extends BaseDataHelper {
                     List<String> users = conn.createQuery(userSql).executeAndFetch(String.class);
                     for(String userId : users) {
                         addInBuySeller(conn, handingBuy.id, userId);
-                        UserMessageDataHelper.instance().setUserMessage(userId, "有您匹配感兴趣的加工求购，请去【后台管理-加工报价管理】 刷新查看。");
+                        String message = "有人求购" + handingBuy.handingType + "，请前往淘求购或后台报价管理页面刷新查看";
+                        UserMessageDataHelper.instance().setUserMessage(userId, message);
                     }
                 }
             }
@@ -345,7 +343,12 @@ public class HandingDataHelper extends BaseDataHelper {
             // 增加站内信
             InnerMessageDataHelper.instance().addInnerMessage(supplyUserId, "恭喜您成功中标", "您已经被买家加工求购中标");
             // 增加推送消息
-            UserMessageDataHelper.instance().setUserMessage(supplyUserId, "您的加工报价已中标，请去【后台管理--加工报价管理】刷新查看");
+            // 增加推送消息
+            HandingBuyBrief handingBuyBrief = getHandingBrief(handingId);
+            if (handingBuyBrief != null) {
+                String message = "恭喜您！您报价的 " + handingBuyBrief.handingType + " 已中标，请联系对方吧 : " + UserDataHelper.instance().getUserMobile(supplyUserId);
+                UserMessageDataHelper.instance().setUserMessage(supplyUserId, message);
+            }
         }));
     }
 
@@ -454,6 +457,15 @@ public class HandingDataHelper extends BaseDataHelper {
                     .executeUpdate();
 
             addInBuySeller(conn, handingId, sellerId);
+
+            HandingBuyBrief handingBuyBrief = getHandingBrief(handingId);
+            if (handingBuyBrief != null) {
+                Seller seller = SellerDataHelper.instance().getSeller(sellerId);
+                if (seller != null) {
+                    String message = seller.companyName + "公司 已对您的" + handingBuyBrief.handingType + "求购进行报价，请前往求购管理进行刷新查看";
+                    UserMessageDataHelper.instance().setUserMessage(handingBuyBrief.userId, message);
+                }
+            }
         });
     }
 
