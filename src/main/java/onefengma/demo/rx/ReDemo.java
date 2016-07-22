@@ -11,6 +11,7 @@ import org.jsoup.select.Elements;
 import org.sql2o.Connection;
 import org.sql2o.Query;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
@@ -42,6 +43,16 @@ public class ReDemo {
     private String ccc = "fengma2";
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException, UnsupportedEncodingException {
+        try {
+            Document doc = Jsoup.connect("http://gangg.cn/ji/showw.php").get();
+            System.out.println("---:" + doc);
+            new File("./");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void start() {
         try {
             Document doc = Jsoup.connect("http://www.banksteel.com/").get();
             Elements items = doc.select(".mod");
