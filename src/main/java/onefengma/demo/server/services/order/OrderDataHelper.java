@@ -5,6 +5,7 @@ import org.sql2o.Connection;
 import org.sql2o.data.Row;
 import org.sql2o.data.Table;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,17 +61,17 @@ public class OrderDataHelper extends BaseDataHelper {
 //                    .executeScalar(Float.class);
 //            lastRecords.weight = weight;
 
-            Float count = connection.createQuery(countSql)
+            BigDecimal count = connection.createQuery(countSql)
                     .addParameter("lastTime", DateHelper.getLastDayTimestamp())
                     .addParameter("nextTime", DateHelper.getNextDayTimestamp())
-                    .executeScalar(Float.class);
-            lastRecords.count = count == null ? 0 : count;
+                    .executeScalar(BigDecimal.class);
+            lastRecords.count = count == null ? new BigDecimal(0) : count;
 
-            Float sellMoney = connection.createQuery(moneySql)
+            BigDecimal sellMoney = connection.createQuery(moneySql)
                     .addParameter("lastTime", DateHelper.getLastDayTimestamp())
                     .addParameter("nextTime", DateHelper.getNextDayTimestamp())
-                    .executeScalar(Float.class);
-            lastRecords.sellingMoney = sellMoney == null ? 0 : sellMoney;
+                    .executeScalar(BigDecimal.class);
+            lastRecords.sellingMoney = sellMoney == null ? new BigDecimal(0) : sellMoney;
         }
 
         lastGetTime = System.currentTimeMillis();
