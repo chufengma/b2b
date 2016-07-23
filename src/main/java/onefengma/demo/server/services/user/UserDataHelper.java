@@ -179,13 +179,14 @@ public class UserDataHelper extends BaseDataHelper {
     }
 
     public UserProfile getUserProfile(String userId) {
-        String sql = "select " + generateFiledStringExclude(UserProfile.class, "userData", "sellerData", "salesMan") + " from user where userId=:userId ";
+        String sql = "select " + generateFiledStringExclude(UserProfile.class, "userData", "sellerData", "salesMan", "becomeStatus") + " from user where userId=:userId ";
         try(Connection conn = getConn()) {
             UserProfile userProfile = conn.createQuery(sql).addParameter("userId", userId).executeAndFetchFirst(UserProfile.class);
             if (userProfile != null) {
                 userProfile.sellerData = getSellerInfo(userId);
                 userProfile.userData = getUserInfo(userId);
                 userProfile.salesMan = getSalesMan(userId);
+                userProfile.becomeStatus = SellerDataHelper.instance().getBecomeSellerStatus(userId);
             }
             return userProfile;
         }

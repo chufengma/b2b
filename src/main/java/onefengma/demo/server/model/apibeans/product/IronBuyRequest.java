@@ -16,9 +16,10 @@ public class IronBuyRequest extends AuthSession {
     public String locationCityId;
     @NotRequired
     public String message = "";
-    public long length;
-    public long width;
-    public long height;
+
+    public String length;
+    public String width;
+    public String height;
     public String toleranceFrom;
     public String toleranceTo;
     public long numbers;

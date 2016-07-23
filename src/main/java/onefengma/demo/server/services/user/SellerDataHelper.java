@@ -203,6 +203,23 @@ public class SellerDataHelper extends BaseDataHelper {
         }
     }
 
+    // 0 = 没有提交信息 1 = 待审核 2 = 审核通过
+    public int getBecomeSellerStatus(String userId) {
+        String sql = "select passed from seller where userId=:userId";
+        try(Connection conn = getConn()) {
+            Integer status = conn.createQuery(sql).addParameter("userId", userId).executeScalar(Integer.class);
+            if (status == null || status == 2) {
+                return 0;
+            } else if (status == 0) {
+                return 1;
+            } else if (status == 1) {
+                return 2;
+            } else {
+                return 0;
+            }
+        }
+    }
+
     public List<ShopBrief> getShops(PageBuilder pageBuilder, int productType) {
         String productTypeSql = "";
         if (productType == 0) {

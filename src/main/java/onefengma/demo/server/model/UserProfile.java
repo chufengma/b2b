@@ -11,6 +11,7 @@ public class UserProfile {
     public String name;
     public String avator;
     public String mobile;
+    public int becomeStatus = 0;
 
     @NotRequired
     public UserInfo userData;
