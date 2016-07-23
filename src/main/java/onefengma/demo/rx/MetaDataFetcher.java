@@ -1,12 +1,14 @@
 package onefengma.demo.rx;
 
 import com.alibaba.fastjson.JSON;
+import onefengma.demo.common.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -28,6 +30,7 @@ public class MetaDataFetcher {
             @Override
             public void run() {
                 fetch();
+                fetchGraph();
             }
         }, 0, 1000 * 60 * 60 * 12);
     }
@@ -42,8 +45,23 @@ public class MetaDataFetcher {
     public static void fetchGraph() {
         try {
             Document doc = Jsoup.parse(new URL("http://www.gangg.cn/ji/showw.php"), 20000);
-
-            doc.toString();
+            Elements elements = doc.select("script");
+            for (Element element : elements) {
+                if (StringUtils.equals(element.attr("src"), "jquery.js")) {
+                    element.attr("src", "/admin/js/jquery.js");
+                }
+                if (StringUtils.equals(element.attr("src"), "highcharts.js")) {
+                    element.attr("src", "/data/highcharts.js");
+                }
+                if (StringUtils.equals(element.attr("src"), "geett.js")) {
+                    element.attr("src", "/data/geett.js");
+                }
+            }
+            doc.select("#container").attr("style", "width:100%;height:120px;");
+            File file = new File("./res/B2BPlatformFront/data/graph.html");
+            FileWriter fileWriter  = new FileWriter(file);
+            fileWriter.write(doc.toString());
+            fileWriter.flush();
         } catch (Exception e) {
             e.printStackTrace();
         }

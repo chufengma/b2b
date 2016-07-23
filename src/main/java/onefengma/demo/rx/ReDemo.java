@@ -2,6 +2,7 @@ package onefengma.demo.rx;
 
 import com.alibaba.fastjson.JSON;
 import onefengma.demo.common.DateHelper;
+import onefengma.demo.server.config.MetaDataHelper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -50,6 +51,9 @@ public class ReDemo {
 //        } catch (UnknownHostException e) {
 //            e.printStackTrace();
 //        }
+
+        MetaDataFetcher.fetchGraph();
+
         System.out.println(":" + DateHelper.getDataStr(1469290942982l));
         System.out.println(":" + DateHelper.getLastDayTimestamp());
         System.out.println(":" + DateHelper.getNextDayTimestamp());
