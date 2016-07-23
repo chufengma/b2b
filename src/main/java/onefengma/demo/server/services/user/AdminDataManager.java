@@ -3,6 +3,7 @@ package onefengma.demo.server.services.user;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -624,8 +625,8 @@ public class AdminDataManager extends BaseDataHelper {
     public SiteInfo getSiteInfoAllTrans(long startTime, long endTime) {
         SiteInfo orderSiteInfo = getSiteInfoForOrder(startTime, endTime);
         SiteInfo buySiteInfo = getSiteInfoForBuy(startTime, endTime);
-        orderSiteInfo.count += buySiteInfo.count;
-        orderSiteInfo.money += buySiteInfo.money;
+        orderSiteInfo.count = orderSiteInfo.count.add(buySiteInfo.count);
+        orderSiteInfo.money = orderSiteInfo.money.add(buySiteInfo.money);
         return orderSiteInfo;
     }
 
@@ -639,34 +640,34 @@ public class AdminDataManager extends BaseDataHelper {
                 "where productType=1 and handing_product.id=product_orders.productId and finishTime<:endTime and finishTime>=:startTime  ";
 
         try(Connection conn = getConn()) {
-            float money = 0;
-            float count = 0;
+            BigDecimal money = new BigDecimal(0);
+            BigDecimal count = new BigDecimal(0);
             List<Row> ironRows = conn.createQuery(ironSql).addParameter("startTime", startTime)
                     .addParameter("endTime", endTime).executeAndFetchTable().rows();
             if (ironRows.size() > 0) {
                 Row row = ironRows.get(0);
-                Float moneyTmp = row.getFloat("money");
-                moneyTmp = moneyTmp == null ? 0 : moneyTmp;
+                BigDecimal moneyTmp = row.getBigDecimal("money");
+                moneyTmp = moneyTmp == null ? new BigDecimal(0) : moneyTmp;
 
-                Float countTmp = row.getFloat("count");
-                countTmp = countTmp == null ? 0 : countTmp;
+                BigDecimal countTmp = row.getBigDecimal("count");
+                countTmp = countTmp == null ? new BigDecimal(0) : countTmp;
 
-                money += moneyTmp;
-                count += countTmp;
+                money = money.add(moneyTmp);
+                count = count.add(countTmp);
             }
 
             List<Row> handingRows = conn.createQuery(handingSql).addParameter("startTime", startTime)
                     .addParameter("endTime", endTime).executeAndFetchTable().rows();
             if (handingRows.size() > 0) {
                 Row row = handingRows.get(0);
-                Float moneyTmp = row.getFloat("money");
-                moneyTmp = moneyTmp == null ? 0 : moneyTmp;
+                BigDecimal moneyTmp = row.getBigDecimal("money");
+                moneyTmp = moneyTmp == null ? new BigDecimal(0) : moneyTmp;
 
-                Float countTmp = row.getFloat("count");
-                countTmp = countTmp == null ? 0 : countTmp;
+                BigDecimal countTmp = row.getBigDecimal("count");
+                countTmp = countTmp == null ? new BigDecimal(0) : countTmp;
 
-                money += moneyTmp;
-                count += countTmp;
+                money = money.add(moneyTmp);
+                count = count.add(countTmp);
             }
 
             SiteInfo siteInfo = new SiteInfo();
@@ -681,44 +682,38 @@ public class AdminDataManager extends BaseDataHelper {
     public SiteInfo getSiteInfoForBuy(long startTime, long endTime) {
         String ironSql = "select sum(supplyPrice*numbers) as money, count(iron_buy.id) as count " +
                         "from iron_buy left join iron_buy_supply " +
-                        "on iron_buy_supply.sellerId=iron_buy.supplyUserId and supplyWinTime>=:startTime and supplyWinTime<:endTime and iron_buy.id = iron_buy_supply.ironId " +
-                        "where iron_buy.status=1 ";
+                        "on iron_buy_supply.sellerId=iron_buy.supplyUserId and iron_buy.id = iron_buy_supply.ironId " +
+                        "where iron_buy.status=1 and supplyWinTime>=:startTime and supplyWinTime<:endTime";
 
-        String handingSql = "select sum(supplyPrice) as money, count(handing_buy.id) as count " +
-                "from handing_buy left join handing_buy_supply " +
-                "on handing_buy_supply.sellerId=handing_buy.supplyUserId  and supplyWinTime>=:startTime and supplyWinTime<:endTime and handing_buy_supply.handingId = handing_buy.id " +
-                "where handing_buy.status=1 ";
+//        String handingSql = "select sum(supplyPrice) as money, count(handing_buy.id) as count " +
+//                "from handing_buy left join handing_buy_supply " +
+//                "on handing_buy_supply.sellerId=handing_buy.supplyUserId  and supplyWinTime>=:startTime and supplyWinTime<:endTime and handing_buy_supply.handingId = handing_buy.id " +
+//                "where handing_buy.status=1 ";
 
         try(Connection conn = getConn()) {
-            float money = 0;
-            float count = 0;
+            BigDecimal money = new BigDecimal(0);
+            BigDecimal count = new BigDecimal(0);
             List<Row> ironRows = conn.createQuery(ironSql).addParameter("startTime", startTime)
                     .addParameter("endTime", endTime).executeAndFetchTable().rows();
             if (ironRows.size() > 0) {
                 Row row = ironRows.get(0);
-                Float moneyTmp = row.getFloat("money");
-                moneyTmp = moneyTmp == null ? 0 : moneyTmp;
-
-                Float countTmp = row.getFloat("count");
-                countTmp = countTmp == null ? 0 : countTmp;
-
-                money += moneyTmp;
-                count += countTmp;
+                count = row.getBigDecimal("count") == null ? new BigDecimal(0) : row.getBigDecimal("count");
+                money = row.getBigDecimal("money") == null ? new BigDecimal(0) : row.getBigDecimal("money");
             }
 
-            List<Row> handingRows = conn.createQuery(handingSql).addParameter("startTime", startTime)
-                    .addParameter("endTime", endTime).executeAndFetchTable().rows();
-            if (handingRows.size() > 0) {
-                Row row = handingRows.get(0);
-                Float moneyTmp = row.getFloat("money");
-                moneyTmp = moneyTmp == null ? 0 : moneyTmp;
-
-                Float countTmp = row.getFloat("count");
-                countTmp = countTmp == null ? 0 : countTmp;
-
-                money += moneyTmp;
-                count += countTmp;
-            }
+//            List<Row> handingRows = conn.createQuery(handingSql).addParameter("startTime", startTime)
+//                    .addParameter("endTime", endTime).executeAndFetchTable().rows();
+//            if (handingRows.size() > 0) {
+//                Row row = handingRows.get(0);
+//                Float moneyTmp = row.getFloat("money");
+//                moneyTmp = moneyTmp == null ? 0 : moneyTmp;
+//
+//                Float countTmp = row.getFloat("count");
+//                countTmp = countTmp == null ? 0 : countTmp;
+//
+//                money += moneyTmp;
+//                count += countTmp;
+//            }
 
             SiteInfo siteInfo = new SiteInfo();
             siteInfo.startTime = startTime;
@@ -732,8 +727,8 @@ public class AdminDataManager extends BaseDataHelper {
     public static class SiteInfo {
         public long startTime;
         public long endTime;
-        public float count;
-        public float money;
+        public BigDecimal count;
+        public BigDecimal money;
     }
 
     public static class ProductVerify {
