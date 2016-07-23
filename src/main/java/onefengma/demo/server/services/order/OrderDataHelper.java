@@ -63,13 +63,13 @@ public class OrderDataHelper extends BaseDataHelper {
 
             BigDecimal count = connection.createQuery(countSql)
                     .addParameter("lastTime", DateHelper.getLastDayTimestamp())
-                    .addParameter("nextTime", DateHelper.getNextDayTimestamp())
+                    .addParameter("nextTime", DateHelper.getTodayStart())
                     .executeScalar(BigDecimal.class);
             lastRecords.count = count == null ? new BigDecimal(0) : count;
 
             BigDecimal sellMoney = connection.createQuery(moneySql)
                     .addParameter("lastTime", DateHelper.getLastDayTimestamp())
-                    .addParameter("nextTime", DateHelper.getNextDayTimestamp())
+                    .addParameter("nextTime", DateHelper.getTodayStart())
                     .executeScalar(BigDecimal.class);
             lastRecords.sellingMoney = sellMoney == null ? new BigDecimal(0) : sellMoney;
         }
@@ -302,7 +302,7 @@ public class OrderDataHelper extends BaseDataHelper {
 
             int id = conn.createQuery(idSql)
                     .addParameter("lastTime", DateHelper.getLastDayTimestamp())
-                    .addParameter("nextTime", DateHelper.getNextDayTimestamp())
+                    .addParameter("nextTime", DateHelper.getTodayStart())
                     .executeScalar(Integer.class);
             String dateStr = DateHelper.getDataStrWithOut();
             dateStr = order.productType + dateStr + "0" + id;
