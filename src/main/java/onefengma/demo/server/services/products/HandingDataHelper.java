@@ -371,7 +371,7 @@ public class HandingDataHelper extends BaseDataHelper {
         String maxCountSql = "select count(*) " +
         " from handing_buy,handing_buy_seller where handing_buy_seller.handingId = handing_buy.id and sellerId=:sellerId and status<>2 ";
 
-        String winTimesSql = "select winningTimes from seller where userId=:sellerId";
+        String winTimesSql = "select count(supplyUserId) as winningTimes from handing_buy where supplyUserId=:sellerId";
         String offerTimesSql = "select count(*) from handing_buy_supply where sellerId=:sellerId";
 
         SellerHandingBuysResponse response = new SellerHandingBuysResponse(pageBuilder.currentPage, pageBuilder.pageCount);
