@@ -2,6 +2,7 @@ package onefengma.demo.server.services.user;
 
 import org.sql2o.Connection;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -214,8 +215,8 @@ public class UserDataHelper extends BaseDataHelper {
         String handingBuyCountsql = "select count(*) from handing_buy where status = 0 and userId=:userId ";
         String orderCountSql = "select count(*) from product_orders where status = 0 and buyerId=:userId";
         try(Connection conn = getConn()) {
-            Integer integral = conn.createQuery(sql).addParameter("userId", userId).executeScalar(Integer.class);
-            integral = (integral == null) ? 0 : integral;
+            BigDecimal integral = conn.createQuery(sql).addParameter("userId", userId).executeScalar(BigDecimal.class);
+            integral = (integral == null) ? new BigDecimal(0) : integral;
 
             Integer ironCount = conn.createQuery(ironBuyCountsql).addParameter("userId", userId).executeScalar(Integer.class);
             ironCount = (ironCount == null) ? 0 : ironCount;
@@ -241,8 +242,8 @@ public class UserDataHelper extends BaseDataHelper {
         String handingBuyCountsql = "select count(*) from handing_buy where status = 0 and userId=:userId ";
         String orderCountSql = "select count(*) from product_orders where status = 0 and sellerId=:userId";
         try(Connection conn = getConn()) {
-            Integer integral = conn.createQuery(sql).addParameter("userId", userId).executeScalar(Integer.class);
-            integral = (integral == null) ? 0 : integral;
+            BigDecimal integral = conn.createQuery(sql).addParameter("userId", userId).executeScalar(BigDecimal.class);
+            integral = (integral == null) ? new BigDecimal(0) : integral;
 
             Integer ironCount = conn.createQuery(ironBuyCountsql).addParameter("userId", userId).executeScalar(Integer.class);
             ironCount = (ironCount == null) ? 0 : ironCount;
@@ -263,7 +264,7 @@ public class UserDataHelper extends BaseDataHelper {
     }
 
     public static class UserInfo {
-        public int integral;
+        public BigDecimal integral;
         public int buys;
         public int orders;
     }

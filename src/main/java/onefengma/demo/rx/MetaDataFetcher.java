@@ -39,6 +39,17 @@ public class MetaDataFetcher {
         return quotations;
     }
 
+    public static void fetchGraph() {
+        try {
+            Document doc = Jsoup.parse(new URL("http://www.gangg.cn/ji/showw.php"), 20000);
+
+            doc.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public static void fetch() {
         List<Quotation> quotationsTmp = new ArrayList<>();
         try {
