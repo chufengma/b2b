@@ -7,10 +7,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,10 +55,10 @@ public class MetaDataFetcher {
                 }
             }
             doc.select("#container").attr("style", "width:100%;height:120px;");
-            File file = new File("./res/B2BPlatformFront/data/graph.html");
-            FileWriter fileWriter  = new FileWriter(file);
-            fileWriter.write(doc.toString());
-            fileWriter.flush();
+            Writer out = new BufferedWriter(
+                    new OutputStreamWriter(new FileOutputStream("./res/B2BPlatformFront/data/graph.html"), "UTF-8"));
+            out.write(doc.toString());
+            out.flush();
         } catch (Exception e) {
             e.printStackTrace();
         }
