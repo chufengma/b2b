@@ -76,17 +76,17 @@ public class AdminDataManager extends BaseDataHelper {
         }
     }
 
-    public void updateUser(String userId, float integral, int salesmanId) {
+    public void updateUser(String userId, BigDecimal integral, int salesmanId) {
         String sql = "update user set salesManId=:salesManId,integral=:integral where userId=:userId";
         try (Connection conn = getConn()) {
             conn.createQuery(sql)
-                    .addParameter("integral", integral)
+                    .addParameter("integral", integral.toPlainString())
                     .addParameter("userId", userId)
                     .addParameter("salesManId", salesmanId).executeUpdate();
         }
     }
 
-    public void updateSeller(String sellerId, float integral, int salesmanId) {
+    public void updateSeller(String sellerId, BigDecimal integral, int salesmanId) {
         String sql = "update seller set integral=:integral where userId=:userId";
         String userSql = "update user set salesmanId=:salesManId where userId=:userId";
         try (Connection conn = getConn()) {
@@ -805,10 +805,10 @@ public class AdminDataManager extends BaseDataHelper {
         public long becomeSellerTime;
         public String contactName;
         public int productCount;
-        public float score;
+        public BigDecimal score;
         public int salesId;
         public String salesMobile;
-        public float integral;
+        public BigDecimal integral;
 
         private float sellerTotalMoney;
         private float buyerTotalMoney;
@@ -835,9 +835,9 @@ public class AdminDataManager extends BaseDataHelper {
         private long registerTime;
         public int salesId;
         public String salesTel;
-        public float buyMoney;
+        public BigDecimal buyMoney;
         public String userId;
-        public float integral;
+        public BigDecimal integral;
 
         public long getRegisterTime() {
             return registerTime;

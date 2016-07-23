@@ -185,6 +185,9 @@ public class UserManager extends BaseManager {
         }));
 
         post("bindSalesman", BindSalesManRequest.class, ((request, response, requestBean) -> {
+            if (!UserDataHelper.instance().isSalesManExited(requestBean.salesmanId)) {
+                return error("该顾问不存在");
+            }
             UserDataHelper.instance().bindSalesman(requestBean.getUserId(), requestBean.salesmanId);
             return success();
         }));

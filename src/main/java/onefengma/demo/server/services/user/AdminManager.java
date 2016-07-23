@@ -108,7 +108,7 @@ public class AdminManager extends BaseManager {
             if (!UserDataHelper.instance().isSalesManExited(requestBean.salesmanId)) {
                 return error("该顾问不存在");
             }
-            AdminDataManager.instance().updateSeller(requestBean.userId,requestBean.integral, requestBean.salesmanId);
+            AdminDataManager.instance().updateSeller(requestBean.userId, requestBean.integral, requestBean.salesmanId);
             UserDataHelper.instance().updateSalesmanBindTime(requestBean.salesmanId, requestBean.userId);
             return success("修改成功");
         }));
