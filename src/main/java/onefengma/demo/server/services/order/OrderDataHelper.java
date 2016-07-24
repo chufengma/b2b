@@ -264,7 +264,7 @@ public class OrderDataHelper extends BaseDataHelper {
     }
 
     public List<OrderDynamic> getOrdersDynamic() {
-        String sql = "select product_orders.id,iron_product.proId,iron_product.proId as ironId,ironType,material,mobile,pushTime,count,price  " +
+        String sql = "select product_orders.id,iron_product.proId,iron_product.proId as ironId,ironType,material,mobile,finishTime,count,price  " +
                 "from product_orders, iron_product, user where productType=0 and iron_product.proId = productId and status<>4 and buyerId=user.userId " +
                 "order by finishTime desc limit 0,10";
         try(Connection conn = getConn()) {

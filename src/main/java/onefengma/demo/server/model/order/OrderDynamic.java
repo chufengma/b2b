@@ -10,7 +10,7 @@ public class OrderDynamic {
     public String ironType;
     public String material;
     public String mobile;
-    public long pushTime;
+    public long finishTime;
     public float count;
     public float price;
 }
