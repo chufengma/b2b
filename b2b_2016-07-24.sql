@@ -5,9 +5,9 @@
 # http://www.sequelpro.com/
 # https://github.com/sequelpro/sequelpro
 #
-# Host: 127.0.0.1 (MySQL 5.1.63)
+# Host: 118.178.17.15 (MySQL 5.5.49-0ubuntu0.14.04.1)
 # Database: b2b
-# Generation Time: 2016-06-05 14:20:39 +0000
+# Generation Time: 2016-07-24 08:15:12 +0000
 # ************************************************************
 
 
@@ -18,6 +18,63 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+
+# Dump of table admin_user
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `admin_user`;
+
+CREATE TABLE `admin_user` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `userName` varchar(200) NOT NULL DEFAULT '',
+  `password` varchar(100) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+LOCK TABLES `admin_user` WRITE;
+/*!40000 ALTER TABLE `admin_user` DISABLE KEYS */;
+
+INSERT INTO `admin_user` (`id`, `userName`, `password`)
+VALUES
+	(1,'fengma','42d0fde669a000eaf26fdc1cc2cab454'),
+	(2,'tbxcg1','f8d2a09b5fa0252d794d739b00bb8c99'),
+	(3,'tbxcg2','f8d2a09b5fa0252d794d739b00bb8c99');
+
+/*!40000 ALTER TABLE `admin_user` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+# Dump of table all_orders
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `all_orders`;
+
+CREATE TABLE `all_orders` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `allCount` bigint(100) NOT NULL,
+  `allSales` double NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table buyer_amount
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `buyer_amount`;
+
+CREATE TABLE `buyer_amount` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `ironCount` bigint(20) DEFAULT '0',
+  `ironMoney` double DEFAULT '0',
+  `handingCount` bigint(11) DEFAULT '0',
+  `handingMoney` double DEFAULT '0',
+  `day` bigint(100) DEFAULT '0',
+  `buyerId` varchar(200) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 
 
 # Dump of table city
@@ -286,7 +343,10 @@ VALUES
 	('Z0M9BtFa','5a8QXEaX','大港区',-1),
 	('5emDTbl5','5a8QXEaX','东丽区',-1),
 	('m8WOFReo','5a8QXEaX','西青区',-1),
-	('iYq5m7NV','5a8QXEaX','北辰区',-1),
+	('iYq5m7NV','5a8QXEaX','北辰区',-1);
+
+INSERT INTO `city` (`id`, `fatherId`, `name`, `type`)
+VALUES
 	('Wjn3Q2ie','5a8QXEaX','津南区',-1),
 	('qHM0uamz','5a8QXEaX','武清区',-1),
 	('Ut1JBvPL','5a8QXEaX','宝坻区',-1),
@@ -536,7 +596,10 @@ VALUES
 	('b6YvJPkY','4LkZxG5Z','启东市',-1),
 	('NVHFA4kY','4LkZxG5Z','海安县',-1),
 	('TgT1JEXk','4LkZxG5Z','如东县',-1),
-	('hrdkmrA5','4LkZxG5Z','其他',-1),
+	('hrdkmrA5','4LkZxG5Z','其他',-1);
+
+INSERT INTO `city` (`id`, `fatherId`, `name`, `type`)
+VALUES
 	('XzCNYAs1','gqS9V8lT','海陵区',-1),
 	('RV3MjsWJ','gqS9V8lT','高港区',-1),
 	('bF0Fp6vK','gqS9V8lT','姜堰市',-1),
@@ -786,7 +849,10 @@ VALUES
 	('WR8BNPUX','ShOEA35s','龙马潭区',-1),
 	('h2UlveIU','ShOEA35s','泸县',-1),
 	('fd0pLUs5','ShOEA35s','合江县',-1),
-	('hUb0vS5t','ShOEA35s','叙永县',-1),
+	('hUb0vS5t','ShOEA35s','叙永县',-1);
+
+INSERT INTO `city` (`id`, `fatherId`, `name`, `type`)
+VALUES
 	('yc48TGSl','ShOEA35s','古蔺县',-1),
 	('hrt2pts4','ShOEA35s','其他',-1),
 	('tQERvJto','6WeLL2eq','旌阳区',-1),
@@ -1036,7 +1102,10 @@ VALUES
 	('vKBmtEfD','F1sgGEjJ','其他',-1),
 	('0ZVOogdF','sWCMwqfe','汉台区',-1),
 	('boERT6mG','sWCMwqfe','留坝县',-1),
-	('bcGs9sb9','sWCMwqfe','镇巴县',-1),
+	('bcGs9sb9','sWCMwqfe','镇巴县',-1);
+
+INSERT INTO `city` (`id`, `fatherId`, `name`, `type`)
+VALUES
 	('ZF26r6Zk','sWCMwqfe','城固县',-1),
 	('REBSygiK','sWCMwqfe','南郑县',-1),
 	('RxUCraRu','sWCMwqfe','洋县',-1),
@@ -1286,7 +1355,10 @@ VALUES
 	('Bg4jlUj0','bSUEhIxP','吕梁',0),
 	('k5I7DjRN','bSUEhIxP','其他',-1),
 	('uMxtikdb','aSrMP8HT','杏花岭区',-1),
-	('nqwp4sJU','aSrMP8HT','小店区',-1),
+	('nqwp4sJU','aSrMP8HT','小店区',-1);
+
+INSERT INTO `city` (`id`, `fatherId`, `name`, `type`)
+VALUES
 	('xOquyyY7','aSrMP8HT','迎泽区',-1),
 	('8eEF7DdR','aSrMP8HT','尖草坪区',-1),
 	('hoVivm3d','aSrMP8HT','万柏林区',-1),
@@ -1536,7 +1608,10 @@ VALUES
 	('pgFuZgs8','kjOIUqTI','禹州市',-1),
 	('O1qAEGge','kjOIUqTI','长葛市',-1),
 	('x5aPuveF','kjOIUqTI','许昌县',-1),
-	('LwBDrPiZ','kjOIUqTI','鄢陵县',-1),
+	('LwBDrPiZ','kjOIUqTI','鄢陵县',-1);
+
+INSERT INTO `city` (`id`, `fatherId`, `name`, `type`)
+VALUES
 	('pf10nWgW','kjOIUqTI','襄城县',-1),
 	('G7Qou0ZA','kjOIUqTI','其他',-1),
 	('nIqDymJS','AS4VYBeZ','源汇区',-1),
@@ -1786,7 +1861,10 @@ VALUES
 	('mgdplGBL','SOYSjcWs','美溪区',-1),
 	('pb16VfMH','SOYSjcWs','乌马河区',-1),
 	('79Ln1OGo','SOYSjcWs','翠峦区',-1),
-	('Gza2P2xV','SOYSjcWs','友好区',-1),
+	('Gza2P2xV','SOYSjcWs','友好区',-1);
+
+INSERT INTO `city` (`id`, `fatherId`, `name`, `type`)
+VALUES
 	('yEs8FdSs','SOYSjcWs','上甘岭区',-1),
 	('nVBryVjU','SOYSjcWs','五营区',-1),
 	('eECcdT4y','SOYSjcWs','红星区',-1),
@@ -2036,7 +2114,10 @@ VALUES
 	('bTav96G2','mnifivpZ','广饶县',-1),
 	('aT5pdij7','mnifivpZ','利津县',-1),
 	('hwDDsPI6','mnifivpZ','其他',-1),
-	('ekGJPsEP','sCCfXHF1','芝罘区',-1),
+	('ekGJPsEP','sCCfXHF1','芝罘区',-1);
+
+INSERT INTO `city` (`id`, `fatherId`, `name`, `type`)
+VALUES
 	('f0YbPkKb','sCCfXHF1','福山区',-1),
 	('PZ5cH0dr','sCCfXHF1','牟平区',-1),
 	('q671NOfL','sCCfXHF1','莱山区',-1),
@@ -2286,7 +2367,10 @@ VALUES
 	('tQiqSTbE','mMVXsJKi','泾县',-1),
 	('56nOJXKE','mMVXsJKi','旌德县',-1),
 	('89PCpeZa','mMVXsJKi','绩溪县',-1),
-	('flZa2dH6','mMVXsJKi','其他',-1),
+	('flZa2dH6','mMVXsJKi','其他',-1);
+
+INSERT INTO `city` (`id`, `fatherId`, `name`, `type`)
+VALUES
 	('DsKts358','zL77rzsP','杭州',0),
 	('PdejvOHS','zL77rzsP','宁波',0),
 	('yopbl2y9','zL77rzsP','温州',0),
@@ -2536,7 +2620,10 @@ VALUES
 	('UnwLs30Z','qo2XfmyX','醴陵市',-1),
 	('LyVNYvJn','qo2XfmyX','株洲县',-1),
 	('VGsUq1nd','qo2XfmyX','炎陵县',-1),
-	('KiVu0XPp','qo2XfmyX','茶陵县',-1),
+	('KiVu0XPp','qo2XfmyX','茶陵县',-1);
+
+INSERT INTO `city` (`id`, `fatherId`, `name`, `type`)
+VALUES
 	('chFcaOuS','qo2XfmyX','攸县',-1),
 	('VOgr8NIQ','qo2XfmyX','其他',-1),
 	('3xjqXoxq','C2cwbJRM','岳塘区',-1),
@@ -2786,7 +2873,10 @@ VALUES
 	('3MJI3gY5','Gg9NakPd','金秀瑶族自治县',-1),
 	('Cqk8jY6U','Gg9NakPd','其他',-1),
 	('DcJ33dmA','rtwLnSSz','江州区',-1),
-	('vgV6RpKP','rtwLnSSz','凭祥市',-1),
+	('vgV6RpKP','rtwLnSSz','凭祥市',-1);
+
+INSERT INTO `city` (`id`, `fatherId`, `name`, `type`)
+VALUES
 	('CejkbAsl','rtwLnSSz','宁明县',-1),
 	('3bsdYTcz','rtwLnSSz','扶绥县',-1),
 	('z8YqkPdx','rtwLnSSz','龙州县',-1),
@@ -3036,7 +3126,10 @@ VALUES
 	('otTpHB3h','lgUbqdSZ','大理白族自治州',0),
 	('ag5MOASY','lgUbqdSZ','楚雄彝族自治州',0),
 	('Trz9SgCj','lgUbqdSZ','红河哈尼族彝族自治州',0),
-	('S9Ws0Kny','lgUbqdSZ','文山壮族苗族自治州',0),
+	('S9Ws0Kny','lgUbqdSZ','文山壮族苗族自治州',0);
+
+INSERT INTO `city` (`id`, `fatherId`, `name`, `type`)
+VALUES
 	('9xJPNH2t','lgUbqdSZ','西双版纳傣族自治州',0),
 	('PwUvrUko','lgUbqdSZ','其他',-1),
 	('UiO4x2le','PPsgE18G','盘龙区',-1),
@@ -3286,7 +3379,10 @@ VALUES
 	('M2n7WLld','wjxGWGBN','临高县',0),
 	('vAitvQrB','wjxGWGBN','白沙黎族自治县',0),
 	('KtohUckj','wjxGWGBN','昌江黎族自治县',0),
-	('WEYa7p0h','wjxGWGBN','乐东黎族自治县',0),
+	('WEYa7p0h','wjxGWGBN','乐东黎族自治县',0);
+
+INSERT INTO `city` (`id`, `fatherId`, `name`, `type`)
+VALUES
 	('x6HNElYf','wjxGWGBN','陵水黎族自治县',0),
 	('hBKs2Q91','wjxGWGBN','保亭黎族苗族自治县',0),
 	('0Akz87E0','wjxGWGBN','琼中黎族苗族自治县',0),
@@ -3536,7 +3632,10 @@ VALUES
 	('WWay83s4','7J6k9RT3','独山子区',-1),
 	('zdM1s2CR','7J6k9RT3','白碱滩区',-1),
 	('9oxFLuIB','7J6k9RT3','乌尔禾区',-1),
-	('8qqh04yt','7J6k9RT3','其他',-1),
+	('8qqh04yt','7J6k9RT3','其他',-1);
+
+INSERT INTO `city` (`id`, `fatherId`, `name`, `type`)
+VALUES
 	('s29wd3Yr','OI3GDjdy','吐鲁番市',-1),
 	('UrGliVP2','OI3GDjdy','托克逊县',-1),
 	('YgbW5FRh','OI3GDjdy','鄯善县',-1),
@@ -3686,18 +3785,50 @@ CREATE TABLE `handing_buy` (
   `handingType` varchar(100) NOT NULL DEFAULT '',
   `souCityId` varchar(100) NOT NULL DEFAULT '',
   `message` varchar(500) NOT NULL DEFAULT '',
+  `userId` varchar(100) NOT NULL DEFAULT '',
+  `pushTime` bigint(20) NOT NULL,
+  `timeLimit` bigint(20) NOT NULL,
+  `status` int(11) DEFAULT '0',
+  `supplyUserId` varchar(200) DEFAULT NULL,
+  `supplyWinTime` bigint(100) DEFAULT '0',
+  `salesmanId` int(11) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-LOCK TABLES `handing_buy` WRITE;
-/*!40000 ALTER TABLE `handing_buy` DISABLE KEYS */;
 
-INSERT INTO `handing_buy` (`id`, `handingType`, `souCityId`, `message`)
-VALUES
-	('d0p50HOYdWCc','冲花板','PwUgn58r','asfasdf');
 
-/*!40000 ALTER TABLE `handing_buy` ENABLE KEYS */;
-UNLOCK TABLES;
+# Dump of table handing_buy_seller
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `handing_buy_seller`;
+
+CREATE TABLE `handing_buy_seller` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `handingId` varchar(200) NOT NULL DEFAULT '',
+  `sellerId` varchar(200) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table handing_buy_supply
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `handing_buy_supply`;
+
+CREATE TABLE `handing_buy_supply` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `handingId` varchar(200) NOT NULL DEFAULT '',
+  `sellerId` varchar(200) NOT NULL DEFAULT '',
+  `supplyPrice` float NOT NULL DEFAULT '0',
+  `supplyMsg` varchar(1000) NOT NULL DEFAULT '',
+  `status` int(11) DEFAULT '0',
+  `salesmanId` int(11) DEFAULT '0',
+  `unit` varchar(100) DEFAULT 'kg',
+  `offerTime` bigint(20) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 
 
 # Dump of table handing_product
@@ -3710,25 +3841,70 @@ CREATE TABLE `handing_product` (
   `type` varchar(200) NOT NULL DEFAULT '',
   `souCityId` varchar(100) NOT NULL DEFAULT '',
   `title` varchar(200) NOT NULL DEFAULT '',
-  `price` float NOT NULL,
+  `price` varchar(500) NOT NULL DEFAULT '0',
   `unit` varchar(100) NOT NULL DEFAULT '',
   `cover` varchar(200) NOT NULL DEFAULT '',
   `image1` varchar(200) DEFAULT NULL,
   `image2` varchar(200) DEFAULT NULL,
   `image3` varchar(200) DEFAULT NULL,
+  `userId` varchar(100) NOT NULL DEFAULT '',
+  `reviewed` tinyint(4) NOT NULL DEFAULT '0',
+  `score` float NOT NULL DEFAULT '0',
+  `pushTime` bigint(100) DEFAULT '0',
+  `refuseMessage` varchar(500) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-LOCK TABLES `handing_product` WRITE;
-/*!40000 ALTER TABLE `handing_product` DISABLE KEYS */;
 
-INSERT INTO `handing_product` (`id`, `type`, `souCityId`, `title`, `price`, `unit`, `cover`, `image1`, `image2`, `image3`)
-VALUES
-	('A2amYGBYWgVu','整卷油磨','wYC4sP3V','sss',123,'米','./files/2016/6/5/ZAtfEHLT6IEg.png','','',''),
-	('5Gpr2IaEUKm9','整卷油磨','wYC4sP3V','sss',123,'米','./files/2016/6/5/nbzxo95rfgHM.png','','','');
 
-/*!40000 ALTER TABLE `handing_product` ENABLE KEYS */;
-UNLOCK TABLES;
+# Dump of table help_find_product
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `help_find_product`;
+
+CREATE TABLE `help_find_product` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `applyTime` bigint(100) NOT NULL,
+  `mobile` varchar(45) COLLATE utf8_bin NOT NULL,
+  `type` varchar(100) COLLATE utf8_bin NOT NULL,
+  `city` varchar(100) CHARACTER SET utf8 DEFAULT NULL,
+  `comment` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+  `spec` varchar(200) COLLATE utf8_bin DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+
+
+# Dump of table inner_message
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `inner_message`;
+
+CREATE TABLE `inner_message` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(300) NOT NULL DEFAULT ' ',
+  `message` text NOT NULL,
+  `userId` varchar(100) NOT NULL DEFAULT '',
+  `reviewed` tinyint(4) NOT NULL DEFAULT '0',
+  `pushTime` bigint(100) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table inner_news
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `inner_news`;
+
+CREATE TABLE `inner_news` (
+  `id` varchar(100) NOT NULL DEFAULT '',
+  `title` varchar(300) NOT NULL DEFAULT '',
+  `content` mediumtext NOT NULL,
+  `pushTime` bigint(20) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 
 
 # Dump of table iron_buy
@@ -3745,19 +3921,55 @@ CREATE TABLE `iron_buy` (
   `locationCityId` varchar(100) NOT NULL DEFAULT '',
   `userId` varchar(100) NOT NULL DEFAULT '',
   `message` varchar(500) NOT NULL DEFAULT '',
+  `pushTime` bigint(20) NOT NULL,
+  `length` varchar(500) NOT NULL DEFAULT '',
+  `width` varchar(500) NOT NULL DEFAULT '',
+  `height` varchar(500) NOT NULL DEFAULT '',
+  `tolerance` varchar(100) NOT NULL DEFAULT '',
+  `numbers` bigint(20) NOT NULL,
+  `timeLimit` bigint(20) NOT NULL,
+  `status` int(11) DEFAULT '0',
+  `supplyUserId` varchar(200) DEFAULT NULL,
+  `supplyWinTime` bigint(100) NOT NULL DEFAULT '0',
+  `salesmanId` int(10) DEFAULT '0',
+  `unit` varchar(50) DEFAULT 'kg',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-LOCK TABLES `iron_buy` WRITE;
-/*!40000 ALTER TABLE `iron_buy` DISABLE KEYS */;
 
-INSERT INTO `iron_buy` (`id`, `ironType`, `material`, `surface`, `proPlace`, `locationCityId`, `userId`, `message`)
-VALUES
-	('L5RGy7O98VYk','不锈钢管','409L','No.1','宝新','LnbsZoa2','527cec6a380046b5b813537e10d065e9','ASFASFASF'),
-	('P7x9wpB1lqtE','不锈钢管','409L','No.1','宝新','LnbsZoa2','527cec6a380046b5b813537e10d065e9','非常好的是不是，我要这个和那个');
 
-/*!40000 ALTER TABLE `iron_buy` ENABLE KEYS */;
-UNLOCK TABLES;
+# Dump of table iron_buy_seller
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `iron_buy_seller`;
+
+CREATE TABLE `iron_buy_seller` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `ironId` varchar(200) NOT NULL DEFAULT '',
+  `sellerId` varchar(200) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table iron_buy_supply
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `iron_buy_supply`;
+
+CREATE TABLE `iron_buy_supply` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `ironId` varchar(200) NOT NULL DEFAULT '',
+  `sellerId` varchar(200) NOT NULL DEFAULT '',
+  `supplyPrice` varchar(500) NOT NULL DEFAULT '0',
+  `supplyMsg` varchar(1000) NOT NULL DEFAULT '',
+  `status` int(11) DEFAULT '0',
+  `salesmanId` int(11) DEFAULT '0',
+  `unit` varchar(100) DEFAULT 'kg',
+  `offerTime` bigint(20) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 
 
 # Dump of table iron_product
@@ -3774,7 +3986,7 @@ CREATE TABLE `iron_product` (
   `material` varchar(100) NOT NULL DEFAULT '',
   `sourceCityId` varchar(100) NOT NULL DEFAULT '',
   `title` varchar(100) NOT NULL DEFAULT '',
-  `price` float NOT NULL,
+  `price` varchar(500) NOT NULL DEFAULT '0',
   `cover` varchar(100) NOT NULL DEFAULT '',
   `image1` varchar(100) DEFAULT NULL,
   `image2` varchar(100) DEFAULT NULL,
@@ -3782,24 +3994,117 @@ CREATE TABLE `iron_product` (
   `isSpec` tinyint(4) NOT NULL DEFAULT '0',
   `userId` varchar(100) NOT NULL DEFAULT '',
   `pushTime` bigint(100) DEFAULT NULL,
+  `numbers` bigint(20) NOT NULL,
+  `reviewed` tinyint(4) NOT NULL DEFAULT '0',
+  `score` float DEFAULT '0',
+  `refuseMessage` varchar(500) DEFAULT NULL,
+  `spec` varchar(200) DEFAULT NULL,
+  `unit` varchar(100) DEFAULT 'kg',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-LOCK TABLES `iron_product` WRITE;
-/*!40000 ALTER TABLE `iron_product` DISABLE KEYS */;
 
-INSERT INTO `iron_product` (`id`, `proId`, `surface`, `ironType`, `proPlace`, `material`, `sourceCityId`, `title`, `price`, `cover`, `image1`, `image2`, `image3`, `isSpec`, `userId`, `pushTime`)
+
+# Dump of table news
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `news`;
+
+CREATE TABLE `news` (
+  `id` varchar(100) NOT NULL DEFAULT '',
+  `title` varchar(300) NOT NULL DEFAULT '',
+  `content` mediumtext NOT NULL,
+  `pushTime` bigint(20) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table order_car
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_car`;
+
+CREATE TABLE `order_car` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `userId` varchar(200) NOT NULL DEFAULT '',
+  `proId` varchar(200) NOT NULL DEFAULT '',
+  `productType` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table product_orders
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product_orders`;
+
+CREATE TABLE `product_orders` (
+  `id` varchar(200) NOT NULL DEFAULT '',
+  `buyerId` varchar(100) NOT NULL DEFAULT '',
+  `sellerId` varchar(100) NOT NULL DEFAULT '',
+  `productId` varchar(100) DEFAULT NULL,
+  `productType` int(11) NOT NULL,
+  `count` int(11) DEFAULT NULL,
+  `salesmanId` int(11) DEFAULT NULL,
+  `sellTime` bigint(100) NOT NULL,
+  `timeLimit` bigint(20) NOT NULL,
+  `status` int(11) NOT NULL DEFAULT '0' COMMENT '0：买家已下单，1，卖家已确认,未评价 2,卖家已确认并且买家已评价',
+  `ironCount` bigint(11) DEFAULT '0',
+  `ironPrice` float DEFAULT '0',
+  `singleScore` float DEFAULT '0',
+  `totalMoney` varchar(1000) NOT NULL DEFAULT '0',
+  `deleteBy` int(4) DEFAULT '0',
+  `cancelBy` int(11) DEFAULT '0',
+  `finishTime` bigint(20) DEFAULT '0',
+  `message` varchar(400) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table recruit
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `recruit`;
+
+CREATE TABLE `recruit` (
+  `id` varchar(100) NOT NULL DEFAULT '',
+  `pushTime` bigint(20) NOT NULL DEFAULT '0',
+  `companyName` varchar(200) NOT NULL,
+  `place` varchar(200) NOT NULL,
+  `tel` varchar(100) NOT NULL,
+  `position` varchar(200) NOT NULL,
+  `salary` varchar(100) NOT NULL,
+  `welfare` mediumtext NOT NULL,
+  `description` mediumtext NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table salesman
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `salesman`;
+
+CREATE TABLE `salesman` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL DEFAULT '',
+  `tel` varchar(100) NOT NULL DEFAULT '',
+  `bindTime` bigint(20) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+LOCK TABLES `salesman` WRITE;
+/*!40000 ALTER TABLE `salesman` DISABLE KEYS */;
+
+INSERT INTO `salesman` (`id`, `name`, `tel`, `bindTime`)
 VALUES
-	(11,'3tp0TCGYqjXk','No.1','不锈钢管','宝新','201(L1,L2)','eIjqrOOc','AAAAAA',444434,'./files/2016/6/4/QKoj80zJDSJU.png',NULL,NULL,NULL,1,'527cec6a380046b5b813537e10d065e9',2016),
-	(14,'7USwfNZuL2IV','No.1','不锈钢管','宝新','201(L1,L2)','eIjqrOOc','AAAAAA',444434,'./files/2016/6/5/19sYUM9A9GmG.png','','','',1,'527cec6a380046b5b813537e10d065e9',2016),
-	(15,'8mqBXAuVnxZ9','No.1','不锈钢管','宝新','201(L1,L2)','eIjqrOOc','AAAAAA',444434,'./files/2016/6/5/wl32qIQ6KfkM.png','','','',1,'527cec6a380046b5b813537e10d065e9',2016),
-	(16,'Cmxxa08XqnVV','No.1','不锈钢管','宝新','201(L1,L2)','eIjqrOOc','AAAAAA',444434,'./files/2016/6/5/1kC0gfeJNqmC.png','','','',1,'527cec6a380046b5b813537e10d065e9',2016),
-	(17,'lW3zEDexjb1v','No.1','不锈钢管','宝新','201(L1,L2)','eIjqrOOc','AAAAAA',444434,'./files/2016/6/5/UiRyIRrL75zF.png','','','',1,'527cec6a380046b5b813537e10d065e9',2016),
-	(18,'rDydI0kSlq5l','No.1','不锈钢管','宝新','201(L1,L2)','eIjqrOOc','AAAAAA',444434,'./files/2016/6/5/Zjf6BJWCBma4.png','','','',1,'527cec6a380046b5b813537e10d065e9',1465112350182),
-	(19,'1b9GAlY1sGvr','No.1','不锈钢管','宝新','201(L1,L2)','eIjqrOOc','风马',444434,'./files/2016/6/5/Ywy8uNKa4zaS.png','','','',1,'527cec6a380046b5b813537e10d065e9',1465112434388),
-	(20,'dwzL4HiPwEeG','No.1','不锈钢管','宝新','409L','eIjqrOOc','风马',444434,'./files/2016/6/5/CYvwvzV3bV2U.png','','','',1,'527cec6a380046b5b813537e10d065e9',1465112515586);
+	(0,'','',1469248018526);
 
-/*!40000 ALTER TABLE `iron_product` ENABLE KEYS */;
+/*!40000 ALTER TABLE `salesman` ENABLE KEYS */;
 UNLOCK TABLES;
 
 
@@ -3825,17 +4130,128 @@ CREATE TABLE `seller` (
   `codeLic` varchar(100) DEFAULT NULL,
   `financeLic` varchar(100) DEFAULT NULL,
   `cover` varchar(200) NOT NULL DEFAULT '',
+  `ironTypeDesc` varchar(300) DEFAULT '',
+  `handingTypeDesc` varchar(300) DEFAULT '',
+  `salesmanId` int(11) DEFAULT '-1',
+  `productCount` int(11) DEFAULT '0',
+  `monthSellCount` int(11) DEFAULT '0',
+  `monthSellMoney` float DEFAULT '0',
+  `score` float DEFAULT '0',
+  `passed` tinyint(4) DEFAULT '0',
+  `passTime` bigint(20) DEFAULT '0',
+  `winningTimes` int(11) DEFAULT '0',
+  `integral` varchar(500) DEFAULT '0',
+  `reviewed` tinyint(4) DEFAULT '0',
+  `applyTime` bigint(20) DEFAULT '0',
+  `refuseMessage` varchar(500) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-LOCK TABLES `seller` WRITE;
-/*!40000 ALTER TABLE `seller` DISABLE KEYS */;
 
-INSERT INTO `seller` (`id`, `userId`, `companyName`, `regMoney`, `contact`, `cantactTel`, `fax`, `cityId`, `officeAddress`, `qq`, `shopProfile`, `allCer`, `businessLic`, `codeLic`, `financeLic`, `cover`)
+
+# Dump of table seller_amount
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `seller_amount`;
+
+CREATE TABLE `seller_amount` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `ironCount` bigint(20) NOT NULL DEFAULT '0',
+  `ironMoney` double NOT NULL DEFAULT '0',
+  `handingCount` bigint(11) NOT NULL DEFAULT '0',
+  `handingMoney` double NOT NULL DEFAULT '0',
+  `day` bigint(100) NOT NULL DEFAULT '0',
+  `sellerId` varchar(200) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table seller_transactions
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `seller_transactions`;
+
+CREATE TABLE `seller_transactions` (
+  `transId` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `sellerId` varchar(200) NOT NULL DEFAULT '0',
+  `productType` int(11) NOT NULL,
+  `productId` varchar(200) NOT NULL DEFAULT '',
+  `money` varchar(1000) NOT NULL DEFAULT '0',
+  `count` float NOT NULL DEFAULT '0',
+  `finishTime` bigint(30) NOT NULL DEFAULT '0',
+  `buyerId` varchar(200) NOT NULL,
+  PRIMARY KEY (`transId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table shop_orders
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `shop_orders`;
+
+CREATE TABLE `shop_orders` (
+  `sellerId` varchar(100) NOT NULL DEFAULT '',
+  `ironCount` bigint(20) DEFAULT '0',
+  `ironMoney` double DEFAULT '0',
+  `handingCount` bigint(11) DEFAULT '0',
+  `handingMoney` double DEFAULT '0',
+  PRIMARY KEY (`sellerId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table test
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `test`;
+
+CREATE TABLE `test` (
+  `orderId` varchar(11) NOT NULL DEFAULT '',
+  `test` int(11) DEFAULT NULL,
+  PRIMARY KEY (`orderId`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+LOCK TABLES `test` WRITE;
+/*!40000 ALTER TABLE `test` DISABLE KEYS */;
+
+INSERT INTO `test` (`orderId`, `test`)
 VALUES
-	(8,'527cec6a380046b5b813537e10d065e9','风马科技有限公司',1000,'将三米','18355551276','12300991','gVgwxppO','你打打发打发斯蒂芬','578323123','阿斯顿发撒旦法师打发士大夫','./res/files/2016/6/4/55RmFOs1.png','','','','');
+	('123',123),
+	('222',223),
+	('333',334);
 
-/*!40000 ALTER TABLE `seller` ENABLE KEYS */;
+/*!40000 ALTER TABLE `test` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+# Dump of table they_say
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `they_say`;
+
+CREATE TABLE `they_say` (
+  `id` varchar(100) NOT NULL DEFAULT '',
+  `title` varchar(300) NOT NULL DEFAULT '',
+  `content` mediumtext NOT NULL,
+  `pushTime` bigint(20) NOT NULL,
+  `who` varchar(100) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+LOCK TABLES `they_say` WRITE;
+/*!40000 ALTER TABLE `they_say` DISABLE KEYS */;
+
+INSERT INTO `they_say` (`id`, `title`, `content`, `pushTime`, `who`)
+VALUES
+	('iHI6AS019','','淘不锈为我们提供了网络平台，把不锈钢线下生意做到了线上，节省了我们传统电话报价的时间成本，增加了销路，很期待。',1469324487001,'卖方体验用户'),
+	('iHI6AS021','','找货难，找便宜靠谱的货更难。在淘不锈不仅可以发布求购，还可以看到卖家挂的现货以及评分，信息一目了然，很方便！',1469324487002,'买方体验用户A'),
+	('iHI6AS022','','淘不锈可以帮我们上门质检，作为外地买家，最担心的就是货物的质量问题，淘不锈替我们解决了最头疼的麻烦，一言不和就质检。',1469324487003,'买方体验用户B'),
+	('iHI6AS023','','淘不锈的淘加工版块为我们及客户提供了极大的方便，大大减少了我们的沟通成本，期待在淘加工这个平台更好的为大家提供服务。',1469324487004,'无锡昌协加工卯老板'),
+	('iHI6AS024','','公司环境不错，设施也齐全，为了提高用户体验我们都很努力。现在什么都是互联网+，利用网络进行各种商贸活动也是必然趋势！',1469324487005,'淘不锈成员');
+
+/*!40000 ALTER TABLE `they_say` ENABLE KEYS */;
 UNLOCK TABLES;
 
 
@@ -3850,20 +4266,53 @@ CREATE TABLE `user` (
   `password` varchar(200) NOT NULL DEFAULT '',
   `mobile` varchar(11) NOT NULL DEFAULT '',
   `userId` varchar(200) NOT NULL DEFAULT '',
-  `isSeller` tinyint(1) NOT NULL DEFAULT '0',
+  `isSeller` tinyint(4) NOT NULL DEFAULT '0',
+  `monthBuyMoney` float DEFAULT '0',
+  `buySellerId` int(11) NOT NULL DEFAULT '0',
+  `registerTime` bigint(20) NOT NULL,
+  `salesManId` int(11) DEFAULT '0',
+  `avator` varchar(200) DEFAULT '',
+  `integral` varchar(500) DEFAULT '0',
+  `salesBindTime` bigint(20) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-LOCK TABLES `user` WRITE;
-/*!40000 ALTER TABLE `user` DISABLE KEYS */;
 
-INSERT INTO `user` (`id`, `name`, `password`, `mobile`, `userId`, `isSeller`)
-VALUES
-	(1,'fengma','42D0FDE669A000EAF26FDC1CC2CAB454','18355551276','527cec6a380046b5b813537e10d065e9',1),
-	(2,NULL,'42D0FDE669A000EAF26FDC1CC2CAB454','18366661276','5afa98c48214438dad364113e3a82ce9',0);
 
-/*!40000 ALTER TABLE `user` ENABLE KEYS */;
-UNLOCK TABLES;
+# Dump of table user_bak
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `user_bak`;
+
+CREATE TABLE `user_bak` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) DEFAULT '',
+  `password` varchar(200) NOT NULL DEFAULT '',
+  `mobile` varchar(11) NOT NULL DEFAULT '',
+  `userId` varchar(200) NOT NULL DEFAULT '',
+  `isSeller` tinyint(4) NOT NULL DEFAULT '0',
+  `monthBuyMoney` float DEFAULT '0',
+  `buySellerId` int(11) NOT NULL DEFAULT '0',
+  `registerTime` bigint(20) NOT NULL,
+  `salesManId` int(11) DEFAULT '0',
+  `avator` varchar(200) DEFAULT '',
+  `integral` float DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table user_message
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `user_message`;
+
+CREATE TABLE `user_message` (
+  `userId` varchar(200) NOT NULL DEFAULT '',
+  `message` varchar(500) NOT NULL DEFAULT '',
+  PRIMARY KEY (`userId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 
 
