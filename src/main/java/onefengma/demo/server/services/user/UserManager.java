@@ -204,7 +204,7 @@ public class UserManager extends BaseManager {
                 return error("短信验证码不正确");
             }
             String userId = UserDataHelper.instance().getUserIdByMobile(requestBean.mobile);
-            if (!StringUtils.isEmpty(userId)) {
+            if (StringUtils.isEmpty(userId)) {
                 return error("没有该用户!");
             }
             UserDataHelper.instance().changeUserPassword(userId, IdUtils.md5(requestBean.newPassword));
