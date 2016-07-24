@@ -197,7 +197,7 @@ public class UserManager extends BaseManager {
         }));
 
         post("forgetPassword", ForgetPasswordRequest.class, ((request, response, requestBean) -> {
-            if (StringUtils.equals(requestBean.newPassword, requestBean.newPasswordConfirm)) {
+            if (!StringUtils.equals(requestBean.newPassword, requestBean.newPasswordConfirm)) {
                 return error("俩次密码输入不一致");
             }
             if (!MsgCodeHelper.isMsgCodeRight(request, requestBean.msgCode, requestBean.mobile)) {
