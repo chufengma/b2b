@@ -24,4 +24,5 @@ public class OrderBrief {
 
     public String sellerMobile;
     public String buyerMobile;
+    public String message;
 }

@@ -159,6 +159,7 @@ public class OrderDataHelper extends BaseDataHelper {
         orderBrief.sellTime = row.getLong("sellTime");
         orderBrief.timeLimit = row.getLong("timeLimit");
         orderBrief.productType = productType;
+        orderBrief.message = row.getString("message");
         String proId = row.getString("productId");
 
         if (isSeller) {
