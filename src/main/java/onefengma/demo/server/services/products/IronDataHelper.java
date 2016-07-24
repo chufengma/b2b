@@ -399,7 +399,7 @@ public class IronDataHelper extends BaseDataHelper {
             // 增加推送消息
             IronBuyBrief ironBuyBrief = getIronBuyBrief(ironId);
             if (ironBuyBrief != null) {
-                String message = "恭喜您！您报价的 " + generateIronBuyMessage(ironBuyBrief) + " 已中标，请联系对方吧 : " + UserDataHelper.instance().getUserMobile(supplyUserId);
+                String message = "恭喜您！您报价的 " + generateIronBuyMessage(ironBuyBrief) + " 已中标，请联系对方吧 : " + UserDataHelper.instance().getUserMobile(buyerId);
                 UserMessageDataHelper.instance().setUserMessage(supplyUserId, message);
                 // 增加站内信
                 InnerMessageDataHelper.instance().addInnerMessage(supplyUserId, "恭喜您成功中标", message);

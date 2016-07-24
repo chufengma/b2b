@@ -346,7 +346,7 @@ public class HandingDataHelper extends BaseDataHelper {
             // 增加推送消息
             HandingBuyBrief handingBuyBrief = getHandingBrief(handingId);
             if (handingBuyBrief != null) {
-                String message = "恭喜您！您报价的 " + handingBuyBrief.handingType + " 已中标，请联系对方吧 : " + UserDataHelper.instance().getUserMobile(supplyUserId);
+                String message = "恭喜您！您报价的 " + handingBuyBrief.handingType + " 已中标，请联系对方吧 : " + UserDataHelper.instance().getUserMobile(buyerId);
                 UserMessageDataHelper.instance().setUserMessage(supplyUserId, message);
                 // 增加站内信
                 InnerMessageDataHelper.instance().addInnerMessage(supplyUserId, "恭喜您成功中标", message);
