@@ -57,10 +57,10 @@ public class SellerDataHelper extends BaseDataHelper {
     public void insertSeller(Seller seller) throws NoSuchFieldException, IllegalAccessException {
         String sql = createSql("insert into @TABLE(@USER_ID, @COMPANY_NAME, @REG_MONEY, @CONTACT," +
                 "@CANTACT_TEL, @FAX, @CITY_ID, @OFFICE_ADDRESS, @QQ, @SHOP_PROFILE, " +
-                "@ALL_CER, @BUSINESS_LIC, @CODE_LIC, @FINANCE_LIC, applyTime) values (" +
+                "@ALL_CER, @BUSINESS_LIC, @CODE_LIC, @FINANCE_LIC, applyTime, cover) values (" +
                 ":userId, :companyName, :regMoney, :contact, :cantactTel," +
                 ":fax, :cityId, :officeAddress, :qq, :shopProfile, :allCer," +
-                ":buCli, :codeCli, :finCli, :applyTime)");
+                ":buCli, :codeCli, :finCli, :applyTime, :cover)");
         try(Connection connection = getConn()) {
             connection.createQuery(sql).addParameter("userId", seller.userId)
                     .addParameter("companyName", seller.companyName)
@@ -76,6 +76,7 @@ public class SellerDataHelper extends BaseDataHelper {
                     .addParameter("buCli", seller.businessLic)
                     .addParameter("codeCli", seller.codeLic)
                     .addParameter("finCli", seller.financeLic)
+                    .addParameter("cover", seller.cover)
                     .addParameter("applyTime", seller.applyTime)
                     .executeUpdate();
         }
