@@ -47,6 +47,8 @@ public class Config {
 
     public static final String LOG_FILE_PREFIX = "/root/data/logs/";
 
+    public static final boolean LOG_OPEN = false;
+
     public static final int PORT = 9090;
     private static String HOST;
 

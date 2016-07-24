@@ -32,6 +32,9 @@ public class LogUtils {
     }
 
     public static void saveToFiles(String log) {
+        if (!Config.LOG_OPEN) {
+            return;
+        }
         FileWriter writer = null;
         try {
             String folder = Config.LOG_FILE_PREFIX + DateHelper.getDataStr() + "/";
