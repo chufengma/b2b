@@ -8,6 +8,7 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Locale;
 
+import com.tinify.Tinify;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
@@ -43,6 +44,8 @@ public class Config {
     private static final String BASE_META_PATH = "./res/meta/";
 
     public static final String DEFAULT_AVATAR_URL = "./files/2016/6/19/WdDfdnobGk7Y.jpg";
+
+    public static final String LOG_FILE_PREFIX = "/root/data/logs/";
 
     public static final int PORT = 9090;
     private static String HOST;
@@ -102,6 +105,8 @@ public class Config {
             Spark.stop();
             LogUtils.i(e.toString());
         }
+
+        Tinify.setKey("wMGvp7X-Sk02pI1vkouapzIKt3_6m84j");
     }
 
     public boolean isDev() {

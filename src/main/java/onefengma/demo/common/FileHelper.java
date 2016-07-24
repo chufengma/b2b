@@ -2,17 +2,24 @@ package onefengma.demo.common;
 
 import com.oreilly.servlet.multipart.FileRenamePolicy;
 
+import com.tinify.Options;
+import com.tinify.Source;
+import com.tinify.Tinify;
+import onefengma.demo.server.core.LogUtils;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.Part;
 
 import onefengma.demo.server.config.Config;
+import sun.rmi.runtime.Log;
 
 /**
  * @author yfchu
@@ -82,6 +89,27 @@ public class FileHelper {
             return newFile;
         }
 
+    }
+
+    public static void compressImage(final String fileNameA) {
+        final String fileName = fileNameA.replace("./res", "res");
+        ThreadUtils.instance().post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    LogUtils.i("start compress : " + fileName);
+                    Source source = Tinify.fromFile(fileName);
+                    Options options = new Options()
+                            .with("method", "scale")
+                            .with("width", 320);
+                    Source resized = source.resize(options);
+                    resized.toFile(fileName);
+                    LogUtils.i("compress done : " + fileName);
+                } catch (IOException e) {
+                    LogUtils.i("compress error : " + e.getMessage() + "for" + fileName);
+                }
+            }
+        });
     }
 
     public static File getFileFromPath(String path) {

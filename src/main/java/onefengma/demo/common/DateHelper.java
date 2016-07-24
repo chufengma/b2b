@@ -15,6 +15,11 @@ public class DateHelper {
         return dateFormat.format(new Date());
     }
 
+    public static String getDataFullStr() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return dateFormat.format(new Date());
+    }
+
     public static String getDataStr(long time) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         return dateFormat.format(time);

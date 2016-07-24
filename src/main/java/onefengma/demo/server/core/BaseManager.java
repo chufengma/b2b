@@ -4,13 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.oreilly.servlet.MultipartRequest;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
+import freemarker.template.utility.NullArgumentException;
 import onefengma.demo.common.FileHelper;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.config.Config;
@@ -119,6 +117,7 @@ public abstract class BaseManager {
                 if (requestBean != null) {
                     cleanTmpFiles(requestBean.extra);
                 }
+                LogUtils.e(e, "error in doMultiRequest:" + e.getMessage());
                 return exception(e);
             }
         };
@@ -255,6 +254,11 @@ public abstract class BaseManager {
                     continue;
                 }
                 files.add(value);
+                if (value.length() >= 1024*1024*1.5) {
+                    value.delete();
+                    throw new NullPointerException("上传的图片大小不能超过1.5M");
+                }
+                FileHelper.compressImage(value.getAbsolutePath());
                 beanJson.put(paramsName, value);
             }
 
