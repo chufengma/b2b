@@ -317,9 +317,9 @@ public class AdminManager extends BaseManager {
             }
             AdminDataManager.instance().ironVerifyOperation(requestBean.id, requestBean.operation == 1, requestBean.message);
             if (requestBean.operation == 1) {
-                InnerMessageDataHelper.instance().addInnerMessage(ironDetail.userId, "恭喜资源成功", "恭喜资源成功");
+                InnerMessageDataHelper.instance().addInnerMessage(ironDetail.userId, "恭喜资源发布成功", "恭喜您发布的不锈钢产品审核通过");
             } else if (requestBean.operation == 2)  {
-                InnerMessageDataHelper.instance().addInnerMessage(ironDetail.userId, "资源发布失败！", "很抱歉，资源发布失败！");
+                InnerMessageDataHelper.instance().addInnerMessage(ironDetail.userId, "资源发布失败！", "很抱歉您的不锈钢产品发布失败！");
             }
             return success("操作成功");
         }));

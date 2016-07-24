@@ -23,7 +23,7 @@ public class InnerMessageDataHelper extends BaseDataHelper {
     }
 
     public void addRegisterSuccessMessage(String userId) {
-        addInnerMessage(userId, "欢迎加入淘不秀", "淘不秀好得很淘不秀好得很淘不秀好得很淘不秀好得很淘不秀好得很淘不秀好得很");
+        addInnerMessage(userId, "欢迎加入淘不锈", "淘不锈是全国首家提供上门质检的不锈钢电商平台，恭喜您注册成为淘不锈会员，开启您的淘不锈之旅吧，一言不和就上门质检");
     }
 
     public void addInnerMessage(String userId, String title, String message) {

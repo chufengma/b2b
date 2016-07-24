@@ -6,6 +6,7 @@ import org.sql2o.data.Row;
 import org.sql2o.data.Table;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -265,7 +266,7 @@ public class OrderDataHelper extends BaseDataHelper {
 
     public List<OrderDynamic> getOrdersDynamic() {
         String sql = "select product_orders.id,iron_product.proId,iron_product.proId as ironId,ironType,material,mobile,finishTime,count,price  " +
-                "from product_orders, iron_product, user where productType=0 and iron_product.proId = productId and status<>4 and buyerId=user.userId " +
+                "from product_orders, iron_product, user where productType=0 and iron_product.proId = productId and status in (1,2) and buyerId=user.userId " +
                 "order by finishTime desc limit 0,10";
         try(Connection conn = getConn()) {
             return conn.createQuery(sql).executeAndFetch(OrderDynamic.class);
@@ -482,14 +483,16 @@ public class OrderDataHelper extends BaseDataHelper {
         float buyerIntegral = (long)((long)totalMoney / 1000) * 0.5f;
         float sellerIntegral = (long)((long)totalMoney / 1000) * 0.1f;
 
+        DecimalFormat df = new DecimalFormat("0.0");
+
         conn.createQuery(buyerIntegralSql)
                 .addParameter("userId", buyerId)
-                .addParameter("add", buyerIntegral)
+                .addParameter("add", df.format(buyerIntegral))
                 .executeUpdate();
 
         conn.createQuery(sellerIntegralSql)
                 .addParameter("userId", sellerId)
-                .addParameter("add", sellerIntegral)
+                .addParameter("add", df.format(sellerIntegral))
                 .executeUpdate();
     }
 

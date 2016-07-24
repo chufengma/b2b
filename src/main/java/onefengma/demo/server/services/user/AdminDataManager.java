@@ -416,10 +416,10 @@ public class AdminDataManager extends BaseDataHelper {
     public void sellerVerifyOperation(String userId, boolean pass, String message) {
         if (pass) {
             doSellerVerify(userId, 1, message);
-            InnerMessageDataHelper.instance().addInnerMessage(userId, "恭喜您申请成为商家成功！", "恭喜您成功入住淘不锈");
+            InnerMessageDataHelper.instance().addInnerMessage(userId, "恭喜您成为入住商户！", "恭喜您成为淘不锈商家用户，淘不锈为您提供智能求购匹配功能，请时刻保持登陆状态，我们能够帮您更快更准的找到潜在生意");
         } else {
             doSellerVerify(userId, 2, message);
-            InnerMessageDataHelper.instance().addInnerMessage(userId, "很抱歉，申请成为商家失败！", "很抱歉，申请成为商家失败！");
+            InnerMessageDataHelper.instance().addInnerMessage(userId, "很抱歉，申请成为商家失败！", "很抱歉，申请成为商家审核失败, 失败原因:" + message);
         }
     }
 
@@ -633,11 +633,11 @@ public class AdminDataManager extends BaseDataHelper {
     public SiteInfo getSiteInfoForOrder(long startTime, long endTime) {
         String ironSql = "select count(*) count, sum(count*price) as money " +
                          "from product_orders,iron_product " +
-                         "where productType=0 and iron_product.proId=product_orders.productId and finishTime<:endTime and finishTime>=:startTime ";
+                         "where productType=0 and iron_product.proId=product_orders.productId and finishTime<:endTime and finishTime>=:startTime and status in (1 ,2)";
 
         String handingSql = "select count(*) count, sum(count*price) as money " +
                 "from product_orders,handing_product " +
-                "where productType=1 and handing_product.id=product_orders.productId and finishTime<:endTime and finishTime>=:startTime  ";
+                "where productType=1 and handing_product.id=product_orders.productId and finishTime<:endTime and finishTime>=:startTime and status in (1 ,2) ";
 
         try(Connection conn = getConn()) {
             BigDecimal money = new BigDecimal(0);
