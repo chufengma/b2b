@@ -8,6 +8,7 @@ import org.sql2o.data.Row;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,6 +86,7 @@ public class HandingDataHelper extends BaseDataHelper {
                     .addParameter("startTime", DateHelper.getThisMonthStartTimestamp())
                     .addParameter("endTime", DateHelper.getNextMonthStatimestamp()).executeAndFetch(HandingProductBrief.class);
             for(HandingProductBrief brief : briefs) {
+                brief.monthSellCount = brief.monthSellCount == null ? new BigDecimal(0) : brief.monthSellCount;
                 brief.setSourceCity(CityDataHelper.instance().getCityDescById(brief.souCityId));
             }
             return briefs;

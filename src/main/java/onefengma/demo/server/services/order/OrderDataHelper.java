@@ -8,6 +8,7 @@ import org.sql2o.data.Table;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import onefengma.demo.common.DateHelper;
 import onefengma.demo.common.StringUtils;
@@ -38,9 +39,12 @@ public class OrderDataHelper extends BaseDataHelper {
     private static LastRecords lastRecords;
     private static long lastGetTime;
 
+    private Random random;
+
     public static OrderDataHelper instance() {
         if (orderDataHelper == null) {
             orderDataHelper = new OrderDataHelper();
+            orderDataHelper.random = new Random();
         }
         return orderDataHelper;
     }
@@ -301,11 +305,11 @@ public class OrderDataHelper extends BaseDataHelper {
                     .addParameter("proId", order.productId).executeScalar(String.class);
 
             int id = conn.createQuery(idSql)
-                    .addParameter("lastTime", DateHelper.getLastDayTimestamp())
-                    .addParameter("nextTime", DateHelper.getTodayStart())
+                    .addParameter("lastTime", DateHelper.getTodayStart())
+                    .addParameter("nextTime", System.currentTimeMillis())
                     .executeScalar(Integer.class);
             String dateStr = DateHelper.getDataStrWithOut();
-            dateStr = order.productType + dateStr + "0" + id;
+            dateStr = order.productType + "" + random.nextInt(100) + dateStr + "0" + id;
             order.id = dateStr;
             order.sellerId = sellerId;
 

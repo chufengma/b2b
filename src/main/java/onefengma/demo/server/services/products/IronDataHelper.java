@@ -89,6 +89,7 @@ public class IronDataHelper extends BaseDataHelper {
                     .addParameter("endTime", DateHelper.getNextMonthStatimestamp())
                     .executeAndFetch(IronProductBrief.class);
             for (IronProductBrief ironProductBrief : ironProductBriefs) {
+                ironProductBrief.monthSellCount = ironProductBrief.monthSellCount == null ? new BigDecimal(0) : ironProductBrief.monthSellCount;
                 ironProductBrief.setSourceCity(CityDataHelper.instance().getCityDescById(ironProductBrief.sourceCityId));
             }
             return ironProductBriefs;
