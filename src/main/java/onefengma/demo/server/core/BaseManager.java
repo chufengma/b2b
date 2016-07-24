@@ -254,7 +254,7 @@ public abstract class BaseManager {
                     continue;
                 }
                 files.add(value);
-                if (value.length() >= 1024*1024*1.5) {
+                if (value.length() >= 1024 * 1024 * 1.5) {
                     value.delete();
                     throw new NullPointerException("上传的图片大小不能超过1.5M");
                 }
@@ -278,9 +278,9 @@ public abstract class BaseManager {
     public static void cleanTmpFiles(Object extra) {
         if (extra != null && extra instanceof ArrayList) {
             ArrayList arrayList = (ArrayList) extra;
-            for(int i = 0; i< arrayList.size() ; i++) {
+            for (int i = 0; i < arrayList.size(); i++) {
                 if (arrayList.get(i) instanceof File) {
-                    ((File)arrayList.get(i)).delete();
+                    ((File) arrayList.get(i)).delete();
                 }
             }
         }
@@ -296,7 +296,7 @@ public abstract class BaseManager {
             }
         } else {
             String[] params = request.body().split("&");
-            for(String param : params) {
+            for (String param : params) {
                 String[] realParams = param.split("=");
                 if (realParams.length != 2) {
                     continue;
@@ -308,7 +308,8 @@ public abstract class BaseManager {
                 } catch (Exception e) {
                     try {
                         keyValue = JSON.parseArray(value);
-                    } catch (Exception e2) {}
+                    } catch (Exception e2) {
+                    }
                 }
                 beanJson.put(realParams[0], keyValue);
             }
@@ -358,23 +359,26 @@ public abstract class BaseManager {
 
     private static String becomeUrl = "/html/view/common/become.html";
     private static String loginUrl = "/html/view/common/login.html";
+    private static String mainUrl = "/html/view/index-build.html";
 
     private static void addFilers() {
         Spark.before((request, response) -> {
                     String pathInfo = request.pathInfo();
                     File pageFile = null;
-                    if (pathInfo.startsWith("/admin") || pathInfo.startsWith("/html")) {
+                    if (StringUtils.equals(pathInfo, "/")) {
+                        pageFile = FileHelper.getFileFromPath(mainUrl);
+                    } else if (pathInfo.startsWith("/admin") || pathInfo.startsWith("/html")) {
                         // other pages
                         if (request.pathInfo().startsWith("/auth")) {
                             pageFile = FileHelper.getFileFromPath("notLogin.html");
                         } else if (request.pathInfo().startsWith("/admin/auth")) {
-                            if(!AuthHelper.isAdminLogin(request)) {
+                            if (!AuthHelper.isAdminLogin(request)) {
                                 response.redirect("/admin/login.html");
                             }
                         } else if (pathInfo.startsWith("/html/view/account")) {
                             AuthData serverData = new AuthData(AuthHelper.getServerToken(request), AuthHelper.getServerUserId(request));
                             AuthData clientData = new AuthData(AuthHelper.getRequestToken(request), AuthHelper.getRequestUserId(request));
-                            if((serverData == null || !serverData.equals(clientData))) {
+                            if ((serverData == null || !serverData.equals(clientData))) {
                                 response.redirect(loginUrl);
                             }
                             if (pathInfo.startsWith("/html/view/account/seller")) {

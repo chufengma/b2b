@@ -49,7 +49,7 @@ public class Config {
 
     public static final boolean LOG_OPEN = false;
 
-    public static final int PORT = 9090;
+    public static final int PORT = 80;
     private static String HOST;
 
     private static DataBaseModel dataBaseModel;
