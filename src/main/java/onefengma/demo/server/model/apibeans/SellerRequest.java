@@ -18,8 +18,9 @@ public class SellerRequest extends AuthSession {
     public String fax;
     public String cityId;
     public String officeAddress;
-    public File cover;
 
+    @NotRequired
+    public File cover;
     @NotRequired
     public String qq;
     public String shopProfile;
@@ -57,7 +58,7 @@ public class SellerRequest extends AuthSession {
         seller.officeAddress = cityDesc + sellerRequest.officeAddress;
         seller.qq = sellerRequest.qq;
         seller.shopProfile = sellerRequest.shopProfile;
-        seller.cover = FileHelper.generateRelativeInternetUri(cover);
+        seller.cover = sellerRequest.cover == null ? "./files/2016/6/19/WdDfdnobGk7Y.jpg" : FileHelper.generateRelativeInternetUri(cover);
         seller.allCer = sellerRequest.allCer == null ? "" : FileHelper.generateRelativeInternetUri(sellerRequest.allCer.getPath());
         seller.businessLic = sellerRequest.businessLic == null ? "" : FileHelper.generateRelativeInternetUri(sellerRequest.businessLic.getPath());
         seller.codeLic = sellerRequest.codeLic == null ? "" : FileHelper.generateRelativeInternetUri(sellerRequest.codeLic.getPath());
