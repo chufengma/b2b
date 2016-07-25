@@ -385,7 +385,7 @@ public class IronDataHelper extends BaseDataHelper {
                     .addParameter("time", System.currentTimeMillis())
                     .addParameter("userId", supplyUserId).executeUpdate();
 
-            Integer numbers = conn.createQuery(numberSql).addParameter("ironId", ironId).executeScalar(Integer.class);
+            Float numbers = conn.createQuery(numberSql).addParameter("ironId", ironId).executeScalar(float.class);
             if (numbers == null || numbers == 0) {
                 return;
             }
