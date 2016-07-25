@@ -478,8 +478,8 @@ public class OrderDataHelper extends BaseDataHelper {
     public void addIntegralByBuy(Connection conn , String buyerId, String sellerId, float totalMoney) {
         String buyerIntegralSql = "select integral from user where userId=:userId";
         String buyerIntegralUpdateSql = "update user set integral=:add where userId=:userId";
-        String sellerIntegralUpdateSql = "select integral from seller where userId=:userId";
-        String sellerIntegralSql = "update seller set integral=:add where userId=:userId";
+        String sellerIntegralSql = "select integral from seller where userId=:userId";
+        String sellerIntegralUpdateSql = "update seller set integral=:add where userId=:userId";
 
         float buyerIntegral = (long)((long)totalMoney / 1000) * 0.5f;
         float sellerIntegral = (long)((long)totalMoney / 1000) * 0.1f;
