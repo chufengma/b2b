@@ -1,6 +1,5 @@
 package onefengma.demo.server.services.order;
 
-import onefengma.demo.server.services.user.UserMessageDataHelper;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 import org.sql2o.data.Table;
@@ -477,22 +476,32 @@ public class OrderDataHelper extends BaseDataHelper {
     }
 
     public void addIntegralByBuy(Connection conn , String buyerId, String sellerId, float totalMoney) {
-        String buyerIntegralSql = "update user set integral = (integral + :add) where userId=:userId";
-        String sellerIntegralSql = "update seller set integral = (integral + :add) where userId=:userId";
+        String buyerIntegralSql = "select integral from user where userId=:userId";
+        String buyerIntegralUpdateSql = "update user set integral=:add where userId=:userId";
+        String sellerIntegralUpdateSql = "select integral from seller where userId=:userId";
+        String sellerIntegralSql = "update seller set integral=:add where userId=:userId";
 
         float buyerIntegral = (long)((long)totalMoney / 1000) * 0.5f;
         float sellerIntegral = (long)((long)totalMoney / 1000) * 0.1f;
 
         DecimalFormat df = new DecimalFormat("0.0");
 
-        conn.createQuery(buyerIntegralSql)
+        BigDecimal currentBuy = conn.createQuery(buyerIntegralSql).addParameter("userId", buyerId).executeScalar(BigDecimal.class);
+        currentBuy = currentBuy == null ? new BigDecimal(0) : currentBuy;
+        currentBuy = currentBuy.add(new BigDecimal(buyerIntegral));
+
+        conn.createQuery(buyerIntegralUpdateSql)
                 .addParameter("userId", buyerId)
-                .addParameter("add", df.format(buyerIntegral))
+                .addParameter("add", df.format(currentBuy))
                 .executeUpdate();
 
-        conn.createQuery(sellerIntegralSql)
+        BigDecimal currentSell = conn.createQuery(sellerIntegralSql).addParameter("userId", buyerId).executeScalar(BigDecimal.class);
+        currentSell = currentSell == null ? new BigDecimal(0) : currentSell;
+        currentSell = currentSell.add(new BigDecimal(sellerIntegral));
+
+        conn.createQuery(sellerIntegralUpdateSql)
                 .addParameter("userId", sellerId)
-                .addParameter("add", df.format(sellerIntegral))
+                .addParameter("add", df.format(currentSell))
                 .executeUpdate();
     }
 

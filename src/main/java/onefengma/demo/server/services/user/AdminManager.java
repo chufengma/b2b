@@ -186,10 +186,10 @@ public class AdminManager extends BaseManager {
             if (!OrderDataHelper.instance().isOrderExited(requestBean.orderId)) {
                 return error("该订单不存在");
             }
-            int status = OrderDataHelper.instance().getOrderStatus(requestBean.orderId);
-            if (status == 0) {
-                return error("订单正在进行中,无法删除");
-            }
+//            int status = OrderDataHelper.instance().getOrderStatus(requestBean.orderId);
+//            if (status == 0) {
+//                return error("订单正在进行中,无法删除");
+//            }
             OrderDataHelper.instance().deleteOrderBuyAdmin(requestBean.orderId);
             return success("删除成功");
         }));
@@ -242,8 +242,12 @@ public class AdminManager extends BaseManager {
 
 
         post("deleteProduct", AdminDeleteBuyRequest.class, ((request, response, requestBean) -> {
-            //TODO 删除订单
-            return error("删除订单出错");
+            if (requestBean.productType == 0) {
+                IronDataHelper.getIronDataHelper().deleteIronProduct(requestBean.proId);
+            } else if (requestBean.productType == 1) {
+                HandingDataHelper.getHandingDataHelper().deleteHandingProduct(requestBean.proId);
+            }
+            return success("删除订单成功");
         }));
 
         get("salesmans", AdminSalesRequest.class, ((request, response, requestBean) -> {

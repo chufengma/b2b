@@ -95,6 +95,10 @@ public class UserManager extends BaseManager {
                 return errorAndClear(requestBean, "用户已填写商家信息");
             }
 
+            if (SellerDataHelper.instance().isSellerCompanyNameExisted(requestBean.companyName)) {
+                return errorAndClear(requestBean, "抱歉，该公司名已经存在");
+            }
+
             if (!VerifyUtils.isMobile(requestBean.cantactTel)) {
                 return errorAndClear(requestBean, "手机号码输入不正确");
             }

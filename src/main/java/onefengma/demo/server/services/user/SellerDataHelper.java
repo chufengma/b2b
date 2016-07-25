@@ -94,6 +94,14 @@ public class SellerDataHelper extends BaseDataHelper {
         }
     }
 
+    public boolean isSellerCompanyNameExisted(String companyName) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "select count(*) from seller where companyName=:companyName";
+        try (Connection conn = getConn()){
+            Integer count = conn.createQuery(sql).addParameter("companyName", companyName).executeScalar(Integer.class);
+            return count != null && count > 0;
+        }
+    }
+
     public boolean isSeller(String userID) throws NoSuchFieldException, IllegalAccessException {
         return getSellerByUserId(userID) == null ? false : true;
     }

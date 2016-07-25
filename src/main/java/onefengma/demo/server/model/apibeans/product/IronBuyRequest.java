@@ -22,7 +22,7 @@ public class IronBuyRequest extends AuthSession {
     public String height;
     public String toleranceFrom;
     public String toleranceTo;
-    public long numbers;
+    public float numbers;
     public long timeLimit;
     public String unit;
 

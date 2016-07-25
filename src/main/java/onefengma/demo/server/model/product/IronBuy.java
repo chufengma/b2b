@@ -18,7 +18,7 @@ public class IronBuy {
     public String width;
     public String height;
     public String tolerance;
-    public long numbers;
+    public float numbers;
     public long timeLimit;
     public int salesmanId;
     public String unit;

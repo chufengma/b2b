@@ -1,17 +1,6 @@
 package onefengma.demo.rx;
 
-import com.alibaba.fastjson.JSON;
-
-import com.tinify.Options;
-import com.tinify.Source;
-import com.tinify.Tinify;
-import onefengma.demo.server.core.LogUtils;
-import rx.Observable;
-import rx.functions.Action1;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
 /**
@@ -35,7 +24,7 @@ public class RxDemo {
 //        }
 
         DecimalFormat df = new DecimalFormat("0.0");
-        System.out.println("---" + df.format(112313.39323));
+        System.out.println("---" + df.format(new BigDecimal(112313.39323)));
     }
 
 
