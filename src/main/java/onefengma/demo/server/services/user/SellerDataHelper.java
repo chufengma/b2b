@@ -279,9 +279,9 @@ public class SellerDataHelper extends BaseDataHelper {
     }
 
     private String generateKeyword(String keyword) {
-        return " and companyName like '%" + keyword + "%'" +
+        return " and (companyName like '%" + keyword + "%'" +
         " or officeAddress like '%" + keyword + "%'" +
-                " or shopProfile like '%" + keyword + "%'";
+                " or shopProfile like '%" + keyword + "%')";
     }
 
 
