@@ -1,5 +1,7 @@
 package onefengma.demo.server.model.product;
 
+import java.math.BigDecimal;
+
 /**
  * Created by chufengma on 16/6/29.
  */
@@ -19,7 +21,7 @@ public class IronBuyBrief {
     public String height;
     public String tolerance;
     public String unit;
-    public long numbers;
+    public BigDecimal numbers;
     public long timeLimit;
     public int status; // 0 待报价, 1 交易完成 , 2 过期, 3 已报价候选中, 4 我已中标
     public String supplyUserId;

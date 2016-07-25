@@ -602,6 +602,14 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
+    public void deleteIronBuy(String id) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "delete from iron_buy where id=:id";
+        try (Connection conn = getConn()) {
+            conn.createQuery(sql)
+                    .addParameter("id", id).executeUpdate();
+        }
+    }
+
     public IronBuyOfferDetail getWinSellerOffer(String ironBuyId, String userId) {
         String sql = "select " + generateFiledString(IronBuyOfferDetail.class) + " from iron_buy_supply where ironId=:id and sellerId=:userId";
         try (Connection conn = getConn()) {

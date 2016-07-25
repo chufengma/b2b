@@ -535,6 +535,14 @@ public class HandingDataHelper extends BaseDataHelper {
         });
     }
 
+    public void deleteHandingBuy(String id) throws Exception {
+        String sql = "delete from handing_buy where id=:id";
+        transaction((conn) -> {
+            conn.createQuery(sql)
+                    .addParameter("id", id).executeUpdate();
+        });
+    }
+
     public HandingBuyOfferDetail getWinSellerOffer(String handingBuyId, String userId) {
         String sql = "select " + generateFiledString(HandingBuyOfferDetail.class) + " from handing_buy_supply where handingId=:id and sellerId=:userId";
         try(Connection conn = getConn()) {

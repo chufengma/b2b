@@ -241,11 +241,11 @@ public class AdminManager extends BaseManager {
         }));
 
 
-        post("deleteProduct", AdminDeleteBuyRequest.class, ((request, response, requestBean) -> {
+        post("deleteBuy", AdminDeleteBuyRequest.class, ((request, response, requestBean) -> {
             if (requestBean.productType == 0) {
-                IronDataHelper.getIronDataHelper().deleteIronProduct(requestBean.proId);
+                IronDataHelper.getIronDataHelper().deleteIronBuy(requestBean.proId);
             } else if (requestBean.productType == 1) {
-                HandingDataHelper.getHandingDataHelper().deleteHandingProduct(requestBean.proId);
+                HandingDataHelper.getHandingDataHelper().deleteHandingBuy(requestBean.proId);
             }
             return success("删除订单成功");
         }));
