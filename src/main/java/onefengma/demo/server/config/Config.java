@@ -1,5 +1,7 @@
 package onefengma.demo.server.config;
 
+import com.tinify.Tinify;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
@@ -8,15 +10,14 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Locale;
 
-import com.tinify.Tinify;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import onefengma.demo.server.model.metaData.IconDataCategory;
-import onefengma.demo.server.model.metaData.City;
 import onefengma.demo.server.core.LogUtils;
+import onefengma.demo.server.model.metaData.City;
+import onefengma.demo.server.model.metaData.IconDataCategory;
 import spark.Spark;
 import spark.template.freemarker.FreeMarkerEngine;
 

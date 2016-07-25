@@ -280,7 +280,7 @@ public class SellerDataHelper extends BaseDataHelper {
     public List<ShopBrief> getRecommendShopsByHanding() {
         String sql = "select * from seller left join " +
                 "(select sellerId, sum(count) as count, sum(money) as money " +
-                "from seller_transactions where productType = 1 and finishTime < :endTime and finishTime >= :startTime " +
+                "from seller_transactions where productType in (1,3) and finishTime < :endTime and finishTime >= :startTime " +
                 "group by sellerId) as trans " +
                 "on seller.userId = trans.sellerId where passed=true " +
                 "order by money desc limit 0, 10 ";

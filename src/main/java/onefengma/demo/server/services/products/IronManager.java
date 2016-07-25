@@ -205,8 +205,7 @@ public class IronManager extends BaseManager {
             myIronBuyDetailResponse.supplies = IronDataHelper.getIronDataHelper().getIronBuySupplies(requestBean.ironId);
 
             if (myIronBuyDetailResponse.supplies!= null
-                    && myIronBuyDetailResponse.buy != null
-                    && !StringUtils.isEmpty(myIronBuyDetailResponse.buy.supplyUserId)) {
+                    && myIronBuyDetailResponse.buy != null) {
                 for(SupplyBrief supplyBrief : myIronBuyDetailResponse.supplies) {
                     if (StringUtils.equals(myIronBuyDetailResponse.buy.supplyUserId, supplyBrief.sellerId)) {
                         supplyBrief.isWinner = true;
