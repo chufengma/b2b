@@ -1,7 +1,6 @@
 package onefengma.demo.common;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 
 /**
  * @author yfchu
@@ -12,5 +11,20 @@ public class NumberUtils {
     public static float round(float number, int count) {
         BigDecimal bd = new BigDecimal(number + "");
         return bd.setScale(count, BigDecimal.ROUND_HALF_UP).floatValue();
+    }
+
+    public static BigDecimal round(BigDecimal number, int count) {
+        if (number == null) {
+            return new BigDecimal(0);
+        }
+        int maxLength = number.toString().length();
+        int zeroIndex = number.toString().indexOf(".");
+        if (zeroIndex == -1) {
+            return number;
+        }
+        if (maxLength - zeroIndex <= count) {
+            return number;
+        }
+        return number.setScale(count, BigDecimal.ROUND_HALF_UP);
     }
 }

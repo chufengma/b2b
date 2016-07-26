@@ -131,7 +131,7 @@ public class SellerDataHelper extends BaseDataHelper {
     public List<ShopBrief> getRecommendShopsByIron() {
         String sql = "select * from seller left join " +
                 "(select sellerId, sum(count) as count, sum(money) as money " +
-                "from seller_transactions where productType = 0 and finishTime < :endTime and finishTime >= :startTime " +
+                "from seller_transactions where productType in (0, 2) and finishTime < :endTime and finishTime >= :startTime " +
                 "group by sellerId) as trans " +
                 "on seller.userId = trans.sellerId where passed=true " +
                 "order by money desc limit 0, 10 ";
@@ -175,21 +175,26 @@ public class SellerDataHelper extends BaseDataHelper {
         shopBrief.companyName = row.getString("companyName");
         shopBrief.cover = row.getString("cover");
 
+        BigDecimal count = (row.getBigDecimal("count") == null ? new BigDecimal(0) : row.getBigDecimal("count"));
+        BigDecimal money = row.getBigDecimal("money") == null ? new BigDecimal(0) : row.getBigDecimal("money");
+        count = NumberUtils.round(count, 2);
+        money = NumberUtils.round(money, 2);
+
         if (productType == 0) {
-            shopBrief.ironCount = (row.getBigDecimal("count") == null ? new BigDecimal(0) : row.getBigDecimal("count"));
-            shopBrief.ironMoney = row.getBigDecimal("money") == null ? new BigDecimal(0) : row.getBigDecimal("money");
+            shopBrief.ironCount = count;
+            shopBrief.ironMoney = money;
             shopBrief.count = shopBrief.ironCount;
             shopBrief.money = shopBrief.ironMoney;
             shopBrief.ironTypeDesc = row.getString("ironTypeDesc");
         } else if (productType == 1){
-            shopBrief.handingCount = row.getBigDecimal("money") == null ? new BigDecimal(0) : row.getBigDecimal("money");
-            shopBrief.handingMoney = row.getBigDecimal("money");
+            shopBrief.handingCount = count;
+            shopBrief.handingMoney = money;
             shopBrief.count = shopBrief.handingCount;
             shopBrief.money = shopBrief.handingMoney;
             shopBrief.handingTypeDesc = row.getString("handingTypeDesc");
         } else {
-            shopBrief.count = (row.getBigDecimal("count") == null ? new BigDecimal(0) : row.getBigDecimal("count"));
-            shopBrief.money = row.getBigDecimal("money") == null ? new BigDecimal(0) : row.getBigDecimal("money");
+            shopBrief.count = count;
+            shopBrief.money = money;
             shopBrief.handingTypeDesc = row.getString("handingTypeDesc");
             shopBrief.ironTypeDesc = row.getString("ironTypeDesc");
         }

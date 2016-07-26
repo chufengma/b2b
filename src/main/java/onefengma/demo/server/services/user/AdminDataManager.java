@@ -180,7 +180,7 @@ public class AdminDataManager extends BaseDataHelper {
 
 
     public AdminOrdersResponse getOrdersForAdmin(PageBuilder pageBuilder) {
-        String sql = "select * from product_orders where status<>4  " + (pageBuilder.hasWhere() ? " and " : " ") + pageBuilder.generateWhere() + " " + pageBuilder.generateLimit();
+        String sql = "select * from product_orders where status<>4  " + (pageBuilder.hasWhere() ? " and " : " ") + pageBuilder.generateWhere() + " order by sellTime desc " + pageBuilder.generateLimit();
         String countSql = "select count(*) from product_orders where status<>4   " + (pageBuilder.hasWhere() ? " and " : " ") + pageBuilder.generateWhere();
 
         AdminOrdersResponse adminOrdersResponse = new AdminOrdersResponse();
@@ -247,7 +247,7 @@ public class AdminDataManager extends BaseDataHelper {
         } else {
             tableName = "handing_buy";
         }
-        String sql = "select * from " + tableName + " " + (pageBuilder.hasWhere() ? " where " : " ") + pageBuilder.generateWhere() + " " + pageBuilder.generateLimit();
+        String sql = "select * from " + tableName + " " + (pageBuilder.hasWhere() ? " where " : " ") + pageBuilder.generateWhere() + "  order by pushTime desc " + pageBuilder.generateLimit();
         String countSql = "select count(*) from  " + tableName + " " + (pageBuilder.hasWhere() ? " where " : " ") + pageBuilder.generateWhere();
 
         AdminBuysResponse adminBuysResponse = new AdminBuysResponse();
@@ -271,8 +271,10 @@ public class AdminDataManager extends BaseDataHelper {
                         buyForAdmin.supplyPrice = detail.supplyPrice;
                         buyForAdmin.totalMoney = buyForAdmin.supplyPrice * buyForAdmin.count;
                     }
-                    buyForAdmin.desc = row.getString("ironType") + " " + row.getString("material")
-                            + " " + row.getString("surface") + " " + CityDataHelper.instance().getCityDescById(row.getString("locationCityId"));
+                    buyForAdmin.desc = row.getString("ironType") + " " + row.getString("surface")  + " " + row.getString("material")
+                            + " " + row.getString("height") + "*" + row.getString("width") + "*" + row.getString("length") + " 公差：" + row.getString("tolerance") + " "
+                            + row.getString("numbers") + "" + row.getString("unit") + " "
+                            + "收货城市：" + CityDataHelper.instance().getCityDescById(row.getString("locationCityId")) + " " + row.getString("message");
 
                 } else {
                     HandingBuyOfferDetail detail = HandingDataHelper.getHandingDataHelper().getWinSellerOffer(buyForAdmin.buyId, supplyUserId);
@@ -281,7 +283,7 @@ public class AdminDataManager extends BaseDataHelper {
                         buyForAdmin.totalMoney = buyForAdmin.supplyPrice * buyForAdmin.count;
                     }
 
-                    buyForAdmin.desc = row.getString("handingType") + " " + CityDataHelper.instance().getCityDescById(row.getString("souCityId"));
+                    buyForAdmin.desc = row.getString("handingType") + " " + row.getString("message") + " " + CityDataHelper.instance().getCityDescById(row.getString("souCityId"));
                 }
                 buyForAdmin.pushTime = row.getLong("pushTime");
                 buyForAdmin.outDateTime = buyForAdmin.pushTime + row.getLong("timeLimit");

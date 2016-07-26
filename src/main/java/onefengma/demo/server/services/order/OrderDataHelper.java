@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Random;
 
 import onefengma.demo.common.DateHelper;
+import onefengma.demo.common.NumberUtils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
@@ -69,13 +70,13 @@ public class OrderDataHelper extends BaseDataHelper {
                     .addParameter("lastTime", DateHelper.getLastDayTimestamp())
                     .addParameter("nextTime", DateHelper.getTodayStart())
                     .executeScalar(BigDecimal.class);
-            lastRecords.count = count == null ? new BigDecimal(0) : count;
+            lastRecords.count = NumberUtils.round(count == null ? new BigDecimal(0) : count, 1);
 
             BigDecimal sellMoney = connection.createQuery(moneySql)
                     .addParameter("lastTime", DateHelper.getLastDayTimestamp())
                     .addParameter("nextTime", DateHelper.getTodayStart())
                     .executeScalar(BigDecimal.class);
-            lastRecords.sellingMoney = sellMoney == null ? new BigDecimal(0) : sellMoney;
+            lastRecords.sellingMoney = NumberUtils.round(sellMoney == null ? new BigDecimal(0) : sellMoney, 1);
         }
 
         lastGetTime = System.currentTimeMillis();
@@ -495,7 +496,7 @@ public class OrderDataHelper extends BaseDataHelper {
                 .addParameter("add", df.format(currentBuy))
                 .executeUpdate();
 
-        BigDecimal currentSell = conn.createQuery(sellerIntegralSql).addParameter("userId", buyerId).executeScalar(BigDecimal.class);
+        BigDecimal currentSell = conn.createQuery(sellerIntegralSql).addParameter("userId", sellerId).executeScalar(BigDecimal.class);
         currentSell = currentSell == null ? new BigDecimal(0) : currentSell;
         currentSell = currentSell.add(new BigDecimal(sellerIntegral));
 

@@ -26,7 +26,7 @@ public abstract class BaseDataHelper {
     private static Sql2o sql2o;
     private static String table;
 
-    protected static Sql2o getSql2o() {
+    public static Sql2o getSql2o() {
         if (sql2o == null) {
             DataBaseModel dataBaseModel = Config.instance().getDataBaseModel();
             sql2o = new Sql2o(dataBaseModel.getUrl(), dataBaseModel.getUser(), dataBaseModel.getPassword());
@@ -34,7 +34,7 @@ public abstract class BaseDataHelper {
         return sql2o;
     }
 
-    protected Connection getConn() {
+    public Connection getConn() {
         return getSql2o().open();
     }
 

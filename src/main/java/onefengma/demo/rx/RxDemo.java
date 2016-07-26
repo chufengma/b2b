@@ -1,7 +1,8 @@
 package onefengma.demo.rx;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
+
+import onefengma.demo.common.NumberUtils;
 
 /**
  * @author yfchu
@@ -23,8 +24,14 @@ public class RxDemo {
 //            e.printStackTrace();
 //        }
 
-        DecimalFormat df = new DecimalFormat("0.0");
-        System.out.println("---" + df.format(new BigDecimal(112313.39323)));
+//        DecimalFormat df = new DecimalFormat("0.0");
+//        System.out.println("---" + df.format(new BigDecimal(112313.39323)));
+
+//        try(Connection connection = OrderDataHelper.instance().getConn()) {
+//            OrderDataHelper.instance().addIntegralByBuy(connection, "527cec6a380046b5b813537e10d065e9", "5afa98c48214438dad364113e3a82ce9", 1323);
+//        }
+        BigDecimal bd = new BigDecimal(1233.1129134 + "");
+        System.out.println("---" + NumberUtils.round(bd, 3));
     }
 
 

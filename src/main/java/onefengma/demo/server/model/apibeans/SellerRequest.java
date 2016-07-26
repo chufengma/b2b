@@ -12,7 +12,7 @@ import onefengma.demo.server.services.funcs.CityDataHelper;
  */
 public class SellerRequest extends AuthSession {
     public String companyName;
-    public int regMoney;
+    public float regMoney;
     public String contact;
     public String cantactTel;
     public String fax;

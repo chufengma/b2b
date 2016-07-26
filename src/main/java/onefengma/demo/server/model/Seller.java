@@ -7,7 +7,7 @@ public class Seller {
     public int id;
     public String userId;
     public String companyName;
-    public int regMoney;
+    public float regMoney;
     public String contact;
     public String cantactTel;
     public String fax;
