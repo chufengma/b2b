@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import onefengma.demo.common.NumberUtils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
@@ -114,6 +115,13 @@ public class AdminDataManager extends BaseDataHelper {
                     .addParameter("startTime", pageBuilder.startTime)
                     .addParameter("endTime", pageBuilder.endTime)
                     .executeAndFetch(BuyerBrief.class);
+            if (usersResponse.buyers != null) {
+                for(BuyerBrief buyerBrief : usersResponse.buyers) {
+                    buyerBrief.buyMoney = NumberUtils.round(buyerBrief.buyMoney, 2);
+                    buyerBrief.integral = NumberUtils.round(buyerBrief.integral, 2);
+                }
+            }
+
             Long maxCount = conn.createQuery(maxCountSql).executeScalar(Long.class);
             usersResponse.maxCount = (maxCount == null ? 0 : maxCount);
             return usersResponse;
@@ -628,7 +636,7 @@ public class AdminDataManager extends BaseDataHelper {
         SiteInfo orderSiteInfo = getSiteInfoForOrder(startTime, endTime);
         SiteInfo buySiteInfo = getSiteInfoForBuy(startTime, endTime);
         orderSiteInfo.count = orderSiteInfo.count.add(buySiteInfo.count);
-        orderSiteInfo.money = orderSiteInfo.money.add(buySiteInfo.money);
+        orderSiteInfo.money = NumberUtils.round(orderSiteInfo.money.add(buySiteInfo.money), 2);
         return orderSiteInfo;
     }
 
@@ -675,7 +683,7 @@ public class AdminDataManager extends BaseDataHelper {
             SiteInfo siteInfo = new SiteInfo();
             siteInfo.startTime = startTime;
             siteInfo.endTime = endTime;
-            siteInfo.money = money;
+            siteInfo.money = NumberUtils.round(money, 2);
             siteInfo.count = count;
             return siteInfo;
         }
@@ -720,7 +728,7 @@ public class AdminDataManager extends BaseDataHelper {
             SiteInfo siteInfo = new SiteInfo();
             siteInfo.startTime = startTime;
             siteInfo.endTime = endTime;
-            siteInfo.money = money;
+            siteInfo.money = NumberUtils.round(money, 2);
             siteInfo.count = count;
             return siteInfo;
         }
