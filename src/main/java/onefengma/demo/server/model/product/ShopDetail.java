@@ -6,7 +6,7 @@ package onefengma.demo.server.model.product;
 public class ShopDetail {
     public String userId;
     public String companyName;
-    public int regMoney;
+    public String regMoney;
     public String officeAddress;
     public String shopProfile;
     public String cover;

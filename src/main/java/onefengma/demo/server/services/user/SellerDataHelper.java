@@ -386,7 +386,7 @@ public class SellerDataHelper extends BaseDataHelper {
                 shopDetail.productNumbers = row.getInteger("productCount");
                 shopDetail.officeAddress = row.getString("officeAddress");
                 shopDetail.score = row.getFloat("score") == null ? 0 : row.getFloat("score");
-                shopDetail.regMoney = row.getInteger("regMoney");
+                shopDetail.regMoney = row.getString("regMoney");
                 shopDetail.shopProfile = row.getString("shopProfile");
                 return shopDetail;
             }
