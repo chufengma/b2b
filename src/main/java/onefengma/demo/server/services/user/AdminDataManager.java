@@ -362,8 +362,6 @@ public class AdminDataManager extends BaseDataHelper {
                 salesManAdmin.userCount = userNum == null ? 0 : userNum;
 
                 List<Row> userRows = conn.createQuery(userSql)
-                        .addParameter("endTime", endTime)
-                        .addParameter("startTime", startTime)
                         .addParameter("id", salesManAdmin.id).executeAndFetchTable().rows();
 
                 for(Row userRow : userRows) {
