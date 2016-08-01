@@ -137,7 +137,7 @@ public class SellerDataHelper extends BaseDataHelper {
                 "order by money desc limit 0, 10 ";
             try(Connection conn = getConn()) {
                 List<Row> rows = conn.createQuery(sql)
-                        .addParameter("startTime", DateHelper.getLastMonthStartTimestamp())
+                        .addParameter("startTime", DateHelper.getThisMonthStartTimestamp())
                         .addParameter("endTime", DateHelper.getNextMonthStatimestamp())
                         .executeAndFetchTable().rows();
                 List<ShopBrief> shopBriefs = new ArrayList<>();
@@ -300,7 +300,7 @@ public class SellerDataHelper extends BaseDataHelper {
 
         try(Connection conn = getConn()) {
             List<Row> rows = conn.createQuery(sql)
-                    .addParameter("startTime", DateHelper.getLastMonthStartTimestamp())
+                    .addParameter("startTime", DateHelper.getThisMonthStartTimestamp())
                     .addParameter("endTime", DateHelper.getNextMonthStatimestamp())
                     .executeAndFetchTable().rows();
             List<ShopBrief> shopBriefs = new ArrayList<>();

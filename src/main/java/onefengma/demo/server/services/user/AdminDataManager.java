@@ -327,7 +327,8 @@ public class AdminDataManager extends BaseDataHelper {
     public AdminSalessResponse getSales(PageBuilder pageBuilder, long startTime, long endTime) {
         String salesSql = "select * from salesman where id<>0 " + (pageBuilder.hasWhere() ? " and " : " ") + pageBuilder.generateWhere() + " " + pageBuilder.generateLimit();
         String maxCountSql = "select count(*) from salesman where id<>0 " + (pageBuilder.hasWhere() ? " and " : " ") + pageBuilder.generateWhere() + " ";
-        String userCountSql = "select userId from user where salesManId=:id and salesBindTime<:endTime and salesBindTime>=:startTime  ";
+        String userCountSql = "select count(*) from user where salesManId=:id and salesBindTime<:endTime and salesBindTime>=:startTime  ";
+        String userSql = "select userId from user where salesManId=:id ";
 
         String orderMoneySql = "select sum(totalMoney) from product_orders " +
                 "where buyerId=:buyerId and (status=1 or status=2) and finishTime<:endTime and finishTime>=:startTime";
@@ -353,11 +354,18 @@ public class AdminDataManager extends BaseDataHelper {
                 salesManAdmin.id = row.getInteger("id");
                 salesManAdmin.name = row.getString("name");
                 salesManAdmin.mobile = row.getString("tel");
-                List<Row> userRows = conn.createQuery(userCountSql)
+                Integer userNum = conn.createQuery(userCountSql)
+                        .addParameter("endTime", endTime)
+                        .addParameter("startTime", startTime)
+                        .addParameter("id", salesManAdmin.id).executeScalar(Integer.class);
+
+                salesManAdmin.userCount = userNum == null ? 0 : userNum;
+
+                List<Row> userRows = conn.createQuery(userSql)
                         .addParameter("endTime", endTime)
                         .addParameter("startTime", startTime)
                         .addParameter("id", salesManAdmin.id).executeAndFetchTable().rows();
-                salesManAdmin.userCount = userRows.size();
+
                 for(Row userRow : userRows) {
                     String userId = userRow.getString("userId");
                     Float orderTotal = conn.createQuery(orderMoneySql)
