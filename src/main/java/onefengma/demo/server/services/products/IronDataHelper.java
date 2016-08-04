@@ -1,7 +1,5 @@
 package onefengma.demo.server.services.products;
 
-import onefengma.demo.server.model.Seller;
-import onefengma.demo.server.services.user.UserDataHelper;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -17,6 +15,7 @@ import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.ThreadUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.apibeans.others.HelpFindProduct;
 import onefengma.demo.server.model.apibeans.product.SellerIronBuysResponse;
 import onefengma.demo.server.model.product.IronBuy;
@@ -31,6 +30,7 @@ import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import onefengma.demo.server.services.order.OrderDataHelper;
 import onefengma.demo.server.services.order.TransactionDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
+import onefengma.demo.server.services.user.UserDataHelper;
 import onefengma.demo.server.services.user.UserMessageDataHelper;
 
 /**
@@ -554,7 +554,7 @@ public class IronDataHelper extends BaseDataHelper {
 
     public List<IronProduct> getMyIronProduct(PageBuilder pageBuilder, String userId) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(IronProduct.class) + " " +
-                "from iron_product where userId=:userId and reviewed=true order by pushTime desc " + pageBuilder.generateLimit();
+                "from iron_product where userId=:userId and reviewed=true and deleteStatus=0 order by pushTime desc " + pageBuilder.generateLimit();
         try (Connection conn = getConn()) {
             List<IronProduct> ironProducts = conn.createQuery(sql)
                     .addParameter("userId", userId).executeAndFetch(IronProduct.class);
@@ -594,7 +594,7 @@ public class IronDataHelper extends BaseDataHelper {
     }
 
     public void deleteIronProduct(String ironId) throws NoSuchFieldException, IllegalAccessException {
-        String sql = "delete from iron_product where proId=:proId";
+        String sql = "update iron_product set deleteStatus=1 where proId=:proId";
         try (Connection conn = getConn()) {
             conn.createQuery(sql)
                     .addParameter("proId", ironId).executeUpdate();

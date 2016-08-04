@@ -62,6 +62,7 @@ public class IronManager extends BaseManager {
                     .addEqualWhere("userId", requestBean.sellerId)
                     .addEqualWhere("isSpec", requestBean.isSpec)
                     .addEqualWhere("reviewed", true)
+                    .addEqualWhere("deleteStatus", 0)
                     .addInWhere("sourceCityId", CityDataHelper.instance().getCitiesById(new ArrayList<>(), requestBean.cityId))
                     .setOrderByRequest(requestBean);
 
