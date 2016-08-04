@@ -64,9 +64,11 @@ public class AdminDataManager extends BaseDataHelper {
         String bakSql = "insert into user_bak select * from user where userId=:userId";
 
         try (Connection conn = getConn()) {
-//            conn.createQuery(bakSql).addParameter("userId", userId).executeUpdate();
+            conn.createQuery(bakSql).addParameter("userId", userId).executeUpdate();
             conn.createQuery(sql).addParameter("userId", userId).executeUpdate();
-            conn.createQuery(sellerSql).addParameter("userId", userId).executeUpdate();
+            if (SellerDataHelper.instance().isSeller(userId)) {
+                conn.createQuery(sellerSql).addParameter("userId", userId).executeUpdate();
+            }
         }
     }
 
