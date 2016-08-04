@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.config.Config;
 import onefengma.demo.server.core.BaseManager;
+import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.BaseAuthPageBean;
 import onefengma.demo.server.model.apibeans.BaseBean;
@@ -231,6 +232,7 @@ public class IronManager extends BaseManager {
             if (!StringUtils.isEmpty(IronDataHelper.getIronDataHelper().getSupplyUserId(requestBean.ironBuyId))) {
                 return error("此次求购已经结束");
             }
+            LogUtils.i("--------selectSupply: userId:" + requestBean.getUserId() + "--ironBuyId:" + requestBean.ironBuyId + "--supplyId:" + requestBean.supplyId, true);
             IronDataHelper.getIronDataHelper().selectIronBuySupply(requestBean.getUserId(), requestBean.ironBuyId, requestBean.supplyId);
             return success();
         }));

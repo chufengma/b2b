@@ -19,20 +19,27 @@ public class LogUtils {
     public static void i(String log) {
         if (Config.instance().isDev()) {
             logger.info(log);
-            saveToFiles(log);
+            saveToFiles(log, false);
+        }
+    }
+
+    public static void i(String log, boolean forceLog) {
+        if (Config.instance().isDev()) {
+            logger.info(log);
+            saveToFiles(log, forceLog);
         }
     }
 
     public static void e(Exception e, String log) {
         if (Config.instance().isDev()) {
             logger.info(log);
-            saveToFiles(log);
+            saveToFiles(log, false);
             e.printStackTrace();
         }
     }
 
-    public static void saveToFiles(String log) {
-        if (!Config.LOG_OPEN) {
+    public static void saveToFiles(String log, boolean forceLog) {
+        if (!Config.LOG_OPEN && !forceLog) {
             return;
         }
         FileWriter writer = null;

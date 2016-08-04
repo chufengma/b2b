@@ -6,6 +6,7 @@ import org.sql2o.data.Row;
 import java.util.List;
 
 import onefengma.demo.server.core.BaseDataHelper;
+import onefengma.demo.server.core.LogUtils;
 
 /**
  * Created by chufengma on 16/6/18.
@@ -22,6 +23,7 @@ public class TransactionDataHelper extends BaseDataHelper {
     }
 
     public void insertIronBuyTransaction(Connection conn, String userId, String sellerId, String productId, float money, float count) {
+        LogUtils.i("--------insertIronBuyTransaction:" + userId + "--" + sellerId + "--" + productId + "--" + money + "--" + count, true);
         insertTransaction(conn, userId, sellerId, productId, 0, money, count);
     }
 
