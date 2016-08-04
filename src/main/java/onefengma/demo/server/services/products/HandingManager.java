@@ -22,6 +22,7 @@ import onefengma.demo.server.model.apibeans.product.SelectHandingSupply;
 import onefengma.demo.server.model.apibeans.product.UpdateHandingProductRequest;
 import onefengma.demo.server.model.metaData.HandingDataCategory;
 import onefengma.demo.server.model.product.HandingBuy;
+import onefengma.demo.server.model.product.HandingBuyBrief;
 import onefengma.demo.server.model.product.HandingDetail;
 import onefengma.demo.server.model.product.SupplyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
@@ -149,6 +150,10 @@ public class HandingManager extends BaseManager{
         post("selectSupply", SelectHandingSupply.class, ((request, response, requestBean) -> {
             HandingDataHelper.getHandingDataHelper().updateBuyStatusByUserId(requestBean.getUserId());
 
+            HandingBuyBrief handingBuyBrief = HandingDataHelper.getHandingDataHelper().getHandingBrief(requestBean.handingBuyId);
+            if (handingBuyBrief == null || !StringUtils.equals(requestBean.getUserId(), handingBuyBrief.userId)) {
+                return error("您没有相应求购");
+            }
             if (HandingDataHelper.getHandingDataHelper().getHandingBuyStatus(requestBean.handingBuyId) != 0) {
                 return error("此次求购已经结束");
             }

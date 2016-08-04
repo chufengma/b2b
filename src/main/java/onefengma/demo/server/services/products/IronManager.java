@@ -24,6 +24,7 @@ import onefengma.demo.server.model.apibeans.product.SelectIronSupply;
 import onefengma.demo.server.model.apibeans.product.UpdateIronProductRequest;
 import onefengma.demo.server.model.metaData.IconDataCategory;
 import onefengma.demo.server.model.product.IronBuy;
+import onefengma.demo.server.model.product.IronBuyBrief;
 import onefengma.demo.server.model.product.IronDetail;
 import onefengma.demo.server.model.product.SupplyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
@@ -223,6 +224,10 @@ public class IronManager extends BaseManager {
         post("selectSupply", SelectIronSupply.class, ((request, response, requestBean) -> {
             IronDataHelper.getIronDataHelper().updateBuyStatusByUserId(requestBean.getUserId());
 
+            IronBuyBrief ironBuyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.ironBuyId);
+            if (ironBuyBrief == null || !StringUtils.equals(requestBean.getUserId(), ironBuyBrief.userId)) {
+                return error("您没有相应求购");
+            }
             if (IronDataHelper.getIronDataHelper().getIronBuyStatus(requestBean.ironBuyId) != 0) {
                 return error("此次求购已经结束");
             }
