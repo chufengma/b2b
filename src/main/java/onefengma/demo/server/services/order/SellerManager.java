@@ -19,7 +19,6 @@ import onefengma.demo.server.model.apibeans.product.SellerHandingBuyDetailRespon
 import onefengma.demo.server.model.apibeans.product.SellerIronBuyDetailRequest;
 import onefengma.demo.server.model.apibeans.product.SellerIronBuyDetailResponse;
 import onefengma.demo.server.model.metaData.City;
-import onefengma.demo.server.model.order.Order;
 import onefengma.demo.server.model.product.HandingBuyBrief;
 import onefengma.demo.server.model.product.IronBuyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;

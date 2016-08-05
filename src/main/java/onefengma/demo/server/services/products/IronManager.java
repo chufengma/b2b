@@ -1,6 +1,7 @@
 package onefengma.demo.server.services.products;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.config.Config;
@@ -26,6 +27,7 @@ import onefengma.demo.server.model.metaData.IconDataCategory;
 import onefengma.demo.server.model.product.IronBuy;
 import onefengma.demo.server.model.product.IronBuyBrief;
 import onefengma.demo.server.model.product.IronDetail;
+import onefengma.demo.server.model.product.ShopBrief;
 import onefengma.demo.server.model.product.SupplyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.order.OrderDataHelper;
@@ -176,7 +178,8 @@ public class IronManager extends BaseManager {
         }));
 
         get("shopRecommend", BaseBean.class, ((request, response, requestBean) -> {
-            return success(SellerDataHelper.instance().getRecommendShopsByIron());
+            List<ShopBrief> shopBriefs = SellerDataHelper.instance().getRecommendShopsByIron();
+            return success(SellerDataHelper.filterShopRecommend(shopBriefs, SellerDataHelper.shopBlackListForIron, SellerDataHelper.shopWhiteListForIron));
         }));
 
         get("productRecommed", BaseBean.class, ((request, response, requestBean) -> {

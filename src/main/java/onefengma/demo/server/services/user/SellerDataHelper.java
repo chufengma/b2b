@@ -5,6 +5,7 @@ import org.sql2o.data.Row;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import onefengma.demo.common.DateHelper;
@@ -46,6 +47,12 @@ public class SellerDataHelper extends BaseDataHelper {
     private static final String FINANCE_LIC = "financeLic";
 
     private static SellerDataHelper sellerDataHelper;
+
+    public static List<String> shopBlackListForIron = Arrays.asList("TjKFdh0xvSlu", "F42LZu4t0LQZ");
+    public static List<String> shopWhiteListForIron = Arrays.asList();
+
+    public static List<String> shopBlackListForHanding = Arrays.asList("TjKFdh0xvSlu", "F42LZu4t0LQZ");
+    public static List<String> shopWhiteListForHanding = Arrays.asList("odAgP2ARqXJB");
 
     public static SellerDataHelper instance() {
         if (sellerDataHelper == null) {
@@ -544,4 +551,37 @@ public class SellerDataHelper extends BaseDataHelper {
             conn.createQuery(updateScoreSql).addParameter("score", newScore).addParameter("userId", userId).executeUpdate();
         }
     }
+
+
+    public static List<ShopBrief> filterShopRecommend(List<ShopBrief> source, List<String> blackListUserIds, List<String> whiteListUserIds) {
+        if (source == null || blackListUserIds == null || whiteListUserIds == null) {
+            return source;
+        }
+
+        // 白名单
+        List<ShopBrief> addToIndexShops = new ArrayList<>();
+        for(String userId : whiteListUserIds) {
+            ShopBrief shopBrief = SellerDataHelper.instance().getShopBrief(userId);
+            if (shopBrief != null) {
+                addToIndexShops.add(shopBrief);
+            }
+        }
+
+        // 黑名单
+        List<ShopBrief> deleteShops = new ArrayList<>();
+        for(ShopBrief shopBrief : source) {
+            if (blackListUserIds.contains(shopBrief.userId)) {
+                deleteShops.add(shopBrief);
+            }
+            if (whiteListUserIds.contains(shopBrief.userId)) {
+                deleteShops.add(shopBrief);
+            }
+        }
+
+        source.removeAll(deleteShops);
+        source.addAll(0, addToIndexShops);
+
+        return source;
+    }
+
 }

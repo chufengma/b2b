@@ -1,6 +1,7 @@
 package onefengma.demo.server.services.products;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseManager;
@@ -24,6 +25,7 @@ import onefengma.demo.server.model.metaData.HandingDataCategory;
 import onefengma.demo.server.model.product.HandingBuy;
 import onefengma.demo.server.model.product.HandingBuyBrief;
 import onefengma.demo.server.model.product.HandingDetail;
+import onefengma.demo.server.model.product.ShopBrief;
 import onefengma.demo.server.model.product.SupplyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.order.OrderDataHelper;
@@ -168,7 +170,8 @@ public class HandingManager extends BaseManager{
         }));
 
         get("shopRecommend", BaseBean.class, ((request, response, requestBean) -> {
-            return success(SellerDataHelper.instance().getRecommendShopsByHanding());
+            List<ShopBrief> shopBriefs = SellerDataHelper.instance().getRecommendShopsByHanding();
+            return success(SellerDataHelper.filterShopRecommend(shopBriefs, SellerDataHelper.shopBlackListForHanding, SellerDataHelper.shopWhiteListForHanding));
         }));
 
         get("myProducts", BaseAuthPageBean.class, ((request, response, requestBean) -> {
