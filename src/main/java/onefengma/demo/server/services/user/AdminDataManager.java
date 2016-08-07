@@ -332,16 +332,8 @@ public class AdminDataManager extends BaseDataHelper {
         String userCountSql = "select count(*) from user where salesManId=:id and salesBindTime<:endTime and salesBindTime>=:startTime  ";
         String userSql = "select userId from user where salesManId=:id ";
 
-        String orderMoneySql = "select sum(totalMoney) from product_orders " +
-                "where buyerId=:buyerId and (status=1 or status=2) and finishTime<:endTime and finishTime>=:startTime";
-
-        String handingBuyMoneySql = "select sum(supplyPrice) from handing_buy,handing_buy_supply " +
-                "where handing_buy.supplyUserId = handing_buy_supply.sellerId and handing_buy_supply.sellerId=:userId" +
-                " and supplyWinTime<:endTime and supplyWinTime>=:startTime ";
-
-        String ironBuyMoneySql = "select sum(supplyPrice*numbers) from iron_buy,iron_buy_supply " +
-                "where iron_buy.supplyUserId = iron_buy_supply.sellerId and iron_buy.status=1 and userId=:userId and iron_buy.id = iron_buy_supply.ironId " +
-                " and supplyWinTime<:endTime and supplyWinTime>=:startTime ";
+        String orderMoneySql = "select sum(money) from seller_transactions " +
+                "where buyerId=:buyerId and finishTime<:endTime and finishTime>=:startTime and productType in (0, 2, 3)";
 
         AdminSalessResponse adminSalessResponse = new AdminSalessResponse();
         adminSalessResponse.pageCount = pageBuilder.pageCount;
@@ -373,20 +365,7 @@ public class AdminDataManager extends BaseDataHelper {
                             .addParameter("endTime", endTime)
                             .addParameter("buyerId", userId).executeScalar(Float.class);
                     orderTotal = orderTotal == null ? 0 : orderTotal;
-
-//                    Float handingBuyTotal = conn.createQuery(handingBuyMoneySql)
-//                            .addParameter("startTime", startTime)
-//                            .addParameter("endTime", endTime)
-//                            .addParameter("userId", userId).executeScalar(Float.class);
-//                    handingBuyTotal = handingBuyTotal == null ? 0 : handingBuyTotal;
-
-                    Float ironBuyTotal = conn.createQuery(ironBuyMoneySql)
-                            .addParameter("startTime", startTime)
-                            .addParameter("endTime", endTime)
-                            .addParameter("userId", userId).executeScalar(Float.class);
-                    ironBuyTotal = ironBuyTotal == null ? 0 : ironBuyTotal;
-
-                    salesManAdmin.totalMoney += ironBuyTotal + orderTotal;
+                    salesManAdmin.totalMoney = NumberUtils.round(orderTotal, 2);
                 }
                 admins.add(salesManAdmin);
             }
