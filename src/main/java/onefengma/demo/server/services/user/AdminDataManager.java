@@ -332,7 +332,7 @@ public class AdminDataManager extends BaseDataHelper {
         String userCountSql = "select count(*) from user where salesManId=:id and salesBindTime<:endTime and salesBindTime>=:startTime  ";
         String userSql = "select userId from user where salesManId=:id ";
 
-        String orderMoneySql = "select sum(money) from seller_transactions " +
+        String orderMoneySql = "select sum(money) as money from seller_transactions " +
                 "where buyerId=:buyerId and finishTime<:endTime and finishTime>=:startTime and productType in (0, 2, 3)";
 
         AdminSalessResponse adminSalessResponse = new AdminSalessResponse();
@@ -365,7 +365,7 @@ public class AdminDataManager extends BaseDataHelper {
                             .addParameter("endTime", endTime)
                             .addParameter("buyerId", userId).executeScalar(Float.class);
                     orderTotal = orderTotal == null ? 0 : orderTotal;
-                    salesManAdmin.totalMoney = NumberUtils.round(orderTotal, 2);
+                    salesManAdmin.totalMoney += NumberUtils.round(orderTotal, 2);
                 }
                 admins.add(salesManAdmin);
             }
