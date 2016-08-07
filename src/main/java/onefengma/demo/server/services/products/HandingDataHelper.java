@@ -537,10 +537,18 @@ public class HandingDataHelper extends BaseDataHelper {
 
     public void deleteHandingBuy(String id) throws Exception {
         String sql = "delete from handing_buy where id=:id";
-        transaction((conn) -> {
-            conn.createQuery(sql)
-                    .addParameter("id", id).executeUpdate();
-        });
+        // delete buy_seller
+        String buySellerSql = "delete from handing_buy_supply where handingId=:id";
+        // delete buy_supply
+        String buySupplySql = "delete from handing_buy_seller where handingId=:id";
+        // delete seller_transactions
+        String transactionsSql = "delete from seller_transactions where productId=:id and productType=1 ";
+        try (Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("id", id).executeUpdate();
+            conn.createQuery(buySellerSql).addParameter("id", id).executeUpdate();
+            conn.createQuery(buySupplySql).addParameter("id", id).executeUpdate();
+            conn.createQuery(transactionsSql).addParameter("id", id).executeUpdate();
+        }
     }
 
     public HandingBuyOfferDetail getWinSellerOffer(String handingBuyId, String userId) {

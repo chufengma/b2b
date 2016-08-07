@@ -603,10 +603,19 @@ public class IronDataHelper extends BaseDataHelper {
     }
 
     public void deleteIronBuy(String id) throws NoSuchFieldException, IllegalAccessException {
+        // delete iron buy
         String sql = "delete from iron_buy where id=:id";
+        // delete iron_buy_seller
+        String ironBuySellerSql = "delete from iron_buy_supply where ironId=:id";
+        // delete iron_buy_supply
+        String ironBuySupplySql = "delete from iron_buy_seller where ironId=:id";
+        // delete seller_transactions
+        String ironBuyTransactionsSql = "delete from seller_transactions where productId=:id and productType=0 ";
         try (Connection conn = getConn()) {
-            conn.createQuery(sql)
-                    .addParameter("id", id).executeUpdate();
+            conn.createQuery(sql).addParameter("id", id).executeUpdate();
+            conn.createQuery(ironBuySellerSql).addParameter("id", id).executeUpdate();
+            conn.createQuery(ironBuySupplySql).addParameter("id", id).executeUpdate();
+            conn.createQuery(ironBuyTransactionsSql).addParameter("id", id).executeUpdate();
         }
     }
 
