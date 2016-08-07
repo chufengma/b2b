@@ -454,9 +454,9 @@ public class AdminManager extends BaseManager {
 
         get("siteInfo", SiteInfoRequest.class, ((request, response, requestBean) -> {
             if (requestBean.type == 0) {
-                return success(AdminDataManager.instance().getSiteInfoForBuy(requestBean.startTime, requestBean.endTime));
+                return success(AdminDataManager.instance().getSiteInfoForBuyFromTrans(requestBean.startTime, requestBean.endTime));
             } else if (requestBean.type == 1) {
-                return success(AdminDataManager.instance().getSiteInfoForOrder(requestBean.startTime, requestBean.endTime));
+                return success(AdminDataManager.instance().getSiteInfoForOrderFromTrans(requestBean.startTime, requestBean.endTime));
             } else {
                 return success(AdminDataManager.instance().getSiteInfoAllTrans(requestBean.startTime, requestBean.endTime));
             }

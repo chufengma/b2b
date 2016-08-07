@@ -641,8 +641,8 @@ public class AdminDataManager extends BaseDataHelper {
     }
 
     public SiteInfo getSiteInfoAllTrans(long startTime, long endTime) {
-        SiteInfo orderSiteInfo = getSiteInfoForOrder(startTime, endTime);
-        SiteInfo buySiteInfo = getSiteInfoForBuy(startTime, endTime);
+        SiteInfo orderSiteInfo = getSiteInfoForOrderFromTrans(startTime, endTime);
+        SiteInfo buySiteInfo = getSiteInfoForBuyFromTrans(startTime, endTime);
         orderSiteInfo.count = orderSiteInfo.count.add(buySiteInfo.count);
         orderSiteInfo.money = NumberUtils.round(orderSiteInfo.money.add(buySiteInfo.money), 2);
         return orderSiteInfo;
@@ -688,6 +688,51 @@ public class AdminDataManager extends BaseDataHelper {
                 count = count.add(countTmp);
             }
 
+            SiteInfo siteInfo = new SiteInfo();
+            siteInfo.startTime = startTime;
+            siteInfo.endTime = endTime;
+            siteInfo.money = NumberUtils.round(money, 2);
+            siteInfo.count = count;
+            return siteInfo;
+        }
+    }
+
+    public SiteInfo getSiteInfoForBuyFromTrans(long startTime, long endTime) {
+        String sql = "select count(*) as count, sum(money) as money from seller_transactions where productType in (0) and finishTime<:endTime and startTime>=startTime ";
+
+        try(Connection conn = getConn()) {
+            BigDecimal money = new BigDecimal(0);
+            BigDecimal count = new BigDecimal(0);
+            List<Row> ironRows = conn.createQuery(sql).addParameter("startTime", startTime)
+                    .addParameter("endTime", endTime).executeAndFetchTable().rows();
+            if (ironRows.size() > 0) {
+                Row row = ironRows.get(0);
+                count = row.getBigDecimal("count") == null ? new BigDecimal(0) : row.getBigDecimal("count");
+                money = row.getBigDecimal("money") == null ? new BigDecimal(0) : row.getBigDecimal("money");
+            }
+            SiteInfo siteInfo = new SiteInfo();
+            siteInfo.startTime = startTime;
+            siteInfo.endTime = endTime;
+            siteInfo.money = NumberUtils.round(money, 2);
+            siteInfo.count = count;
+            return siteInfo;
+        }
+    }
+
+
+    public SiteInfo getSiteInfoForOrderFromTrans(long startTime, long endTime) {
+        String sql = "select count(*) as count, sum(money) as money from seller_transactions where productType in (2, 3) and finishTime<:endTime and startTime>=startTime ";
+
+        try(Connection conn = getConn()) {
+            BigDecimal money = new BigDecimal(0);
+            BigDecimal count = new BigDecimal(0);
+            List<Row> ironRows = conn.createQuery(sql).addParameter("startTime", startTime)
+                    .addParameter("endTime", endTime).executeAndFetchTable().rows();
+            if (ironRows.size() > 0) {
+                Row row = ironRows.get(0);
+                count = row.getBigDecimal("count") == null ? new BigDecimal(0) : row.getBigDecimal("count");
+                money = row.getBigDecimal("money") == null ? new BigDecimal(0) : row.getBigDecimal("money");
+            }
             SiteInfo siteInfo = new SiteInfo();
             siteInfo.startTime = startTime;
             siteInfo.endTime = endTime;

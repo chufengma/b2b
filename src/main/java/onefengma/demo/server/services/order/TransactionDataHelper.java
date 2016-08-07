@@ -15,6 +15,8 @@ public class TransactionDataHelper extends BaseDataHelper {
 
     private static TransactionDataHelper instance;
 
+    // 0 ironbuy 1 handingBuy 2 ironOrder 3 handignOrder
+
     public static TransactionDataHelper instance() {
         if (instance == null) {
             instance = new TransactionDataHelper();
