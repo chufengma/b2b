@@ -698,7 +698,7 @@ public class AdminDataManager extends BaseDataHelper {
     }
 
     public SiteInfo getSiteInfoForBuyFromTrans(long startTime, long endTime) {
-        String sql = "select count(*) as count, sum(money) as money from seller_transactions where productType in (0) and finishTime<:endTime and startTime>=startTime ";
+        String sql = "select count(*) as count, sum(money) as money from seller_transactions where productType in (0) and finishTime<:endTime and finishTime>=startTime ";
 
         try(Connection conn = getConn()) {
             BigDecimal money = new BigDecimal(0);
@@ -721,7 +721,7 @@ public class AdminDataManager extends BaseDataHelper {
 
 
     public SiteInfo getSiteInfoForOrderFromTrans(long startTime, long endTime) {
-        String sql = "select count(*) as count, sum(money) as money from seller_transactions where productType in (2, 3) and finishTime<:endTime and startTime>=startTime ";
+        String sql = "select count(*) as count, sum(money) as money from seller_transactions where productType in (2, 3) and finishTime<:endTime and finishTime>=startTime ";
 
         try(Connection conn = getConn()) {
             BigDecimal money = new BigDecimal(0);
