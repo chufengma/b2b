@@ -1,18 +1,22 @@
 package onefengma.demo.rx;
 
-import com.alibaba.fastjson.JSON;
-import onefengma.demo.common.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import onefengma.demo.common.StringUtils;
 
 /**
  * Created by chufengma on 16/7/22.
@@ -55,8 +59,14 @@ public class MetaDataFetcher {
                 }
             }
             doc.select("#container").attr("style", "width:100%;height:120px;");
+
+            File graphFile = new File("./res/B2BPlatformFront/data/graph.html");
+            if (!graphFile.exists()) {
+                graphFile.createNewFile();
+            }
+
             Writer out = new BufferedWriter(
-                    new OutputStreamWriter(new FileOutputStream("./res/B2BPlatformFront/data/graph.html"), "UTF-8"));
+                    new OutputStreamWriter(new FileOutputStream(graphFile), "UTF-8"));
             out.write(doc.toString());
             out.flush();
         } catch (Exception e) {

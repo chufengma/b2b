@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import onefengma.demo.common.StringUtils;
+import onefengma.demo.server.config.ConfigBean;
 import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.services.user.UserDataHelper;
 
@@ -40,7 +41,7 @@ public class UserMessageServer extends WebSocketServer {
     }
 
     public UserMessageServer() throws UnknownHostException {
-        super(new InetSocketAddress(9091));
+        super(new InetSocketAddress(ConfigBean.USER_MESSAGE_PORT));
     }
 
     @Override
