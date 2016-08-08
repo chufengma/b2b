@@ -29,10 +29,6 @@ public class Config {
 
     // environment
     public static final ENVI ENV = ENVI.DEV;
-    // data
-    private static final String DATA_BASE_URL = "jdbc:mysql://localhost:3306/b2b?useUnicode=true&characterEncoding=utf8&useSSL=false";
-    private static final String DATA_BASE_USER = "root";
-    private static final String DATA_BASE_PASS = "8686239";
 
     private static final String NOT_FOUND_PATH = "/404.html";
     private static final String INDEX_PATH = "/index.html";
@@ -46,11 +42,8 @@ public class Config {
 
     public static final String DEFAULT_AVATAR_URL = "./files/2016/6/19/WdDfdnobGk7Y.jpg";
 
-    public static final String LOG_FILE_PREFIX = "/root/data/logs/";
-
     public static final boolean LOG_OPEN = false;
 
-    public static final int PORT = 80;
     private static String HOST;
 
     private static DataBaseModel dataBaseModel;
@@ -73,6 +66,13 @@ public class Config {
     }
 
     public void init() {
+        // db config
+        if (ENV == ENVI.DEV) {
+            ConfigBean.configDev();
+        } else {
+            ConfigBean.configPro();
+        }
+
         // host
         try {
             HOST = InetAddress.getLocalHost().getHostAddress();
@@ -82,7 +82,7 @@ public class Config {
         }
 
         // config port
-        Spark.port(PORT);
+        Spark.port(ConfigBean.PORT);
 
         // static files
         Spark.externalStaticFileLocation("./res/B2BPlatformFront/");
@@ -126,7 +126,7 @@ public class Config {
 
     public DataBaseModel getDataBaseModel() {
         if (dataBaseModel == null) {
-            dataBaseModel = new DataBaseModel(DATA_BASE_URL, DATA_BASE_USER, DATA_BASE_PASS);
+            dataBaseModel = new DataBaseModel(ConfigBean.DATA_BASE_URL, ConfigBean.DATA_BASE_USER, ConfigBean.DATA_BASE_PASS);
         }
         return dataBaseModel;
     }
@@ -212,6 +212,6 @@ public class Config {
     }
 
     public static String getAddressPrefix() {
-        return "http://" + HOST + ":" + PORT + "/";
+        return "http://" + HOST + ":" + ConfigBean.PORT + "/";
     }
 }
