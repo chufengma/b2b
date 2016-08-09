@@ -9,6 +9,7 @@ import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.VerifyUtils;
 import onefengma.demo.server.core.BaseAdminPageBean;
 import onefengma.demo.server.core.BaseManager;
+import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.Admin;
 import onefengma.demo.server.model.admin.AdminDetailRequest;
@@ -242,6 +243,7 @@ public class AdminManager extends BaseManager {
 
 
         post("deleteBuy", AdminDeleteBuyRequest.class, ((request, response, requestBean) -> {
+            LogUtils.i("admin delete buy data!  adminId:" + request.cookie("admin") + ", productType:" + requestBean.productType + ", productId=" + requestBean.proId, true);
             if (requestBean.productType == 0) {
                 IronDataHelper.getIronDataHelper().deleteIronBuy(requestBean.proId);
             } else if (requestBean.productType == 1) {
