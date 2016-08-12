@@ -62,6 +62,35 @@ public class UserManager extends BaseManager {
             return success();
         });
 
+        /* 注册 */
+        post("app/register", Register.class, (req, rep, register) -> {
+            // 输入验证
+//            if (!ValidateHelper.isPasswordConfirmed(register.password, register.passwordConfirm)) {
+//                return error("俩次密码输入不一致");
+//            }
+            if (!ValidateHelper.isPasswordRight(register.password)) {
+                return error("密码长度为 6~16");
+            }
+            if (!VerifyUtils.isMobile(register.mobile)) {
+                return error("手机号码输入不正确");
+            }
+//            if(!ValidateHelper.isCodeValid(register.validateCode, req.session())) {
+//                return error("验证码不正确");
+//            }
+            if (!MsgCodeHelper.isMsgCodeRight(req, register.msgCode, register.mobile)) {
+                return error("短信验证码不正确");
+            }
+
+            // 是否是重复用户
+            User user = getUserDataHelper().findUserByMobile(register.mobile);
+            if (user != null) {
+                return error("用户名已注册!");
+            }
+
+            getUserDataHelper().insertUser(register.generateUser());
+            return success();
+        });
+
         post("quit", AuthSession.class, ((request, response, requestBean) -> {
             requestBean.cleanLogin(request, response);
             return success();

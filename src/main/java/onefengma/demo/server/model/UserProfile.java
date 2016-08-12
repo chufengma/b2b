@@ -13,6 +13,7 @@ public class UserProfile {
     public String mobile;
     public int becomeStatus = 0;
 
+    public Seller seller;
     @NotRequired
     public UserInfo userData;
     @NotRequired
