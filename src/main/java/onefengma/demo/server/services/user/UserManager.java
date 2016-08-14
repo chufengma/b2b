@@ -104,7 +104,8 @@ public class UserManager extends BaseManager {
             }
             if (StringUtils.equals(user.getPassword(), IdUtils.md5(loginBean.password))) {
                 AuthHelper.setLoginSession(request, response, user);
-                return success();
+//                PushManager.instance().pushAndroidMessage(user.getUserId());
+                return success(UserDataHelper.instance().getUserProfile(user.getUserId()));
             } else {
                 return error("密码错误！");
             }
