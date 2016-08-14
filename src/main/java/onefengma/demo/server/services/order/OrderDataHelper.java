@@ -506,6 +506,38 @@ public class OrderDataHelper extends BaseDataHelper {
                 .executeUpdate();
     }
 
+    public void degreeIntegralByBuy(Connection conn , String buyerId, String sellerId, float totalMoney) {
+        String buyerIntegralSql = "select integral from user where userId=:userId";
+        String buyerIntegralUpdateSql = "update user set integral=:add where userId=:userId";
+        String sellerIntegralSql = "select integral from seller where userId=:userId";
+        String sellerIntegralUpdateSql = "update seller set integral=:add where userId=:userId";
+
+        float buyerIntegral = (long)((long)totalMoney / 1000) * 0.5f;
+        float sellerIntegral = (long)((long)totalMoney / 1000) * 0.1f;
+
+        DecimalFormat df = new DecimalFormat("0.0");
+
+        BigDecimal currentBuy = conn.createQuery(buyerIntegralSql).addParameter("userId", buyerId).executeScalar(BigDecimal.class);
+        currentBuy = currentBuy == null ? new BigDecimal(0) : currentBuy;
+        currentBuy = currentBuy.subtract(new BigDecimal(buyerIntegral));
+        currentBuy = currentBuy.floatValue() < 0 ? new BigDecimal(0) : currentBuy;
+
+        conn.createQuery(buyerIntegralUpdateSql)
+                .addParameter("userId", buyerId)
+                .addParameter("add", df.format(currentBuy))
+                .executeUpdate();
+
+        BigDecimal currentSell = conn.createQuery(sellerIntegralSql).addParameter("userId", sellerId).executeScalar(BigDecimal.class);
+        currentSell = currentSell == null ? new BigDecimal(0) : currentSell;
+        currentSell = currentSell.subtract(new BigDecimal(sellerIntegral));
+        currentSell = currentSell.floatValue() < 0 ? new BigDecimal(0) : currentSell;
+
+        conn.createQuery(sellerIntegralUpdateSql)
+                .addParameter("userId", sellerId)
+                .addParameter("add", df.format(currentSell))
+                .executeUpdate();
+    }
+
     public void concelOrder(String orderId) {
         String sql = "update product_orders set status=3,cancelBy=2 where id=:orderId and status=0";
         try(Connection conn = getConn()) {

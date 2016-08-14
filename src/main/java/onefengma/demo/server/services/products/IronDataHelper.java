@@ -611,7 +611,20 @@ public class IronDataHelper extends BaseDataHelper {
         String ironBuySupplySql = "delete from iron_buy_seller where ironId=:id";
         // delete seller_transactions
         String ironBuyTransactionsSql = "delete from seller_transactions where productId=:id and productType=0 ";
+
+        String transactionSql = "select * from seller_transactions where  productId=:id and productType=0";
+
         try (Connection conn = getConn()) {
+            List<Row> rows = conn.createQuery(transactionSql).addParameter("id", id).executeAndFetchTable().rows();
+            if (rows != null && rows.size() > 0) {
+                Row row = rows.get(0);
+                String sellerId = row.getString("sellerId");
+                String buyerId = row.getString("buyerId");
+                Float money = row.getFloat("money");
+                money = money == null ? 0 : money;
+                OrderDataHelper.instance().degreeIntegralByBuy(conn, buyerId, sellerId, money);
+            }
+
             conn.createQuery(sql).addParameter("id", id).executeUpdate();
             conn.createQuery(ironBuySellerSql).addParameter("id", id).executeUpdate();
             conn.createQuery(ironBuySupplySql).addParameter("id", id).executeUpdate();
