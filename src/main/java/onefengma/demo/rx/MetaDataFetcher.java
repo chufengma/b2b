@@ -79,11 +79,16 @@ public class MetaDataFetcher {
         List<Quotation> quotationsTmp = new ArrayList<>();
         try {
             Document doc = Jsoup.parse(new URL("http://www.51bxg.com"), 20000);
-            Elements items = doc.select(".ab_4 .unite_news_box_3 .unite_box_3 li");
-            for(int i=0;i<3;i++) {
-                Element element = items.get(i);
+            Elements items = doc.select(".news_box a").attr("block", "板卷价格");
+
+            for(Element element : items) {
                 String title = element.select(".title_right").html();
                 String price = element.select(".price_right").html();
+
+                if (StringUtils.isEmpty(title) && StringUtils.isEmpty(price)) {
+                    continue;
+                }
+
                 Quotation quotation = new Quotation();
                 quotation.time = System.currentTimeMillis();
                 quotation.price = price;
@@ -92,6 +97,12 @@ public class MetaDataFetcher {
                 quotation.proCity = descs[1];
                 quotation.market = descs[0];
                 quotationsTmp.add(quotation);
+
+                System.out.println(element);
+                if (quotationsTmp.size() == 3) {
+                    break;
+                }
+
             }
             if (quotationsTmp.size() != 0) {
                 quotations.clear();

@@ -16,7 +16,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
@@ -38,37 +41,7 @@ public class ReDemo {
     private String ccc = "fengma2";
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException, UnsupportedEncodingException {
-//        try {
-//            UserMessageServer userMessageServer = new UserMessageServer();
-//            userMessageServer.start();
-//            new Timer().schedule(new TimerTask() {
-//                @Override
-//                public void run() {
-//                    userMessageServer.sendUserMessage("527cec6a380046b5b813537e10d065e9", "纱布" + System.currentTimeMillis());
-//                }
-//            }, 0, 1000);
-//
-//        } catch (UnknownHostException e) {
-//            e.printStackTrace();
-//        }
-
-        MetaDataFetcher.fetchGraph();
-
-        System.out.println(":" + DateHelper.getDataStr(1469290942982l));
-        System.out.println(":" + DateHelper.getLastDayTimestamp());
-        System.out.println(":" + DateHelper.getTodayStart());
-        System.out.println(":" + DateHelper.getThisMonthStartTimestamp());
-        System.out.println(":" + DateHelper.getNextMonthStatimestamp());
-
-        BigDecimal value = new BigDecimal(219890700);
-        Test test = new Test();
-        test.name = "asdfasdfasdf";
-        test.value = value;
-
-        String json = "{\"name\":\"asdfasdfasdf\",\"value\":219890700}";
-
-        System.out.println("value:" + JSON.toJSONString(test));
-
+        MetaDataFetcher.fetch();
     }
 
     public static class Test {
