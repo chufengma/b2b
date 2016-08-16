@@ -141,7 +141,7 @@ public class SellerDataHelper extends BaseDataHelper {
                 "from seller_transactions where productType in (0, 2) and finishTime < :endTime and finishTime >= :startTime " +
                 "group by sellerId) as trans " +
                 "on seller.userId = trans.sellerId where passed=true " +
-                "order by money desc limit 0, 10 ";
+                "order by money desc limit 0, 15 ";
             try(Connection conn = getConn()) {
                 List<Row> rows = conn.createQuery(sql)
                         .addParameter("startTime", DateHelper.getThisMonthStartTimestamp())
@@ -303,7 +303,7 @@ public class SellerDataHelper extends BaseDataHelper {
                 "from seller_transactions where productType in (1,3) and finishTime < :endTime and finishTime >= :startTime " +
                 "group by sellerId) as trans " +
                 "on seller.userId = trans.sellerId where passed=true " +
-                "order by money desc limit 0, 10 ";
+                "order by money desc limit 0, 15 ";
 
         try(Connection conn = getConn()) {
             List<Row> rows = conn.createQuery(sql)
