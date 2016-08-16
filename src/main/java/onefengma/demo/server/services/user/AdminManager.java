@@ -100,6 +100,9 @@ public class AdminManager extends BaseManager {
             if (!UserDataHelper.instance().isSalesManExited(requestBean.salesmanId)) {
                 return error("该顾问不存在");
             }
+            LogUtils.i(" user update! salesmanId : " + requestBean.salesmanId +
+                    ", integral " + requestBean.integral +
+                    ", userId:" + requestBean.userId, true);
             AdminDataManager.instance().updateUser(requestBean.userId, requestBean.integral,requestBean.salesmanId);
             UserDataHelper.instance().updateSalesmanBindTime(requestBean.salesmanId, requestBean.userId);
             return success("修改成功");
@@ -109,6 +112,9 @@ public class AdminManager extends BaseManager {
             if (!UserDataHelper.instance().isSalesManExited(requestBean.salesmanId)) {
                 return error("该顾问不存在");
             }
+            LogUtils.i(" seller update! salesmanId : " + requestBean.salesmanId +
+                    ", integral " + requestBean.integral +
+                    ", userId:" + requestBean.userId, true);
             AdminDataManager.instance().updateSeller(requestBean.userId, requestBean.integral, requestBean.salesmanId);
             UserDataHelper.instance().updateSalesmanBindTime(requestBean.salesmanId, requestBean.userId);
             return success("修改成功");

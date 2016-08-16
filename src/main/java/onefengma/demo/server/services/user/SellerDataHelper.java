@@ -48,10 +48,10 @@ public class SellerDataHelper extends BaseDataHelper {
 
     private static SellerDataHelper sellerDataHelper;
 
-    public static List<String> shopBlackListForIron = Arrays.asList("TjKFdh0xvSlu", "F42LZu4t0LQZ");
+    public static List<String> shopBlackListForIron = Arrays.asList("TjKFdh0xvSlu", "F42LZu4t0LQZ", "lmO7NmHdSEzU", "DzGK64omOacQ");
     public static List<String> shopWhiteListForIron = Arrays.asList();
 
-    public static List<String> shopBlackListForHanding = Arrays.asList("TjKFdh0xvSlu", "F42LZu4t0LQZ");
+    public static List<String> shopBlackListForHanding = Arrays.asList("TjKFdh0xvSlu", "F42LZu4t0LQZ", "lmO7NmHdSEzU", "DzGK64omOacQ");
     public static List<String> shopWhiteListForHanding = Arrays.asList("odAgP2ARqXJB");
 
     public static SellerDataHelper instance() {
