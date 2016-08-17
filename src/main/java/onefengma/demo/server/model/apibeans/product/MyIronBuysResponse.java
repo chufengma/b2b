@@ -7,6 +7,7 @@ public class MyIronBuysResponse extends IronBuyResponse {
 
     public int canceledCount;
     public float lossRate;
+    public int newSupplyNums;
 
     public MyIronBuysResponse(int currentPage, int pageCount) {
         super(currentPage, pageCount);

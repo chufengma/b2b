@@ -205,6 +205,8 @@ public class IronManager extends BaseManager {
             handingGetResponse.buys = IronDataHelper.getIronDataHelper().getIronsBuy(pageBuilder);
             handingGetResponse.maxCount = IronDataHelper.getIronDataHelper().getMaxIronBuyCounts(pageBuilder);
             handingGetResponse.lossRate = (float) handingGetResponse.canceledCount / (float) handingGetResponse.maxCount;
+            handingGetResponse.lossRate = (float) handingGetResponse.canceledCount / (float) handingGetResponse.maxCount;
+            handingGetResponse.newSupplyNums = IronDataHelper.getIronDataHelper().getMaxIronBuyNewSupplyNum(pageBuilder);
             return success(handingGetResponse);
         }));
 
@@ -226,6 +228,8 @@ public class IronManager extends BaseManager {
             }
 
             myIronBuyDetailResponse.salesManPhone = UserDataHelper.instance().getSalesManTel(requestBean.getUserId());
+            // reset iron new offer count
+            IronDataHelper.getIronDataHelper().resetIronBuyNewOffersCount(requestBean.ironId);
             return success(myIronBuyDetailResponse);
         }));
 

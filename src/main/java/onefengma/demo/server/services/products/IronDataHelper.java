@@ -105,6 +105,15 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
+    public int getMaxIronBuyNewSupplyNum(PageBuilder pageBuilder) {
+        String sql = "select sum(newSupplyNum)" +
+                " from iron_buy " + generateWhereKey(pageBuilder, false);
+
+        try (Connection conn = getConn()) {
+            return conn.createQuery(sql).executeScalar(Integer.class);
+        }
+    }
+
     public List<IronBuyBrief> getIronsBuy(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(IronBuyBrief.class) +
                 " from iron_buy " + generateWhereKey(pageBuilder, true);
@@ -329,6 +338,14 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
+    public void resetIronBuyNewOffersCount(String ironId) {
+        String sql = "update iron_buy set lastGetDetailTime=:lastGetDetailTime, newSupplyNum=0 where id=:id";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("lastGetDetailTime", System.currentTimeMillis())
+                    .addParameter("id", ironId).executeUpdate();
+        }
+    }
+
     public List<SupplyBrief> getIronBuySupplies(String ironId) {
         String sql = "select * from iron_buy_supply,seller where ironId=:ironId and sellerId=userId";
         try (Connection conn = getConn()) {
@@ -509,6 +526,8 @@ public class IronDataHelper extends BaseDataHelper {
                 "salesmanId=0," +
                 "offerTime=:time";
 
+        String updateIronBuySql = "update iron_buy set newSupplyNum=(newSupplyNum+1) where id=:id";
+
         transaction((conn) -> {
             conn.createQuery(sql)
                     .addParameter("ironId", ironId)
@@ -530,6 +549,10 @@ public class IronDataHelper extends BaseDataHelper {
                     UserMessageDataHelper.instance().setUserMessage(ironBuyBrief.userId, message);
                 }
             }
+
+            // add new offer count
+            conn.createQuery(updateIronBuySql).addParameter("id", ironId);
+            // TODO 推送新数目至App
 
         });
     }
