@@ -15,9 +15,12 @@ import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.ThreadUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.core.PushManager;
 import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.apibeans.others.HelpFindProduct;
 import onefengma.demo.server.model.apibeans.product.SellerIronBuysResponse;
+import onefengma.demo.server.model.mobile.BasePushData;
+import onefengma.demo.server.model.mobile.BuyPushData;
 import onefengma.demo.server.model.product.IronBuy;
 import onefengma.demo.server.model.product.IronBuyBrief;
 import onefengma.demo.server.model.product.IronDetail;
@@ -110,7 +113,8 @@ public class IronDataHelper extends BaseDataHelper {
                 " from iron_buy " + generateWhereKey(pageBuilder, false);
 
         try (Connection conn = getConn()) {
-            return conn.createQuery(sql).executeScalar(Integer.class);
+            Integer num =  conn.createQuery(sql).executeScalar(Integer.class);
+            return num == null ? 0 : num;
         }
     }
 
@@ -540,20 +544,31 @@ public class IronDataHelper extends BaseDataHelper {
 
             addInBuySeller(conn, ironId, sellerId);
 
+            // add new offer count
+            conn.createQuery(updateIronBuySql).addParameter("id", ironId).executeUpdate();
+
             IronBuyBrief ironBuyBrief = getIronBuyBrief(ironId);
             if (ironBuyBrief != null) {
                 String message = generateIronBuyMessage(ironBuyBrief);
                 Seller seller = SellerDataHelper.instance().getSeller(sellerId);
                 if (seller != null) {
+                    // 推送至 websockets
                     message = seller.companyName + "公司 已对您的" + message + "求购进行报价，请前往求购管理进行刷新查看";
                     UserMessageDataHelper.instance().setUserMessage(ironBuyBrief.userId, message);
+
+                    // 推送至mobile
+                    BuyPushData pushData = new BuyPushData(ironBuyBrief.userId, BasePushData.PUSH_TYPE_BUY);
+                    pushData.title = "您的求购有新报价";
+                    pushData.desc = message;
+                    pushData.ironBuyBrief = ironBuyBrief;
+                    PageBuilder pageBuilder = new PageBuilder(0, 10)
+                            .addEqualWhere("userId", ironBuyBrief.userId)
+                            .addEqualWhere("status", 0);
+                    pushData.newSupplyNums = IronDataHelper.getIronDataHelper().getMaxIronBuyNewSupplyNum(pageBuilder);
+                    PushManager.instance().pushData(pushData);
                 }
+
             }
-
-            // add new offer count
-            conn.createQuery(updateIronBuySql).addParameter("id", ironId);
-            // TODO 推送新数目至App
-
         });
     }
 

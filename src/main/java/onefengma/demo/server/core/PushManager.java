@@ -1,13 +1,14 @@
 package onefengma.demo.server.core;
 
-import com.xiaomi.xmpush.server.*;
+import com.alibaba.fastjson.JSON;
+import com.xiaomi.xmpush.server.Constants;
+import com.xiaomi.xmpush.server.Message;
+import com.xiaomi.xmpush.server.Sender;
+
+import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.ThreadUtils;
 import onefengma.demo.server.config.ConfigBean;
-import org.json.simple.parser.ParseException;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import onefengma.demo.server.model.mobile.BasePushData;
 
 /**
  * Created by chufengma on 16/8/13.
@@ -31,27 +32,37 @@ public class PushManager {
         Constants.useOfficial();
     }
 
-    public void pushAndroidMessage(String userId) {
-        ThreadUtils.instance().post(new Runnable() {
-            @Override
-            public void run() {
-                String messagePayload = "哈哈哈哈哈哈哈哈啊哈哈哈哈哈哈哈哈哈";
-                String title = "欢迎登陆淘不锈";
-                String description = "淘不锈是一个什么什么什么什么什么什么什么什么什么什么";
-                Message message = new Message.Builder()
-                        .title(title)
-                        .description(description).payload(messagePayload)
-                        .restrictedPackageName(ANDROID_PAKAGE)
-                        .passThrough(1)
-                        .notifyType(1)
-                        .build();
+    public void pushData(BasePushData pushData) {
+        pushAndroidMessage(pushData);
+    }
 
-                Sender sender = new Sender(SECRET_KEY);
-                try {
-                    sender.sendToUserAccount(message, ConfigBean.MOBILE_PUSH_PREFIX + userId, 1);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+    private void pushAndroidMessage(BasePushData basePushData) {
+        if (StringUtils.isEmpty(basePushData.userId)) {
+            return;
+        }
+
+        String content = JSON.toJSONString(basePushData);
+        LogUtils.i("push data " + content, false);
+
+        ThreadUtils.instance().post(() -> {
+            String messagePayload = content;
+            String title = basePushData.title;
+            Message message = new Message.Builder()
+                    .title(title)
+                    .description(basePushData.desc)
+                    .extra("type", basePushData.type)
+                    .payload(messagePayload)
+                    .restrictedPackageName(ANDROID_PAKAGE)
+                    .passThrough(1)
+                    .notifyType(1)
+                    .build();
+
+            Sender sender = new Sender(SECRET_KEY);
+            try {
+                sender.sendToUserAccount(message, ConfigBean.MOBILE_PUSH_PREFIX + basePushData.userId, 4);
+            } catch (Exception e) {
+                LogUtils.i("push data error:" + JSON.toJSONString(basePushData), true);
+                e.printStackTrace();
             }
         });
     }

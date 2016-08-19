@@ -8,6 +8,8 @@ import onefengma.demo.server.config.Config;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.model.SalesMan;
+import onefengma.demo.server.model.apibeans.AuthSession;
 import onefengma.demo.server.model.apibeans.BaseAuthPageBean;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.product.DeleteIronProductRequest;
@@ -19,6 +21,7 @@ import onefengma.demo.server.model.apibeans.product.IronsGetRequest;
 import onefengma.demo.server.model.apibeans.product.IronsGetResponse;
 import onefengma.demo.server.model.apibeans.product.MyIronBuyDetail;
 import onefengma.demo.server.model.apibeans.product.MyIronBuyDetailResponse;
+import onefengma.demo.server.model.apibeans.product.MyIronBuysNewNums;
 import onefengma.demo.server.model.apibeans.product.MyIronBuysResponse;
 import onefengma.demo.server.model.apibeans.product.MyIronProductResponse;
 import onefengma.demo.server.model.apibeans.product.SelectIronSupply;
@@ -214,6 +217,9 @@ public class IronManager extends BaseManager {
             IronDataHelper.getIronDataHelper().updateBuyStatusByUserId(requestBean.getUserId());
 
             MyIronBuyDetailResponse myIronBuyDetailResponse = new MyIronBuyDetailResponse();
+            // reset iron new offer count
+            IronDataHelper.getIronDataHelper().resetIronBuyNewOffersCount(requestBean.ironId);
+
             myIronBuyDetailResponse.buy = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.ironId);
             myIronBuyDetailResponse.supplies = IronDataHelper.getIronDataHelper().getIronBuySupplies(requestBean.ironId);
 
@@ -227,9 +233,10 @@ public class IronManager extends BaseManager {
                 }
             }
 
-            myIronBuyDetailResponse.salesManPhone = UserDataHelper.instance().getSalesManTel(requestBean.getUserId());
-            // reset iron new offer count
-            IronDataHelper.getIronDataHelper().resetIronBuyNewOffersCount(requestBean.ironId);
+            SalesMan salesMan = UserDataHelper.instance().getSalesMan(requestBean.getUserId());
+            myIronBuyDetailResponse.salesMan = salesMan;
+            myIronBuyDetailResponse.salesManPhone = salesMan == null ? "" : salesMan.tel;
+
             return success(myIronBuyDetailResponse);
         }));
 
@@ -278,6 +285,14 @@ public class IronManager extends BaseManager {
             }
             IronDataHelper.getIronDataHelper().deleteIronProduct(requestBean.ironId);
             return success();
+        }));
+
+        get("newBuyNums", AuthSession.class, ((request, response, requestBean) -> {
+            IronDataHelper.getIronDataHelper().updateBuyStatusByUserId(requestBean.getUserId());
+            PageBuilder pageBuilder = new PageBuilder(0, 15)
+                    .addEqualWhere("userId", requestBean.getUserId())
+                    .addEqualWhere("status", 0);
+            return success(new MyIronBuysNewNums(IronDataHelper.getIronDataHelper().getMaxIronBuyNewSupplyNum(pageBuilder)));
         }));
 
     }
