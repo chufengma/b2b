@@ -12,6 +12,8 @@ import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.Admin;
+import onefengma.demo.server.model.SalesMan;
+import onefengma.demo.server.model.User;
 import onefengma.demo.server.model.admin.AdminDetailRequest;
 import onefengma.demo.server.model.admin.AdminOperationRequest;
 import onefengma.demo.server.model.admin.AdminSellersRequest;
@@ -104,7 +106,12 @@ public class AdminManager extends BaseManager {
                     ", integral " + requestBean.integral +
                     ", userId:" + requestBean.userId, true);
             AdminDataManager.instance().updateUser(requestBean.userId, requestBean.integral,requestBean.salesmanId);
-            UserDataHelper.instance().updateSalesmanBindTime(requestBean.salesmanId, requestBean.userId);
+
+            SalesMan salesMan = UserDataHelper.instance().getSalesMan(requestBean.userId);
+            if (salesMan == null || salesMan.id != requestBean.salesmanId) {
+                UserDataHelper.instance().updateSalesmanBindTime(requestBean.salesmanId, requestBean.userId);
+            }
+
             return success("修改成功");
         }));
 
