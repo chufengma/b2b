@@ -295,6 +295,7 @@ public class HandingDataHelper extends BaseDataHelper {
                 supplyBrief.supplyPrice = row.getFloat("supplyPrice");
                 supplyBrief.unit = row.getString("unit");
                 supplyBrief.offerTime = row.getLong("offerTime");
+                supplyBrief.contact = row.getString("contact");
                 supplyBriefs.add(supplyBrief);
             }
             return supplyBriefs;

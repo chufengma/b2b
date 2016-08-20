@@ -367,6 +367,7 @@ public class IronDataHelper extends BaseDataHelper {
                 supplyBrief.supplyPrice = row.getFloat("supplyPrice");
                 supplyBrief.unit = row.getString("unit");
                 supplyBrief.offerTime = row.getLong("offerTime");
+                supplyBrief.contact = row.getString("contact");
                 supplyBriefs.add(supplyBrief);
             }
             return supplyBriefs;
@@ -639,6 +640,14 @@ public class IronDataHelper extends BaseDataHelper {
             SellerDataHelper.instance().deSellerProductCount(conn, 0, ironId);
         }
     }
+
+    public void deleteIronBuyByUser(String ironId) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "update iron_buy set status=5 where id=:id";
+        try (Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("id", ironId).executeUpdate();
+        }
+    }
+
 
     public void deleteIronBuy(String id) throws NoSuchFieldException, IllegalAccessException {
         // delete iron buy

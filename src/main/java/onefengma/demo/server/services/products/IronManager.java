@@ -1,6 +1,7 @@
 package onefengma.demo.server.services.products;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import onefengma.demo.common.StringUtils;
@@ -202,6 +203,8 @@ public class IronManager extends BaseManager {
 
             if (requestBean.status != -1) {
                 pageBuilder.addEqualWhere("status", requestBean.status);
+            } else {
+                pageBuilder.addInWhereNumber("status", Arrays.asList(0, 1, 2));
             }
 
             handingGetResponse.canceledCount = IronDataHelper.getIronDataHelper().getCancledCount(requestBean.getUserId());
@@ -293,6 +296,20 @@ public class IronManager extends BaseManager {
                     .addEqualWhere("userId", requestBean.getUserId())
                     .addEqualWhere("status", 0);
             return success(new MyIronBuysNewNums(IronDataHelper.getIronDataHelper().getMaxIronBuyNewSupplyNum(pageBuilder)));
+        }));
+
+        post("deleteIronBuy", DeleteIronProductRequest.class, ((request, response, requestBean) -> {
+            IronDataHelper.getIronDataHelper().updateBuyStatusByUserId(requestBean.getUserId());
+
+            IronBuyBrief ironBuyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.ironId);
+            if (ironBuyBrief == null || !StringUtils.equals(requestBean.getUserId(), ironBuyBrief.userId)) {
+                return error("您没有相应求购");
+            }
+            if (IronDataHelper.getIronDataHelper().getIronBuyStatus(requestBean.ironId) != 0) {
+                return error("此次求购已经结束");
+            }
+            IronDataHelper.getIronDataHelper().deleteIronBuyByUser(requestBean.ironId);
+            return success();
         }));
 
     }
