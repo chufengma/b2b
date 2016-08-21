@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import onefengma.demo.common.IdUtils;
+import onefengma.demo.common.NumberUtils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.config.Config;
 import onefengma.demo.server.core.BaseManager;
@@ -27,12 +29,15 @@ import onefengma.demo.server.model.apibeans.product.MyIronBuysResponse;
 import onefengma.demo.server.model.apibeans.product.MyIronProductResponse;
 import onefengma.demo.server.model.apibeans.product.SelectIronSupply;
 import onefengma.demo.server.model.apibeans.product.UpdateIronProductRequest;
+import onefengma.demo.server.model.apibeans.qt.QtRequest;
 import onefengma.demo.server.model.metaData.IconDataCategory;
 import onefengma.demo.server.model.product.IronBuy;
 import onefengma.demo.server.model.product.IronBuyBrief;
 import onefengma.demo.server.model.product.IronDetail;
 import onefengma.demo.server.model.product.ShopBrief;
 import onefengma.demo.server.model.product.SupplyBrief;
+import onefengma.demo.server.model.qt.QtBrief;
+import onefengma.demo.server.model.qt.QtDetail;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.order.OrderDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
@@ -312,6 +317,48 @@ public class IronManager extends BaseManager {
             return success();
         }));
 
+        post("qt", QtRequest.class, ((request, response, requestBean) -> {
+            IronBuyBrief ironBuyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.ironId);
+            if (ironBuyBrief == null) {
+                return error("没有该条求购");
+            }
+            if (ironBuyBrief.status != 1 && StringUtils.isEmpty(ironBuyBrief.supplyUserId)) {
+                return error("该条求购无法申请质检");
+            }
+            float price = IronDataHelper.getIronDataHelper().getIronBuySupplyPrice(requestBean.ironId);
+            float totalMoney = NumberUtils.round(ironBuyBrief.numbers.floatValue() * price, 2);
+            if (totalMoney < 5000) {
+                return error("总价过低无法申请质检");
+            }
+
+            SalesMan salesMan = UserDataHelper.instance().getSalesMan(ironBuyBrief.userId);
+            if (salesMan == null) {
+                return error("您好没有绑定专员,请到淘不锈网站后台绑定!");
+            }
+
+            QtDetail qtDetail = IronDataHelper.getIronDataHelper().getQtDetail(ironBuyBrief.id);
+            if (qtDetail != null) {
+                return error("该求购已经提交过申请!");
+            }
+
+            QtBrief qtBrief = new QtBrief();
+            qtBrief.qtId = IdUtils.id();
+            qtBrief.ironBuyId = requestBean.ironId;
+            qtBrief.status = 0;
+            qtBrief.pushTime = System.currentTimeMillis();
+            qtBrief.salesmanId = salesMan.id;
+            qtBrief.userId = ironBuyBrief.userId;
+            IronDataHelper.getIronDataHelper().insertQt(qtBrief);
+
+            return success("申请质检成功!");
+        }));
+
+        get("qt", BaseAuthPageBean.class, ((request, response, requestBean) -> {
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
+                    .addEqualWhere("userId", requestBean.getUserId())
+                    .addOrderBy("pushTime", true);
+            return success(IronDataHelper.getIronDataHelper().qtList(pageBuilder));
+        }));
     }
 
     @Override

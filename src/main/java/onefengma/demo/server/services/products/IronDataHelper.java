@@ -1,5 +1,8 @@
 package onefengma.demo.server.services.products;
 
+import onefengma.demo.server.model.apibeans.qt.QtListResponse;
+import onefengma.demo.server.model.qt.QtBrief;
+import onefengma.demo.server.model.qt.QtDetail;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -690,6 +693,46 @@ public class IronDataHelper extends BaseDataHelper {
         try (Connection conn = getConn()) {
             createInsertQuery(conn, "help_find_product", helpFindProduct).executeUpdate();
         }
+    }
+
+    public QtDetail getQtDetail(String ironId) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "select " + generateFiledString(QtDetail.class) + " from iron_buy_qt where ironBuyId=:id";
+        try(Connection conn = getConn()) {
+            QtDetail qtDetail = conn.createQuery(sql).addParameter("id", ironId).executeAndFetchFirst(QtDetail.class);
+            if (qtDetail == null) {
+                return null;
+            } else {
+                qtDetail.setIronBuyBrief(IronDataHelper.getIronDataHelper().getIronBuyBrief(ironId));
+            }
+            return qtDetail;
+        }
+    }
+
+    public void insertQt(QtBrief qtBrief) throws InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException, IllegalAccessException {
+        try (Connection conn = getConn()) {
+            createInsertQuery(conn, "iron_buy_qt", qtBrief).executeUpdate();
+        }
+    }
+
+    public QtListResponse qtList(PageBuilder pageBuilder) throws InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException, IllegalAccessException, NoSuchFieldException {
+        String where = pageBuilder.generateWhere();
+        where = StringUtils.isEmpty(where) ? "" : " where " + where;
+        String sql = "select " + generateFiledString(QtDetail.class) + " from iron_buy_qt " + where + pageBuilder.generateLimit() ;
+
+        String countSql = "select count(*) from iron_buy_qt " + where;
+
+        QtListResponse qtListResponse = new QtListResponse(pageBuilder.currentPage, pageBuilder.pageCount);
+        try (Connection conn = getConn()) {
+            List<QtDetail> qtDetails = conn.createQuery(sql).executeAndFetch(QtDetail.class);
+            for (QtDetail qtDetail : qtDetails) {
+                qtDetail.setIronBuyBrief(IronDataHelper.getIronDataHelper().getIronBuyBrief(qtDetail.ironBuyId));
+            }
+            qtListResponse.qts = qtDetails;
+            Integer count = conn.createQuery(countSql).executeScalar(Integer.class);
+            count = count == null ? 0 : count;
+            qtListResponse.maxCount = count;
+        }
+        return  qtListResponse;
     }
 
     public void voteIron(String ironId, float vote) {
