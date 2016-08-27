@@ -91,7 +91,7 @@ public class SellerManager extends BaseManager {
                 return error("非商家用户");
             }
             return success(IronDataHelper.getIronDataHelper()
-                    .getSellerIronBuys(new PageBuilder(requestBean.currentPage, requestBean.pageCount), requestBean.getUserId()));
+                    .getSellerIronBuys(new PageBuilder(requestBean.currentPage, requestBean.pageCount), requestBean.getUserId(), requestBean.status));
         }));
 
         get("myIronBuyDetail", SellerIronBuyDetailRequest.class, ((request, response, requestBean) -> {
@@ -120,6 +120,13 @@ public class SellerManager extends BaseManager {
                 ironBuyBrief.status = 3;
             }
 
+            // 流标
+            if (sellerIronBuyDetailResponse.myOffer != null && ironBuyBrief.status == 1) {
+                ironBuyBrief.status = 6;
+            }
+
+            sellerIronBuyDetailResponse.userBuyInfo = SellerDataHelper.instance().getUserBuyInfo(ironBuyBrief.userId);
+
             return success(sellerIronBuyDetailResponse);
         }));
 
@@ -145,6 +152,9 @@ public class SellerManager extends BaseManager {
                     return error("无法对自己的求购进行报价");
                 }
             }
+
+            System.out.println("---offerIronBuy--" + requestBean.ironId + ", " + requestBean.msg + ", " + requestBean.unit + "," + requestBean.price);
+
             IronDataHelper.getIronDataHelper().offerIronBuy(requestBean.getUserId(), requestBean.ironId, requestBean.price, requestBean.msg, requestBean.unit);
             UserMessageDataHelper.instance().setUserMessage(ironBuyBrief.userId, "有人报价您的不锈钢求购 请去【后台管理--不锈钢报价管理】刷新查看。");
             return success();

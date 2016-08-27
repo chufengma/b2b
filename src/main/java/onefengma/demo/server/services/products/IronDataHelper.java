@@ -116,7 +116,7 @@ public class IronDataHelper extends BaseDataHelper {
                 " from iron_buy " + generateWhereKey(pageBuilder, false);
 
         try (Connection conn = getConn()) {
-            Integer num =  conn.createQuery(sql).executeScalar(Integer.class);
+            Integer num = conn.createQuery(sql).executeScalar(Integer.class);
             return num == null ? 0 : num;
         }
     }
@@ -225,7 +225,7 @@ public class IronDataHelper extends BaseDataHelper {
 
     private String generateIronBuyMessage(IronBuyBrief ironBuy) {
         return ironBuy.ironType + " " + ironBuy.surface + "" + ironBuy.material + " "
-                + ironBuy.length + "*" +ironBuy.width + "*" + ironBuy.height + " "
+                + ironBuy.length + "*" + ironBuy.width + "*" + ironBuy.height + " "
                 + ironBuy.numbers + " " + ironBuy.unit;
     }
 
@@ -347,7 +347,7 @@ public class IronDataHelper extends BaseDataHelper {
 
     public void resetIronBuyNewOffersCount(String ironId) {
         String sql = "update iron_buy set lastGetDetailTime=:lastGetDetailTime, newSupplyNum=0 where id=:id";
-        try(Connection conn = getConn()) {
+        try (Connection conn = getConn()) {
             conn.createQuery(sql).addParameter("lastGetDetailTime", System.currentTimeMillis())
                     .addParameter("id", ironId).executeUpdate();
         }
@@ -442,15 +442,38 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
-    public SellerIronBuysResponse getSellerIronBuys(PageBuilder pageBuilder, String sellerId) throws NoSuchFieldException, IllegalAccessException {
-        String sql = "select iron_buy.id as id,supplyUserId,supplyWinTime, ironType, material, surface, proPlace, locationCityId, userId, message, pushTime, length, width, height, tolerance, numbers, timeLimit, status " +
-                " from iron_buy,iron_buy_seller " +
-                "where iron_buy_seller.ironId = iron_buy.id and sellerId=:sellerId and status<>2 order by pushTime desc  " + pageBuilder.generateLimit();
+    public SellerIronBuysResponse getSellerIronBuys(PageBuilder pageBuilder, String sellerId, int status) throws NoSuchFieldException, IllegalAccessException {
+        String statusStr = status == -1 ? " and iron_buy.status<>2 " : " and iron_buy.status=" + status + " ";
+        if (status == 6) {
+            statusStr = " and iron_buy.status <> 0 and iron_buy.supplyUserId<>sellerId ";
+        } else if (status == 3) {
+            statusStr = " and iron_buy.status = 0 ";
+        } else if (status == 4) {
+            statusStr = " and iron_buy.status = 1 and iron_buy.supplyUserId=sellerId ";
+        } else if (status == 0 ) {
+            statusStr = " and iron_buy.status = 0 and iron_buy.id not in (select ironId from iron_buy_supply where sellerId=:sellerId) ";
+        }
+        String fileds = " iron_buy.id as id,supplyUserId,supplyWinTime, ironType, material, surface, proPlace, locationCityId, userId, message, pushTime, length, width, height, tolerance, numbers, timeLimit, iron_buy.unit, iron_buy.status as status ";
+
+        String sql = "";
+        if (status == 6 || status == 3 || status == 4) {
+            sql = "select " + fileds + " from iron_buy,iron_buy_supply " +
+                    "where iron_buy_supply.ironId = iron_buy.id and sellerId=:sellerId " + statusStr + "  order by pushTime desc  " + pageBuilder.generateLimit();
+        } else {
+            sql = "select " + fileds + " from iron_buy,iron_buy_seller " +
+                    "where iron_buy_seller.ironId = iron_buy.id and sellerId=:sellerId " + statusStr + "  order by pushTime desc  " + pageBuilder.generateLimit();
+        }
 
         String supplyCountSql = "select count(*) from iron_buy_supply where ironId=:ironId";
 
-        String maxCountSql = "select count(*)" +
-                " from iron_buy,iron_buy_seller where iron_buy_seller.ironId = iron_buy.id and sellerId=:sellerId and status<>2 ";
+        String maxCountSql = "";
+        if (status == 6 || status == 3 || status == 4) {
+            maxCountSql = "select count(*)" +
+                    " from iron_buy,iron_buy_supply where iron_buy_supply.ironId = iron_buy.id and sellerId=:sellerId " + statusStr;
+        } else {
+            maxCountSql = "select count(*)" +
+                    " from iron_buy,iron_buy_seller where iron_buy_seller.ironId = iron_buy.id and sellerId=:sellerId " + statusStr;
+        }
 
         String winTimesSql = "select count(supplyUserId) as winningTimes from iron_buy where supplyUserId=:sellerId";
         String offerTimesSql = "select count(*) from iron_buy_supply where sellerId=:sellerId";
@@ -477,6 +500,10 @@ public class IronDataHelper extends BaseDataHelper {
                 // 候选中
                 if (ironBuyBrief != null && ironBuyBrief.status == 0 && sellerOffer != null) {
                     ironBuyBrief.status = 3;
+                }
+
+                if (status == 6) {
+                    ironBuyBrief.status = 6;
                 }
 
                 ironBuyBrief.setSourceCity(CityDataHelper.instance().getCityDescById(ironBuyBrief.locationCityId));
@@ -697,7 +724,7 @@ public class IronDataHelper extends BaseDataHelper {
 
     public QtDetail getQtDetail(String ironId) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(QtDetail.class) + " from iron_buy_qt where ironBuyId=:id";
-        try(Connection conn = getConn()) {
+        try (Connection conn = getConn()) {
             QtDetail qtDetail = conn.createQuery(sql).addParameter("id", ironId).executeAndFetchFirst(QtDetail.class);
             if (qtDetail == null) {
                 return null;
@@ -717,7 +744,7 @@ public class IronDataHelper extends BaseDataHelper {
     public QtListResponse qtList(PageBuilder pageBuilder) throws InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException, IllegalAccessException, NoSuchFieldException {
         String where = pageBuilder.generateWhere();
         where = StringUtils.isEmpty(where) ? "" : " where " + where;
-        String sql = "select " + generateFiledString(QtDetail.class) + " from iron_buy_qt " + where + pageBuilder.generateLimit() ;
+        String sql = "select " + generateFiledString(QtDetail.class) + " from iron_buy_qt " + where + pageBuilder.generateLimit();
 
         String countSql = "select count(*) from iron_buy_qt " + where;
 
@@ -732,7 +759,7 @@ public class IronDataHelper extends BaseDataHelper {
             count = count == null ? 0 : count;
             qtListResponse.maxCount = count;
         }
-        return  qtListResponse;
+        return qtListResponse;
     }
 
     public void voteIron(String ironId, float vote) {
@@ -766,6 +793,11 @@ public class IronDataHelper extends BaseDataHelper {
         public float price;
         public String unit;
         public String supplyMsg;
+    }
+
+    public static class UserBuyInfo {
+        public int buyTimes;
+        public float buySuccessRate;
     }
 
 

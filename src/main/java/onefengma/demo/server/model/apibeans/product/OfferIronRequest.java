@@ -12,6 +12,6 @@ public class OfferIronRequest extends AuthSession {
     public String ironId;
     public float price;
     @NotRequired
-    public String msg;
+    public String msg = "";
     public String unit;
 }

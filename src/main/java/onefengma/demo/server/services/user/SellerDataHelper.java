@@ -1,5 +1,6 @@
 package onefengma.demo.server.services.user;
 
+import onefengma.demo.server.services.products.IronDataHelper.UserBuyInfo;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -449,6 +450,24 @@ public class SellerDataHelper extends BaseDataHelper {
             return conn.createQuery(sql)
                     .addParameter("id", proId)
                     .executeScalar(String.class);
+        }
+    }
+
+    public UserBuyInfo getUserBuyInfo(String userId) {
+        String sql = "select count(*) from iron_buy where userId=:userId";
+        String doneSql = "select count(*) from iron_buy where userId=:userId and status=1 ";
+        try(Connection conn = getConn()) {
+            Integer count = conn.createQuery(sql).addParameter("userId", userId).executeScalar(Integer.class);
+            count = count == null ? 0 : count;
+
+            Integer doneCount = conn.createQuery(doneSql).addParameter("userId", userId).executeScalar(Integer.class);
+            doneCount = doneCount == null ? 0 : doneCount;
+
+            UserBuyInfo userBuyInfo = new UserBuyInfo();
+            userBuyInfo.buyTimes = count;
+            userBuyInfo.buySuccessRate = NumberUtils.round((float)doneCount / (float)count, 4);
+
+            return userBuyInfo;
         }
     }
 
