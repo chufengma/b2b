@@ -11,6 +11,7 @@ import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.apibeans.AuthSession;
 import onefengma.demo.server.model.apibeans.BaseAuthPageBean;
 import onefengma.demo.server.model.apibeans.UpdateSellerRequest;
+import onefengma.demo.server.model.apibeans.UpdateSubscribeInfoRequest;
 import onefengma.demo.server.model.apibeans.order.ConfirmSellerOrder;
 import onefengma.demo.server.model.apibeans.product.OfferHandingRequest;
 import onefengma.demo.server.model.apibeans.product.OfferIronRequest;
@@ -87,7 +88,7 @@ public class SellerManager extends BaseManager {
         get("myIronBuys", BaseAuthPageBean.class, ((request, response, requestBean) -> {
             IronDataHelper.getIronDataHelper().updateBuyStatusBySellerId(requestBean.getUserId());
 
-            if(!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
+            if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
                 return error("非商家用户");
             }
             return success(IronDataHelper.getIronDataHelper()
@@ -136,7 +137,7 @@ public class SellerManager extends BaseManager {
             if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
                 return error("仅商家才能进行报价");
             }
-            if(!IronDataHelper.getIronDataHelper().isIronBuyExisted(requestBean.ironId)) {
+            if (!IronDataHelper.getIronDataHelper().isIronBuyExisted(requestBean.ironId)) {
                 return error("该求购不存在");
             }
             int status = IronDataHelper.getIronDataHelper().getIronBuyStatus(requestBean.ironId);
@@ -163,7 +164,7 @@ public class SellerManager extends BaseManager {
         get("myHandingBuys", BaseAuthPageBean.class, ((request, response, requestBean) -> {
             HandingDataHelper.getHandingDataHelper().updateBuyStatusBySellerId(requestBean.getUserId());
 
-            if(!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
+            if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
                 return error("非商家用户");
             }
             return success(HandingDataHelper.getHandingDataHelper()
@@ -207,7 +208,7 @@ public class SellerManager extends BaseManager {
             if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
                 return error("仅商家才能进行报价");
             }
-            if(!HandingDataHelper.getHandingDataHelper().isHandingBuyExisted(requestBean.handingId)) {
+            if (!HandingDataHelper.getHandingDataHelper().isHandingBuyExisted(requestBean.handingId)) {
                 return error("该求购不存在");
             }
             int status = HandingDataHelper.getHandingDataHelper().getHandingBuyStatus(requestBean.handingId);
@@ -275,6 +276,25 @@ public class SellerManager extends BaseManager {
 
         get("sellerCenterData", AuthSession.class, ((request, response, requestBean) -> {
             return success(UserDataHelper.instance().getSellerInfo(requestBean.getUserId()));
+        }));
+
+        get("subscribeInfo", AuthSession.class, ((request, response, requestBean) -> {
+            if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
+                return error("用户权限错误");
+            }
+            return success(SellerDataHelper.instance().getSunscribeInfo(requestBean.getUserId()));
+        }));
+
+        post("subscribeInfo", UpdateSubscribeInfoRequest.class, ((request, response, requestBean) -> {
+            if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
+                return error("用户权限错误");
+            }
+
+            SellerDataHelper.instance().updateSunscribeInfo(requestBean.getUserId(),
+                    requestBean.types, requestBean.surfaces,
+                    requestBean.materials, requestBean.proPlaces);
+
+            return success("更新关注成功");
         }));
 
     }

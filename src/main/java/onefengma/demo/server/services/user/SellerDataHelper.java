@@ -1,5 +1,6 @@
 package onefengma.demo.server.services.user;
 
+import onefengma.demo.server.model.SubscribeInfo;
 import onefengma.demo.server.services.products.IronDataHelper.UserBuyInfo;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
@@ -601,6 +602,30 @@ public class SellerDataHelper extends BaseDataHelper {
         source.addAll(0, addToIndexShops);
 
         return source;
+    }
+
+    public SubscribeInfo getSunscribeInfo(String userId) {
+        String sql = "select * from seller_subscribe where userId=:userId";
+        try(Connection conn = getConn()) {
+            List<Row> rows = conn.createQuery(sql).addParameter("userId", userId).executeAndFetchTable().rows();
+            if (rows == null || rows.isEmpty()) {
+                return new SubscribeInfo();
+            }
+            Row row = rows.get(0);
+            SubscribeInfo subscribeInfo = new SubscribeInfo();
+            subscribeInfo.parse(row.getString("types"), row.getString("surfaces"), row.getString("materials"), row.getString("proPlaces"));
+            return subscribeInfo;
+        }
+    }
+
+    public void updateSunscribeInfo(String userId, String types, String surfaces, String materials, String proPlaces) {
+        String sql = "update or replace seller_subscribe set types=:types, surfaces=:surfaces,materials=:materials,proPlaces=:proPlaces where userId=:userId";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("types", types)
+                    .addParameter("surfaces", surfaces)
+                    .addParameter("materials", materials)
+                    .addParameter("proPlaces", proPlaces).executeUpdate();
+        }
     }
 
 }

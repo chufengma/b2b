@@ -25,4 +25,18 @@ public class StringUtils {
         return URLDecoder.decode(urlStr, "utf-8");
     }
 
+    public static String transArray(String[] arrays) {
+        if (arrays == null) {
+            return "";
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < arrays.length; i++) {
+            stringBuilder.append(arrays[i]);
+            if (i != arrays.length - 1) {
+                stringBuilder.append(",");
+            }
+        }
+        return stringBuilder.toString();
+    }
+
 }
