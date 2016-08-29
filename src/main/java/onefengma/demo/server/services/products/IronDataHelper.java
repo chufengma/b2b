@@ -1,8 +1,5 @@
 package onefengma.demo.server.services.products;
 
-import onefengma.demo.server.model.apibeans.qt.QtListResponse;
-import onefengma.demo.server.model.qt.QtBrief;
-import onefengma.demo.server.model.qt.QtDetail;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -22,8 +19,10 @@ import onefengma.demo.server.core.PushManager;
 import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.apibeans.others.HelpFindProduct;
 import onefengma.demo.server.model.apibeans.product.SellerIronBuysResponse;
+import onefengma.demo.server.model.apibeans.qt.QtListResponse;
 import onefengma.demo.server.model.mobile.BasePushData;
 import onefengma.demo.server.model.mobile.BuyPushData;
+import onefengma.demo.server.model.mobile.WinOfferPushData;
 import onefengma.demo.server.model.product.IronBuy;
 import onefengma.demo.server.model.product.IronBuyBrief;
 import onefengma.demo.server.model.product.IronDetail;
@@ -31,6 +30,8 @@ import onefengma.demo.server.model.product.IronProduct;
 import onefengma.demo.server.model.product.IronProductBrief;
 import onefengma.demo.server.model.product.IronRecommend;
 import onefengma.demo.server.model.product.SupplyBrief;
+import onefengma.demo.server.model.qt.QtBrief;
+import onefengma.demo.server.model.qt.QtDetail;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import onefengma.demo.server.services.order.OrderDataHelper;
@@ -428,6 +429,13 @@ public class IronDataHelper extends BaseDataHelper {
                 UserMessageDataHelper.instance().setUserMessage(supplyUserId, message);
                 // 增加站内信
                 InnerMessageDataHelper.instance().addInnerMessage(supplyUserId, "恭喜您成功中标", message);
+
+                // 推送至mobile
+                WinOfferPushData pushData = new WinOfferPushData(ironBuyBrief.userId);
+                pushData.title = "恭喜您成功中标！";
+                pushData.desc = message;
+                pushData.ironBuyBrief = ironBuyBrief;
+                PushManager.instance().pushData(pushData);
             }
         });
 
