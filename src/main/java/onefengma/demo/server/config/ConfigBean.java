@@ -19,7 +19,7 @@ public class ConfigBean {
         DATA_BASE_USER = "root";
         DATA_BASE_PASS = "8686239";
         LOG_FILE_PREFIX = "/root/data/logs-dev/";
-        PORT = 9090;
+        PORT = 5389;
         USER_MESSAGE_PORT = 9092;
         MOBILE_PUSH_PREFIX = "DEV_";
     }

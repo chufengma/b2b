@@ -1,5 +1,8 @@
 package onefengma.demo.server.services.user;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+
 import org.sql2o.Connection;
 
 import java.math.BigDecimal;
@@ -280,5 +283,47 @@ public class UserDataHelper extends BaseDataHelper {
             conn.createQuery(userSql).addParameter("userId", userId)
                     .addParameter("time", System.currentTimeMillis()).executeUpdate();
         }
+    }
+
+    public IronSubscribe getIronSubscribe(String userId) {
+        String sql = "select * from seller_subscribe where userId=:userId";
+        try(Connection conn = getConn()) {
+            IronSubscribeCache cache = conn.createQuery(sql).addParameter("userId", userId).executeAndFetchFirst(IronSubscribeCache.class);
+            IronSubscribe ironSubscribe = new IronSubscribe();
+            try {
+                ironSubscribe.materials = JSON.parseObject(cache.materials, new TypeReference<List<String>>(){});
+                ironSubscribe.proPlaces = JSON.parseObject(cache.proPlaces, new TypeReference<List<String>>(){});
+                ironSubscribe.surfaces = JSON.parseObject(cache.surfaces, new TypeReference<List<String>>(){});
+                ironSubscribe.types = JSON.parseObject(cache.types, new TypeReference<List<String>>(){});
+            } catch (Exception e) {}
+            return ironSubscribe;
+        }
+    }
+
+    public void updateIronSubscribe(String userId, String types, String surfaces, String materials, String proPlaces) {
+        String sql = "replace seller_subscribe set types=:types,surfaces=:surfaces,materials=:materials,proPlaces=:proPlaces,userId=:userId";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("types", types)
+                    .addParameter("surfaces", surfaces)
+                    .addParameter("materials", materials)
+                    .addParameter("proPlaces", proPlaces)
+                    .addParameter("userId", userId).executeUpdate();
+        }
+    }
+
+    public static class IronSubscribe {
+        public String userId;
+        public List<String> types;
+        public List<String> surfaces;
+        public List<String> materials;
+        public List<String> proPlaces;
+    }
+
+    public static class IronSubscribeCache {
+        public String userId;
+        public String types;
+        public String surfaces;
+        public String materials;
+        public String proPlaces;
     }
 }

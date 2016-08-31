@@ -22,6 +22,7 @@ import onefengma.demo.server.model.apibeans.product.SellerIronBuysResponse;
 import onefengma.demo.server.model.apibeans.qt.QtListResponse;
 import onefengma.demo.server.model.mobile.BasePushData;
 import onefengma.demo.server.model.mobile.BuyPushData;
+import onefengma.demo.server.model.mobile.NewIronBuyPushData;
 import onefengma.demo.server.model.mobile.WinOfferPushData;
 import onefengma.demo.server.model.product.IronBuy;
 import onefengma.demo.server.model.product.IronBuyBrief;
@@ -204,14 +205,37 @@ public class IronDataHelper extends BaseDataHelper {
                         "or ironType like '%" + ironBuy.ironType + "%'" +
                         "or proPlace like '%" + ironBuy.proPlace + "%'" +
                         "or material like '%" + ironBuy.material + "%') and userId<> :userId group by userId";
+
+                String subSql = "select userId from seller_subscribe where (surfaces like '%" + ironBuy.surface + "%'" +
+                        "or types like '%" + ironBuy.ironType + "%'" +
+                        "or proPlaces like '%" + ironBuy.proPlace + "%'" +
+                        "or materials like '%" + ironBuy.material + "%') and userId<> :userId group by userId";
+
                 try (Connection conn = getConn()) {
                     List<String> users = conn.createQuery(userSql)
                             .addParameter("userId", ironBuy.userId)
                             .executeAndFetch(String.class);
-                    for (String userId : users) {
+
+                    List<String> subUsers = conn.createQuery(subSql)
+                            .addParameter("userId", ironBuy.userId)
+                            .executeAndFetch(String.class);
+
+                    List<String> tmpList = new ArrayList<String>(users);
+                    for(String newUser : subUsers) {
+                        if (!users.contains(newUser)) {
+                            tmpList.add(newUser);
+                        }
+                    }
+
+                    for (String userId : tmpList) {
                         addInBuySeller(conn, ironBuy.id, userId);
                         String message = "有人求购" + generateIroBuyMessage(ironBuy) + "，请前往淘求购或后台报价管理页面刷新查看";
                         UserMessageDataHelper.instance().setUserMessage(userId, message);
+
+                        NewIronBuyPushData newIronBuyPushData = new NewIronBuyPushData(userId);
+                        newIronBuyPushData.title = "有您感兴趣的求购";
+                        newIronBuyPushData.desc = "有人求购" + generateIroBuyMessage(ironBuy);
+                        PushManager.instance().pushData(newIronBuyPushData);
                     }
                 }
             }
