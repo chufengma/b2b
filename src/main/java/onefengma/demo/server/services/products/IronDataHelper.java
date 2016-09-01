@@ -16,6 +16,8 @@ import onefengma.demo.common.ThreadUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.core.PushManager;
+import onefengma.demo.server.model.MyBuyHistoryInfo;
+import onefengma.demo.server.model.MyOfferHistoryInfo;
 import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.apibeans.others.HelpFindProduct;
 import onefengma.demo.server.model.apibeans.product.SellerIronBuysResponse;
@@ -810,6 +812,80 @@ public class IronDataHelper extends BaseDataHelper {
             conn.createQuery(updateScoreSql).addParameter("score", newScore).addParameter("proId", ironId).executeUpdate();
         }
     }
+
+    public MyBuyHistoryInfo getMyBuyHistoryInfo(String userId) {
+        String todayBuySql = "select count(*) from iron_buy where pushTime<:todayEnd and pushTime>=:todayStart and userId=:userId ";
+        String todayBuyDoneSql = "select count(*) from iron_buy where supplyWinTime<:todayEnd and supplyWinTime>=:todayStart and userId=:userId and status=1 ";
+        String monthBuySql = "select count(*) from iron_buy where pushTime<:monthEnd and pushTime>=:monthStart and userId=:userId ";
+        String monthBuyDoneSql = "select count(*) from iron_buy where supplyWinTime<:monthEnd and supplyWinTime>=:monthStart and userId=:userId and status=1 ";
+
+        try(Connection conn = getConn()) {
+            MyBuyHistoryInfo myBuyHistoryInfo = new MyBuyHistoryInfo();
+            Integer todayBuyCount = conn.createQuery(todayBuySql).addParameter("todayEnd", System.currentTimeMillis())
+                    .addParameter("todayStart", DateHelper.getTodayStart())
+                    .addParameter("userId", userId).executeScalar(Integer.class);
+            Integer todayBuyDoneCount = conn.createQuery(todayBuyDoneSql).addParameter("todayEnd", System.currentTimeMillis())
+                    .addParameter("todayStart", DateHelper.getTodayStart())
+                    .addParameter("userId", userId).executeScalar(Integer.class);
+            myBuyHistoryInfo.todayBuy = todayBuyCount == null ? 0 : todayBuyCount;
+            myBuyHistoryInfo.todayDone = todayBuyDoneCount == null ? 0 : todayBuyDoneCount;
+            if (myBuyHistoryInfo.todayBuy != 0) {
+                myBuyHistoryInfo.todayDoneRate = myBuyHistoryInfo.todayDone / myBuyHistoryInfo.todayBuy;
+            }
+
+            Integer monthBuyCount = conn.createQuery(monthBuySql).addParameter("monthEnd", System.currentTimeMillis())
+                    .addParameter("monthStart", DateHelper.getThisMonthStartTimestamp())
+                    .addParameter("userId", userId).executeScalar(Integer.class);
+            Integer monthBuyDoneCount = conn.createQuery(monthBuyDoneSql).addParameter("monthEnd", System.currentTimeMillis())
+                    .addParameter("monthStart",DateHelper.getThisMonthStartTimestamp())
+                    .addParameter("userId", userId).executeScalar(Integer.class);
+            myBuyHistoryInfo.monthBuy = monthBuyCount == null ? 0 : monthBuyCount;
+            myBuyHistoryInfo.monthDone = monthBuyDoneCount == null ? 0 : monthBuyDoneCount;
+            if (myBuyHistoryInfo.monthBuy != 0) {
+                myBuyHistoryInfo.monthDoneRate = myBuyHistoryInfo.monthDone / myBuyHistoryInfo.monthBuy;
+            }
+
+            return myBuyHistoryInfo;
+        }
+    }
+
+
+    public MyOfferHistoryInfo getMyOfferHistoryInfo(String userId) {
+        String todayBuySql = "select count(*) from iron_buy_supply where offerTime<:todayEnd and offerTime>=:todayStart and sellerId=:userId ";
+        String todayBuyDoneSql = "select count(*) from iron_buy where supplyWinTime<:todayEnd and supplyWinTime>=:todayStart and supplyUserId=:userId and status=1 ";
+        String monthBuySql = "select count(*) from iron_buy_supply where offerTime<:monthEnd and offerTime>=:monthStart and sellerId=:userId ";
+        String monthBuyDoneSql = "select count(*) from iron_buy_supply where supplyWinTime<:monthEnd and supplyWinTime>=:monthStart and supplyUserId=:userId and status=1 ";
+
+        try(Connection conn = getConn()) {
+            MyOfferHistoryInfo myOfferHistoryInfo = new MyOfferHistoryInfo();
+            Integer todayOfferCount = conn.createQuery(todayBuySql).addParameter("todayEnd", System.currentTimeMillis())
+                    .addParameter("todayStart", DateHelper.getTodayStart())
+                    .addParameter("userId", userId).executeScalar(Integer.class);
+            Integer todayOfferDoneCount = conn.createQuery(todayBuyDoneSql).addParameter("todayEnd", System.currentTimeMillis())
+                    .addParameter("todayStart", DateHelper.getTodayStart())
+                    .addParameter("userId", userId).executeScalar(Integer.class);
+            myOfferHistoryInfo.todayOffer = todayOfferCount == null ? 0 : todayOfferCount;
+            myOfferHistoryInfo.todayWin = todayOfferDoneCount == null ? 0 : todayOfferDoneCount;
+            if (myOfferHistoryInfo.todayOffer != 0) {
+                myOfferHistoryInfo.todayWinRate = myOfferHistoryInfo.todayWin / myOfferHistoryInfo.todayOffer;
+            }
+
+            Integer monthOfferCount = conn.createQuery(monthBuySql).addParameter("monthEnd", System.currentTimeMillis())
+                    .addParameter("monthStart", DateHelper.getThisMonthStartTimestamp())
+                    .addParameter("userId", userId).executeScalar(Integer.class);
+            Integer monthOfferDoneCount = conn.createQuery(monthBuyDoneSql).addParameter("monthEnd", System.currentTimeMillis())
+                    .addParameter("monthStart",DateHelper.getThisMonthStartTimestamp())
+                    .addParameter("userId", userId).executeScalar(Integer.class);
+            myOfferHistoryInfo.monthOffer = monthOfferCount == null ? 0 : monthOfferCount;
+            myOfferHistoryInfo.monthWin = monthOfferDoneCount == null ? 0 : monthOfferDoneCount;
+            if (myOfferHistoryInfo.monthOffer != 0) {
+                myOfferHistoryInfo.monthWinRate = myOfferHistoryInfo.monthWin / myOfferHistoryInfo.monthOffer;
+            }
+
+            return myOfferHistoryInfo;
+        }
+    }
+
 
     public static class IronBuyOfferDetail {
         public String id;
