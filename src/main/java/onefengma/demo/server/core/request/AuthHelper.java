@@ -22,6 +22,10 @@ public class AuthHelper {
         return StringUtils.equals(request.cookie("admin"), request.session().attribute("admin"));
     }
 
+    public static boolean isSalesLogin(Request request) {
+        return StringUtils.equals(request.cookie("sales"), request.session().attribute("sales"));
+    }
+
     public static String getServerToken(Request request) {
         if (request == null) {
             return "";
