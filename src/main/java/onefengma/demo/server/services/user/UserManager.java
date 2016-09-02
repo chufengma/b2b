@@ -28,6 +28,7 @@ import onefengma.demo.server.model.apibeans.login.ChangePassword;
 import onefengma.demo.server.model.apibeans.login.ChangeUserProfile;
 import onefengma.demo.server.model.apibeans.login.Login;
 import onefengma.demo.server.model.apibeans.login.Register;
+import onefengma.demo.server.model.apibeans.login.RegisterMobile;
 import onefengma.demo.server.model.innermessage.InnerMessageDetailRequest;
 import onefengma.demo.server.model.innermessage.InnerMessagesResponse;
 import onefengma.demo.server.model.metaData.City;
@@ -77,7 +78,7 @@ public class UserManager extends BaseManager {
         });
 
         /* 注册 */
-        post("registerMobile", Register.class, (req, rep, register) -> {
+        post("registerMobile", RegisterMobile.class, (req, rep, register) -> {
             if (!ValidateHelper.isPasswordRight(register.password)) {
                 return error("密码长度为 6~16");
             }
