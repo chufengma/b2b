@@ -3,17 +3,32 @@ package onefengma.demo.server.services.user;
 import java.util.HashMap;
 import java.util.Map;
 
-import onefengma.demo.common.*;
-import onefengma.demo.server.core.*;
+import onefengma.demo.common.FileHelper;
+import onefengma.demo.common.IdUtils;
+import onefengma.demo.common.StringUtils;
+import onefengma.demo.common.ValidateCode;
+import onefengma.demo.common.VerifyUtils;
+import onefengma.demo.server.core.BaseManager;
+import onefengma.demo.server.core.MsgCodeHelper;
+import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.core.UpdateBuilder;
+import onefengma.demo.server.core.ValidateHelper;
+import onefengma.demo.server.core.request.AuthHelper;
+import onefengma.demo.server.model.IronSubscribePushResponse;
 import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.UploadDemo;
 import onefengma.demo.server.model.User;
-import onefengma.demo.server.core.request.AuthHelper;
-import onefengma.demo.server.model.apibeans.*;
+import onefengma.demo.server.model.apibeans.AuthSession;
+import onefengma.demo.server.model.apibeans.BaseAuthPageBean;
+import onefengma.demo.server.model.apibeans.BaseBean;
+import onefengma.demo.server.model.apibeans.BindSalesManRequest;
+import onefengma.demo.server.model.apibeans.ForgetPasswordRequest;
+import onefengma.demo.server.model.apibeans.SellerRequest;
 import onefengma.demo.server.model.apibeans.login.ChangePassword;
 import onefengma.demo.server.model.apibeans.login.ChangeUserProfile;
 import onefengma.demo.server.model.apibeans.login.Login;
 import onefengma.demo.server.model.apibeans.login.Register;
+import onefengma.demo.server.model.apibeans.login.RegisterMobile;
 import onefengma.demo.server.model.innermessage.InnerMessageDetailRequest;
 import onefengma.demo.server.model.innermessage.InnerMessagesResponse;
 import onefengma.demo.server.model.metaData.City;
@@ -63,20 +78,13 @@ public class UserManager extends BaseManager {
         });
 
         /* 注册 */
-        post("app/register", Register.class, (req, rep, register) -> {
-            // 输入验证
-//            if (!ValidateHelper.isPasswordConfirmed(register.password, register.passwordConfirm)) {
-//                return error("俩次密码输入不一致");
-//            }
+        post("registerMobile", RegisterMobile.class, (req, rep, register) -> {
             if (!ValidateHelper.isPasswordRight(register.password)) {
                 return error("密码长度为 6~16");
             }
             if (!VerifyUtils.isMobile(register.mobile)) {
                 return error("手机号码输入不正确");
             }
-//            if(!ValidateHelper.isCodeValid(register.validateCode, req.session())) {
-//                return error("验证码不正确");
-//            }
             if (!MsgCodeHelper.isMsgCodeRight(req, register.msgCode, register.mobile)) {
                 return error("短信验证码不正确");
             }
@@ -252,11 +260,25 @@ public class UserManager extends BaseManager {
             return success(userMessage);
         });
 
+        get("ironSubscribe", AuthSession.class, (request, response, requestBean) -> {
+            if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
+                error("用户权限错误");
+            }
+            return success(UserDataHelper.instance().getIronSubscribe(requestBean.getUserId()));
+        });
+
+        post("ironSubscribe", IronSubscribePushResponse.class, (request, response, requestBean) -> {
+            if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
+                error("用户权限错误");
+            }
+            UserDataHelper.instance().updateIronSubscribe(requestBean.getUserId(), requestBean.types, requestBean.surfaces, requestBean.materials, requestBean.proPlaces);
+            return success("更新成功");
+        });
+
         // just for test
         multiPost("upload", UploadDemo.class, (request, response, requestBean) -> {
             return success(requestBean);
         });
-
     }
 
 

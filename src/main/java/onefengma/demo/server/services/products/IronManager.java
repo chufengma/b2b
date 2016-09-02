@@ -359,6 +359,14 @@ public class IronManager extends BaseManager {
                     .addOrderBy("pushTime", true);
             return success(IronDataHelper.getIronDataHelper().qtList(pageBuilder));
         }));
+
+        get("myIronBuyHistory", AuthSession.class, ((request, response, requestBean) -> {
+            return success(IronDataHelper.getIronDataHelper().getMyBuyHistoryInfo(requestBean.getUserId()));
+        }));
+
+        get("myIronOfferHistory", AuthSession.class, ((request, response, requestBean) -> {
+            return success(IronDataHelper.getIronDataHelper().getMyOfferHistoryInfo(requestBean.getUserId()));
+        }));
     }
 
     @Override

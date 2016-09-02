@@ -1,7 +1,6 @@
 package onefengma.demo.server;
 
 import java.io.File;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,7 +9,6 @@ import onefengma.demo.rx.MetaDataFetcher;
 import onefengma.demo.rx.UserMessageServer;
 import onefengma.demo.server.config.Config;
 import onefengma.demo.server.core.BaseManager;
-import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.services.funcs.FuncManager;
 import onefengma.demo.server.services.order.OrderManager;
 import onefengma.demo.server.services.order.SellerManager;
@@ -18,6 +16,7 @@ import onefengma.demo.server.services.products.HandingManager;
 import onefengma.demo.server.services.products.IronManager;
 import onefengma.demo.server.services.products.ProductManager;
 import onefengma.demo.server.services.user.AdminManager;
+import onefengma.demo.server.services.user.SalesManager;
 import onefengma.demo.server.services.user.UserManager;
 import spark.Spark;
 
@@ -35,7 +34,8 @@ public class Enter {
             new HandingManager(),
             new OrderManager(),
             new AdminManager(),
-            new SellerManager()
+            new SellerManager(),
+            new SalesManager()
     );
 
     public static void main(String[] args) {
