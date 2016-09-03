@@ -1,5 +1,6 @@
 package onefengma.demo.server.model.apibeans;
 
+import onefengma.demo.annotation.NotRequired;
 import onefengma.demo.server.core.request.AuthHelper;
 
 /**
@@ -7,7 +8,15 @@ import onefengma.demo.server.core.request.AuthHelper;
  */
 public class SalesAuthSession extends BaseBean {
 
+    @NotRequired
+    public String salesId;
+
+    public String getSalesId() {
+        return salesId;
+    }
+
     public boolean isNotValid() {
+        salesId = request.cookie("sales");
         return !AuthHelper.isSalesLogin(request);
     }
 

@@ -3,7 +3,9 @@ package onefengma.demo.server.services.user;
 import onefengma.demo.common.IdUtils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseManager;
+import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.login.Login;
+import onefengma.demo.server.model.apibeans.sales.SalesManUserRequest;
 import onefengma.demo.server.services.user.SalesDataHelper.SalesManDetail;
 import spark.Session;
 
@@ -34,7 +36,21 @@ public class SalesManager extends BaseManager {
             }
         }));
 
+        get("bindUsers", SalesManUserRequest.class, ((request, response, requestBean) -> {
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount);
+            if (!StringUtils.isEmpty(requestBean.mobile)) {
+                pageBuilder.addLikeWhere("mobile", requestBean.mobile);
+            }
+            return success(SalesDataHelper.instance().getBindUserResponse(requestBean.getSalesId(), pageBuilder));
+        }));
 
+        get("bindSellers", SalesManUserRequest.class, ((request, response, requestBean) -> {
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount);
+            if (!StringUtils.isEmpty(requestBean.mobile)) {
+                pageBuilder.addLikeWhere("mobile", requestBean.mobile);
+            }
+            return success(SalesDataHelper.instance().getBindSellerResponse(requestBean.getSalesId(), pageBuilder));
+        }));
     }
 
     @Override
