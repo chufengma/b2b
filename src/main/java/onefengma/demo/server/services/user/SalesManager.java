@@ -4,8 +4,18 @@ import onefengma.demo.common.IdUtils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.model.SalesMan;
+import onefengma.demo.server.model.apibeans.SalesAuthPageBean;
 import onefengma.demo.server.model.apibeans.login.Login;
+import onefengma.demo.server.model.apibeans.product.MyIronBuyDetail;
+import onefengma.demo.server.model.apibeans.product.MyIronBuyDetailResponse;
+import onefengma.demo.server.model.apibeans.sales.SalesIronBuyDetailResponse;
+import onefengma.demo.server.model.apibeans.sales.SalesIronDetalRequest;
 import onefengma.demo.server.model.apibeans.sales.SalesManUserRequest;
+import onefengma.demo.server.model.apibeans.sales.SalesQtStatusRequest;
+import onefengma.demo.server.model.product.SupplyBrief;
+import onefengma.demo.server.model.qt.QtDetail;
+import onefengma.demo.server.services.products.IronDataHelper;
 import onefengma.demo.server.services.user.SalesDataHelper.SalesManDetail;
 import spark.Session;
 
@@ -50,6 +60,60 @@ public class SalesManager extends BaseManager {
                 pageBuilder.addLikeWhere("mobile", requestBean.mobile);
             }
             return success(SalesDataHelper.instance().getBindSellerResponse(requestBean.getSalesId(), pageBuilder));
+        }));
+
+        get("qtList", SalesAuthPageBean.class, ((request, response, requestBean) -> {
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount);
+            pageBuilder.addEqualWhere("salesmanId", requestBean.getSalesId());
+            pageBuilder.addEqualWhere("status", requestBean.status);
+            return success(SalesDataHelper.instance().qtList(pageBuilder));
+        }));
+
+        get("ironDetail", SalesIronDetalRequest.class, ((request, response, requestBean) -> {
+            IronDataHelper.getIronDataHelper().updateBuyStatusByIronId(requestBean.ironId);
+
+            SalesIronBuyDetailResponse myIronBuyDetailResponse = new SalesIronBuyDetailResponse();
+            // reset iron new offer count
+            IronDataHelper.getIronDataHelper().resetIronBuyNewOffersCount(requestBean.ironId);
+
+            myIronBuyDetailResponse.buy = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.ironId);
+            myIronBuyDetailResponse.supplies = IronDataHelper.getIronDataHelper().getIronBuySupplies(requestBean.ironId);
+
+            if (myIronBuyDetailResponse.supplies!= null
+                    && myIronBuyDetailResponse.buy != null) {
+                for(SupplyBrief supplyBrief : myIronBuyDetailResponse.supplies) {
+                    if (StringUtils.equals(myIronBuyDetailResponse.buy.supplyUserId, supplyBrief.sellerId)) {
+                        supplyBrief.isWinner = true;
+                    }
+                    supplyBrief.mobile = UserDataHelper.instance().getUserMobile(supplyBrief.sellerId);
+                }
+            }
+
+            SalesMan salesMan = UserDataHelper.instance().getSalesManById(Integer.parseInt(requestBean.getSalesId()));
+            myIronBuyDetailResponse.salesMan = salesMan;
+            myIronBuyDetailResponse.salesManPhone = salesMan == null ? "" : salesMan.tel;
+            myIronBuyDetailResponse.qtDetail = SalesDataHelper.instance().getQtDetail(requestBean.ironId);
+            myIronBuyDetailResponse.userInfo = SalesDataHelper.instance().getUserInfo(myIronBuyDetailResponse.buy.userId);
+
+            return success(myIronBuyDetailResponse);
+        }));
+
+        post("updateQtStatus", SalesQtStatusRequest.class, ((request, response, requestBean) -> {
+            if (requestBean.status != 1 && requestBean.status != 2 ) {
+                return error("无效操作");
+            }
+            QtDetail qtDetail = SalesDataHelper.instance().getQtDetailByQtId(requestBean.qtId);
+            if (qtDetail.status != 0) {
+                return error("此次质检无法操作");
+            }
+            SalesDataHelper.instance().updateQtStatus(requestBean.qtId, requestBean.status);
+            return success("操作成功");
+        }));
+
+        get("buyList", SalesAuthPageBean.class, ((request, response, requestBean) -> {
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount);
+            pageBuilder.addEqualWhere("status", requestBean.status);
+            return success(SalesDataHelper.instance().getSalesIronBuy(requestBean.getSalesId(), pageBuilder));
         }));
     }
 

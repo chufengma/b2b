@@ -886,7 +886,6 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
-
     public static class IronBuyOfferDetail {
         public String id;
         public String ironId;

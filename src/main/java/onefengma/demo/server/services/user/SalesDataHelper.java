@@ -1,12 +1,22 @@
 package onefengma.demo.server.services.user;
 
+import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.model.apibeans.qt.QtListResponse;
+import onefengma.demo.server.model.apibeans.sales.SalesIronBuysResponse;
 import onefengma.demo.server.model.apibeans.sales.SalesManSellerResponse;
 import onefengma.demo.server.model.apibeans.sales.SalesManUserResponse;
+import onefengma.demo.server.model.product.IronBuyBrief;
+import onefengma.demo.server.model.qt.QtDetail;
 import onefengma.demo.server.services.funcs.CityDataHelper;
+import onefengma.demo.server.services.products.IronDataHelper;
 import org.sql2o.Connection;
 
 import onefengma.demo.server.core.BaseDataHelper;
+
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 /**
  * @author yfchu
@@ -27,6 +37,13 @@ public class SalesDataHelper extends BaseDataHelper {
         String sql = "select * from salesman where tel=:tel";
         try (Connection conn = getConn()) {
             return conn.createQuery(sql).addParameter("tel", tel).executeAndFetchFirst(SalesManDetail.class);
+        }
+    }
+
+    public UserInfo getUserInfo(String userId) {
+        String sql = "select " + generateFiledString(UserInfo.class) + " from user where userId=:userId";
+        try (Connection conn = getConn()) {
+            return conn.createQuery(sql).addParameter("userId", userId).executeAndFetchFirst(UserInfo.class);
         }
     }
 
@@ -71,6 +88,70 @@ public class SalesDataHelper extends BaseDataHelper {
             sellerResponse.maxCount = count;
             return sellerResponse;
         }
+    }
+
+    public QtListResponse qtList(PageBuilder pageBuilder) throws InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException, IllegalAccessException, NoSuchFieldException {
+        String sql = "select " + generateFiledString(QtDetail.class) + " from iron_buy_qt " + pageBuilder.generateWherePlus(true) + pageBuilder.generateLimit();
+        String countSql = "select count(*) from iron_buy_qt " + pageBuilder.generateWherePlus(true);
+
+        QtListResponse qtListResponse = new QtListResponse(pageBuilder.currentPage, pageBuilder.pageCount);
+        try (Connection conn = getConn()) {
+            List<QtDetail> qtDetails = conn.createQuery(sql).executeAndFetch(QtDetail.class);
+            for (QtDetail qtDetail : qtDetails) {
+                qtDetail.setIronBuyBrief(IronDataHelper.getIronDataHelper().getIronBuyBrief(qtDetail.ironBuyId));
+            }
+            qtListResponse.qts = qtDetails;
+            Integer count = conn.createQuery(countSql).executeScalar(Integer.class);
+            count = count == null ? 0 : count;
+            qtListResponse.maxCount = count;
+        }
+        return qtListResponse;
+    }
+
+    public QtDetail getQtDetail(String ironId) {
+        String sql = "select " + generateFiledString(QtDetail.class) + " from iron_buy_qt where ironBuyId=:ironId";
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql).addParameter("ironId", ironId).executeAndFetchFirst(QtDetail.class);
+        }
+    }
+
+    public QtDetail getQtDetailByQtId(String qtId) {
+        String sql = "select " + generateFiledString(QtDetail.class) + " from iron_buy_qt where qtId=:qtId";
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql).addParameter("qtId", qtId).executeAndFetchFirst(QtDetail.class);
+        }
+    }
+    public void updateQtStatus(String qtId, int status) {
+        String sql = "update iron_buy_qt set status=:status where qtId=:qtId";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("qtId", qtId)
+                    .addParameter("status", status).executeUpdate();
+        }
+    }
+
+    public SalesIronBuysResponse getSalesIronBuy(String salesId, PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "select " + generateFiledString(IronBuyBrief.class) + " from iron_buy where userId in (select userId from user where salesManId=:salesId) " + pageBuilder.generateWherePlus(false) + " order by pushTime desc " + pageBuilder.generateLimit();
+        String countSql = "select count(*) from iron_buy where userId in (select userId from user where salesManId=:salesId) " + pageBuilder.generateWherePlus(false) + " order by pushTime desc " + pageBuilder.generateLimit();
+        String supplyCountSql = "select count(*) from iron_buy_supply where ironId=:ironId";
+
+        try(Connection conn = getConn()) {
+            SalesIronBuysResponse salesIronBuysResponse = new SalesIronBuysResponse(pageBuilder.currentPage, pageBuilder.pageCount);
+            List<IronBuyBrief> ironBuyBriefs = conn.createQuery(sql).addParameter("salesId", salesId).executeAndFetch(IronBuyBrief.class);
+            for (IronBuyBrief ironBuyBrief : ironBuyBriefs) {
+                Integer count = conn.createQuery(supplyCountSql).addParameter("ironId", ironBuyBrief.id).executeScalar(Integer.class);
+                count = count == null ? 0 : count;
+                ironBuyBrief.setSupplyCount(count);
+                ironBuyBrief.setSourceCity(CityDataHelper.instance().getCityDescById(ironBuyBrief.locationCityId));
+            }
+            salesIronBuysResponse.buys = ironBuyBriefs;
+
+            Integer maxCount = conn.createQuery(countSql).addParameter("salesId", salesId).executeScalar(Integer.class);
+            maxCount = maxCount == null ? 0 : maxCount;
+            salesIronBuysResponse.maxCount = maxCount;
+
+            return salesIronBuysResponse;
+        }
+
     }
 
     public static class SalesManDetail {
