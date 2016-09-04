@@ -22,4 +22,5 @@ public class IronBuy {
     public long timeLimit;
     public int salesmanId;
     public String unit;
+    public int appFlag;
 }

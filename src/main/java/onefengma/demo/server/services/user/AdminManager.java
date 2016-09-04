@@ -1,5 +1,7 @@
 package onefengma.demo.server.services.user;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import onefengma.demo.common.DateHelper;
@@ -238,6 +240,10 @@ public class AdminManager extends BaseManager {
                     ids.add("");
                 }
                 pageBuilder.addInWhere("supplyUserId", ids);
+            }
+
+            if (requestBean.appFlag != -1) {
+                pageBuilder.addInWhereNumber("appFlag", Arrays.asList(requestBean.appFlag));
             }
 
             return success(AdminDataManager.instance().getBuysForAdmin(pageBuilder, requestBean.productType));

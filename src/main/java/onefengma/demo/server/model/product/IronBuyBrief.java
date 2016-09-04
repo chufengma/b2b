@@ -29,6 +29,7 @@ public class IronBuyBrief {
     public long lastGetDetailTime;
     public int newSupplyNum;
     public int editStatus; // 0表示未编辑,1 表示已编辑
+    public int appFlag;// 0 非app, 1 Android , 2 IOS
 
     private int supplyCount;
 

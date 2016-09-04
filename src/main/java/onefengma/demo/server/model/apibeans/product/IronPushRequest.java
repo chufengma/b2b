@@ -47,6 +47,7 @@ public class IronPushRequest extends AuthSession {
         ironProduct.cover = FileHelper.generateRelativeInternetUri(cover.getPath());
         ironProduct.surface = surface;
         ironProduct.unit = unit;
+        ironProduct.appFlag = getMobileFlag();
         if (!StringUtils.isEmpty(isSpec)) {
             if (StringUtils.equalsIngcase("false", isSpec)) {
                 ironProduct.isSpec = false;

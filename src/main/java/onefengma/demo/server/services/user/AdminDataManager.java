@@ -288,7 +288,7 @@ public class AdminDataManager extends BaseDataHelper {
                             + " " + row.getString("height") + "*" + row.getString("width") + "*" + row.getString("length") + " 公差：" + row.getString("tolerance") + " "
                             + row.getString("numbers") + "" + row.getString("unit") + " "
                             + "收货城市：" + CityDataHelper.instance().getCityDescById(row.getString("locationCityId")) + " " + row.getString("message");
-
+                    buyForAdmin.appFlag = row.getInteger("appFlag");
                 } else {
                     HandingBuyOfferDetail detail = HandingDataHelper.getHandingDataHelper().getWinSellerOffer(buyForAdmin.buyId, supplyUserId);
                     if (detail != null) {
@@ -870,6 +870,7 @@ public class AdminDataManager extends BaseDataHelper {
         public int salesManId;   // ok
         public String salesManMobile; // ok
 
+        public int appFlag;
         public String desc;
     }
 
