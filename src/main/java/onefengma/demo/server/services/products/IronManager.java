@@ -82,6 +82,7 @@ public class IronManager extends BaseManager {
             ironsGetResponse.maxCount = IronDataHelper.getIronDataHelper().getMaxIronCounts(pageBuilder);
             ironsGetResponse.irons = IronDataHelper.getIronDataHelper()
                     .getIronProducts(pageBuilder);
+
             return success(ironsGetResponse);
         }));
 
@@ -119,7 +120,6 @@ public class IronManager extends BaseManager {
 
             IronDataHelper.getIronDataHelper().pushIronProduct(requestBean.generateIconProduct());
             SellerDataHelper.instance().addIronType(requestBean.getUserId(), requestBean.ironType);
-
             return success();
         }));
 

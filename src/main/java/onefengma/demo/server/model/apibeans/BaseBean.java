@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import onefengma.demo.annotation.NotRequired;
+import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.request.ParamsMissException;
 import spark.Request;
 import spark.Response;
@@ -39,6 +40,10 @@ public class BaseBean {
             }
         }
         return true;
+    }
+
+    public boolean isMobile() {
+        return !StringUtils.isEmpty(request.headers("X-Mobile-Flag"));
     }
 
     public Set<String> getRequiredParams() {
