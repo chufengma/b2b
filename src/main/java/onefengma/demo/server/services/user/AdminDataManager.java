@@ -1,5 +1,8 @@
 package onefengma.demo.server.services.user;
 
+import onefengma.demo.server.model.admin.AdminQtResponse;
+import onefengma.demo.server.model.product.IronBuyBrief;
+import onefengma.demo.server.model.qt.QtBrief;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -764,6 +767,57 @@ public class AdminDataManager extends BaseDataHelper {
             siteInfo.count = count;
             return siteInfo;
         }
+    }
+
+    public AdminQtResponse getQtListResponse(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
+        String where = StringUtils.isEmpty(pageBuilder.generateWherePlus(true)) ? " where " : pageBuilder.generateWherePlus(true) + " and ";
+
+        String sql = "select " + generateFiledStringExclude(QtItem.class, "userMobile", "sellerMobile", "sellerCompany", "desc") + " from iron_buy_qt " + where
+                + " pushTime<:endTime and pushTime>=:startTime order by pushTime desc " + pageBuilder.generateLimit() ;
+
+        String countSql = "select count(*) from iron_buy_qt " + where
+                + " pushTime<:endTime and pushTime>=:startTime order by pushTime desc " + pageBuilder.generateLimit() ;
+        try(Connection conn = getConn()) {
+            AdminQtResponse qtResponse = new AdminQtResponse();
+            qtResponse.currentPage = pageBuilder.currentPage;
+            qtResponse.pageCount = pageBuilder.pageCount;
+            qtResponse.qtBriefList = conn.createQuery(sql).addParameter("startTime", pageBuilder.startTime)
+                    .addParameter("endTime", pageBuilder.endTime).executeAndFetch(QtItem.class);
+            Integer maxCount = conn.createQuery(countSql).addParameter("startTime", pageBuilder.startTime)
+                    .addParameter("endTime", pageBuilder.endTime).executeScalar(Integer.class);
+            maxCount = maxCount == null ? 0 : maxCount;
+            qtResponse.maxCount = maxCount;
+
+            for(QtItem qtItem : qtResponse.qtBriefList) {
+                IronBuyBrief ironBuyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(qtItem.ironBuyId);
+                qtItem.userMobile = UserDataHelper.instance().getUserMobile(ironBuyBrief.userId);
+                Seller seller = SellerDataHelper.instance().getSeller(ironBuyBrief.supplyUserId);
+                if (seller != null) {
+                    qtItem.sellerCompany = seller.companyName;
+                }
+                qtItem.desc =  ironBuyBrief.ironType + " " + ironBuyBrief.surface  + " " + ironBuyBrief.material
+                        + " " + ironBuyBrief.height + "*" + ironBuyBrief.width + "*" + ironBuyBrief.length + " 公差：" + ironBuyBrief.tolerance + " "
+                        + ironBuyBrief.numbers + "" + ironBuyBrief.unit + " "
+                        + "收货城市：" + CityDataHelper.instance().getCityDescById(ironBuyBrief.locationCityId) + " " + ironBuyBrief.message;
+
+                qtItem.sellerMobile = UserDataHelper.instance().getUserMobile(ironBuyBrief.supplyUserId);
+            }
+
+            return qtResponse;
+        }
+    }
+    public static class QtItem {
+        public String qtId;
+        public int salesmanId;
+        public String ironBuyId;
+        public int status; // 0等待质检 1质检完成 2质检取消
+        public long pushTime;
+        public long finishTime;
+        public String userId;
+        public String userMobile;
+        public String sellerMobile;
+        public String sellerCompany;
+        public String desc;
     }
 
     public static class SiteInfo {

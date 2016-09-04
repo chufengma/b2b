@@ -12,12 +12,8 @@ import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.Admin;
-import onefengma.demo.server.model.admin.AdminDetailRequest;
-import onefengma.demo.server.model.admin.AdminOperationRequest;
-import onefengma.demo.server.model.admin.AdminSellersRequest;
-import onefengma.demo.server.model.admin.AdminSellersResponse;
-import onefengma.demo.server.model.admin.AdminUsersRequest;
-import onefengma.demo.server.model.admin.AdminUsersResponse;
+import onefengma.demo.server.model.SalesMan;
+import onefengma.demo.server.model.admin.*;
 import onefengma.demo.server.model.apibeans.admin.AdminBuysRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminChangeSalesmanRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminDeleteBuyRequest;
@@ -468,6 +464,32 @@ public class AdminManager extends BaseManager {
             } else {
                 return success(AdminDataManager.instance().getSiteInfoAllTrans(requestBean.startTime, requestBean.endTime));
             }
+        }));
+
+        get("qtList", AdminQtRequest.class, ((request, response, requestBean) -> {
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount);
+            pageBuilder.setTime(requestBean.startTime, requestBean.endTime);
+            if (requestBean.status != -1) {
+                pageBuilder.addEqualWhere("status", requestBean.status);
+            }
+
+            if (requestBean.salesId != -1) {
+                pageBuilder.addEqualWhere("salesmanId", requestBean.salesId);
+            }
+
+            if (!StringUtils.isEmpty(requestBean.salesMobile)) {
+                String salesManID = UserDataHelper.instance().getSalesManIdByMobile(requestBean.salesMobile);
+                salesManID = salesManID == null ? "" : salesManID;
+                pageBuilder.addEqualWhereCanEmpty("salesmanId", salesManID);
+            }
+
+            if (!StringUtils.isEmpty(requestBean.userMobile)) {
+                String buyerId = UserDataHelper.instance().getUserIdByMobile(requestBean.userMobile);
+                buyerId = buyerId == null ? "" : buyerId;
+                pageBuilder.addEqualWhereCanEmpty("userId", buyerId);
+            }
+
+            return success(AdminDataManager.instance().getQtListResponse(pageBuilder));
         }));
     }
 
