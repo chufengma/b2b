@@ -28,6 +28,7 @@ public class IronBuyBrief {
     public long supplyWinTime;
     public long lastGetDetailTime;
     public int newSupplyNum;
+    public int editStatus; // 0表示未编辑,1 表示已编辑
 
     private int supplyCount;
 

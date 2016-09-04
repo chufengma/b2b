@@ -2,6 +2,7 @@ package onefengma.demo.server.model.apibeans.product;
 
 import onefengma.demo.annotation.NotRequired;
 import onefengma.demo.common.IdUtils;
+import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.model.apibeans.AuthSession;
 import onefengma.demo.server.model.product.IronBuy;
 
@@ -25,10 +26,12 @@ public class IronBuyRequest extends AuthSession {
     public float numbers;
     public long timeLimit;
     public String unit;
+    @NotRequired
+    public String ironId;
 
     public IronBuy generateIronBug() {
         IronBuy ironBuy = new IronBuy();
-        ironBuy.id = IdUtils.id();
+        ironBuy.id = StringUtils.isEmpty(ironId) ? IdUtils.id() : ironId;
         ironBuy.ironType = ironType;
         ironBuy.material = material;
         ironBuy.proPlace = proPlace;

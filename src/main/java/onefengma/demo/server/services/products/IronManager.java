@@ -155,6 +155,47 @@ public class IronManager extends BaseManager {
             return success();
         }));
 
+        post("editBuy", IronBuyRequest.class, ((request, response, requestBean) -> {
+
+
+            if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
+                return error("您不是企业用户，不能发布求购, 请前往后台点击成为商家上传公司三证等相关资料");
+            }
+
+            // 材料种类
+            if (!IconDataCategory.get().materials.contains(requestBean.material)) {
+                return errorAndClear(requestBean, "材料种类填写不正确");
+            }
+            // 表面种类
+            if (!IconDataCategory.get().surfaces.contains(requestBean.surface)) {
+                return errorAndClear(requestBean, "表面种类填写不正确");
+            }
+            // 不锈钢品类
+            if (!IconDataCategory.get().types.contains(requestBean.ironType)) {
+                return errorAndClear(requestBean, "不锈钢品类填写不正确");
+            }
+            // 不锈钢产地
+            if (!IconDataCategory.get().productPlaces.contains(requestBean.proPlace)) {
+                return errorAndClear(requestBean, "不锈钢产地填写不正确");
+            }
+
+            if (!CityDataHelper.instance().isCityExist(requestBean.locationCityId)) {
+                return errorAndClear(requestBean, "交货地点不存在");
+            }
+
+            IronBuyBrief ironBuyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.ironId);
+            if (ironBuyBrief == null) {
+                return error("无此次求购");
+            }
+            if (ironBuyBrief.editStatus != 0) {
+                return error("该求购无法再次编辑");
+            }
+            IronBuy ironBuy = requestBean.generateIronBug();
+            ironBuy.salesmanId = UserDataHelper.instance().getSalesManId(requestBean.getUserId());
+            IronDataHelper.getIronDataHelper().editIronBuy(ironBuy);
+            return success();
+        }));
+
         get("buy", IronsGetRequest.class, ((request, response, requestBean) -> {
             IronDataHelper.getIronDataHelper().updateBuyStatus();
 

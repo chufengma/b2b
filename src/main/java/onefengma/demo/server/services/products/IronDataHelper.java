@@ -199,6 +199,43 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
+    public void editIronBuy(IronBuy ironBuy) throws InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException, IllegalAccessException {
+        String sql = "update iron_buy set ironType=:ironType," +
+                "    material=:material," +
+                "    surface=:surface," +
+                "    proPlace=:proPlace," +
+                "    locationCityId=:locationCityId," +
+                "    message=:message," +
+                "    length=:length," +
+                "    width=:width," +
+                "    height=:height," +
+                "    tolerance=:tolerance," +
+                "    numbers=:numbers," +
+                "    timeLimit=:timeLimit," +
+                "    salesmanId=:salesmanId," +
+                "    unit=:unit,editStatus=1 where id=:id";
+        try (Connection conn = getConn()) {
+            conn.createQuery(sql)
+                    .addParameter("ironType", ironBuy.ironType)
+                    .addParameter("material", ironBuy.material)
+                    .addParameter("surface", ironBuy.surface)
+                    .addParameter("proPlace", ironBuy.proPlace)
+                    .addParameter("locationCityId", ironBuy.locationCityId)
+                    .addParameter("message", ironBuy.message)
+                    .addParameter("length", ironBuy.length)
+                    .addParameter("width", ironBuy.width)
+                    .addParameter("height", ironBuy.height)
+                    .addParameter("tolerance", ironBuy.tolerance)
+                    .addParameter("numbers", ironBuy.numbers)
+                    .addParameter("timeLimit", ironBuy.timeLimit)
+                    .addParameter("salesmanId", ironBuy.salesmanId)
+                    .addParameter("unit", ironBuy.unit)
+                    .addParameter("id", ironBuy.id)
+                    .executeUpdate();
+            pushToSellers(ironBuy);
+        }
+    }
+
     private void pushToSellers(IronBuy ironBuy) {
         ThreadUtils.instance().post(new Runnable() {
             @Override
