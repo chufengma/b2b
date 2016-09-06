@@ -5,6 +5,7 @@ import java.util.Map;
 
 import onefengma.demo.common.*;
 import onefengma.demo.server.core.*;
+import onefengma.demo.server.model.SalesMan;
 import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.UploadDemo;
 import onefengma.demo.server.model.User;
@@ -222,7 +223,10 @@ public class UserManager extends BaseManager {
             if (!UserDataHelper.instance().isSalesManExited(requestBean.salesmanId)) {
                 return error("该顾问不存在");
             }
-            UserDataHelper.instance().bindSalesman(requestBean.getUserId(), requestBean.salesmanId);
+            SalesMan salesMan = UserDataHelper.instance().getSalesMan(requestBean.getUserId());
+            if (salesMan == null || salesMan.id != requestBean.salesmanId) {
+                UserDataHelper.instance().bindSalesman(requestBean.getUserId(), requestBean.salesmanId);
+            }
             return success();
         }));
 

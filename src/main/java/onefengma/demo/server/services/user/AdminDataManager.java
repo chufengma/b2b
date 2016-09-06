@@ -136,22 +136,22 @@ public class AdminDataManager extends BaseDataHelper {
         String companySql = StringUtils.isEmpty(companyName) ? "" :  "and companyName like '%" + companyName +"%' ";
 
         String maxCountSql = "select count(*) from user,seller,salesman where user.userId=seller.userId and user.salesManId=salesman.id "
-                + " and registerTime<:registerEndTime and registerTime>=:registerStartTime " + companySql
+                + " and applyTime<:registerEndTime and applyTime>=:registerStartTime " + companySql
                 + ((StringUtils.isEmpty(whereSql)) ? "" : " and " + whereSql);
 
         String sellerSql = "select userId,integral,companyName, " +
-                " passTime as becomeSellerTime, " +
+                " applyTime as becomeSellerTime, " +
                 " contact as contactName,productCount,score, mobile,registerTime,  " +
                 " sum(money)  as  sellerTotalMoney , " +
                 " tel as salesMobile,salesId  " +
                 " from (select * from (select  companyName, " +
-                "        seller.integral as integral, user.userId, passTime,contact, productCount,score,mobile,registerTime, " +
+                "        seller.integral as integral, user.userId, passTime,contact, productCount,score,mobile,registerTime,applyTime, " +
                 "        user.salesManId as salesId " +
                 "        from seller,user where user.userId=seller.userId) as userTmp left join salesman on salesman.id = userTmp.salesId) " +
                 " as userComplete " +
                 " left join seller_transactions " +
                 " on (userId=sellerId and finishTime>=:dataStartTime and finishTime<:dataEndTime) " +
-                " where registerTime<:registerEndTime and registerTime>=:registerStartTime " + companySql +
+                " where applyTime<:registerEndTime and applyTime>=:registerStartTime " + companySql +
                 (StringUtils.isEmpty(pageBuilder.generateWhere()) ? "" : " and " + whereSql) +
                 " group by userId " +
                 " order by sellerTotalMoney desc " + pageBuilder.generateLimit();
