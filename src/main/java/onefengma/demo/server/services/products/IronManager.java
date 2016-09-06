@@ -398,6 +398,11 @@ public class IronManager extends BaseManager {
             PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
                     .addEqualWhere("userId", requestBean.getUserId())
                     .addOrderBy("pushTime", true);
+
+            if (requestBean.status != -1) {
+                pageBuilder.addEqualWhere("status", requestBean.status);
+            }
+
             return success(IronDataHelper.getIronDataHelper().qtList(pageBuilder));
         }));
 

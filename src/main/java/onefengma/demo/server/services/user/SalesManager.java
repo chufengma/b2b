@@ -7,8 +7,6 @@ import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.SalesMan;
 import onefengma.demo.server.model.apibeans.SalesAuthPageBean;
 import onefengma.demo.server.model.apibeans.login.Login;
-import onefengma.demo.server.model.apibeans.product.MyIronBuyDetail;
-import onefengma.demo.server.model.apibeans.product.MyIronBuyDetailResponse;
 import onefengma.demo.server.model.apibeans.sales.SalesIronBuyDetailResponse;
 import onefengma.demo.server.model.apibeans.sales.SalesIronDetalRequest;
 import onefengma.demo.server.model.apibeans.sales.SalesManUserRequest;
@@ -99,13 +97,24 @@ public class SalesManager extends BaseManager {
         }));
 
         post("updateQtStatus", SalesQtStatusRequest.class, ((request, response, requestBean) -> {
-            if (requestBean.status != 1 && requestBean.status != 2 ) {
+            if (requestBean.status != 1 && requestBean.status != 2 && requestBean.status != 3) {
                 return error("无效操作");
             }
             QtDetail qtDetail = SalesDataHelper.instance().getQtDetailByQtId(requestBean.qtId);
-            if (qtDetail.status != 0) {
-                return error("此次质检无法操作");
+
+            // 开始质检 或 取消质检
+            if (requestBean.status == 3 || requestBean.status == 2) {
+                if (qtDetail.status != 0) {
+                    return error("此次质检无法该操作");
+                }
             }
+
+            if (requestBean.status == 1) {
+                if (qtDetail.status != 3) {
+                    return error("此次质检无法操作该操作");
+                }
+            }
+
             SalesDataHelper.instance().updateQtStatus(requestBean.qtId, requestBean.status);
             return success("操作成功");
         }));
