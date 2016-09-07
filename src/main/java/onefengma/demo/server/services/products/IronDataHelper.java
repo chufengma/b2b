@@ -16,6 +16,7 @@ import onefengma.demo.common.ThreadUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.core.PushManager;
+import onefengma.demo.server.model.MyAllHistoryInfo;
 import onefengma.demo.server.model.MyBuyHistoryInfo;
 import onefengma.demo.server.model.MyOfferHistoryInfo;
 import onefengma.demo.server.model.Seller;
@@ -622,6 +623,13 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
+    public void missIronBuyOffer(String ironId, String sellerId) {
+        String sql = "delete from iron_buy_seller where sellerId=:sellerId and ironId=:ironId";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("ironId", ironId).addParameter("sellerId", sellerId).executeUpdate();
+        }
+    }
+
     public void offerIronBuy(String sellerId, String ironId, float price, String msg, String unit) throws Exception {
         String sql = "insert into iron_buy_supply set " +
                 "ironId=:ironId, " +
@@ -919,6 +927,28 @@ public class IronDataHelper extends BaseDataHelper {
                 myOfferHistoryInfo.monthWinRate = myOfferHistoryInfo.monthWin / myOfferHistoryInfo.monthOffer;
             }
 
+            return myOfferHistoryInfo;
+        }
+    }
+
+    public MyAllHistoryInfo getMyAllHistoryInfo(String userId) {
+        String buyTimesSql = "select count(*) from iron_buy where userId=:userId ";
+        String buyWinTimesSql = "select count(*) from iron_buy where userId=:userId and status=1 ";
+        String offerTimesSql = "select count(*) from iron_buy_supply where sellerId=:userId ";
+        String offerWinSql = "select count(*) from iron_buy where supplyUserId=:userId and status=1 ";
+
+        try(Connection conn = getConn()) {
+            MyAllHistoryInfo myOfferHistoryInfo = new MyAllHistoryInfo();
+            Integer buyTimes = conn.createQuery(buyTimesSql)
+                    .addParameter("userId", userId).executeScalar(Integer.class);
+            Integer buyWinTimes = conn.createQuery(buyWinTimesSql).addParameter("userId", userId).executeScalar(Integer.class);
+            myOfferHistoryInfo.buyTimes = buyTimes == null ? 0 : buyTimes;
+            myOfferHistoryInfo.buyWinTimes = buyWinTimes == null ? 0 : buyWinTimes;
+
+            Integer offerTimes = conn.createQuery(offerTimesSql).addParameter("userId", userId).executeScalar(Integer.class);
+            Integer offerWinTimes = conn.createQuery(offerWinSql).addParameter("userId", userId).executeScalar(Integer.class);
+            myOfferHistoryInfo.offerTimes = offerTimes == null ? 0 : offerTimes;
+            myOfferHistoryInfo.offerWinTimes = offerWinTimes == null ? 0 : offerWinTimes;
             return myOfferHistoryInfo;
         }
     }

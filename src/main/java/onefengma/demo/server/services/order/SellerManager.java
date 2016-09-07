@@ -131,6 +131,15 @@ public class SellerManager extends BaseManager {
             return success(sellerIronBuyDetailResponse);
         }));
 
+        post("missIronBuyOffer", SellerIronBuyDetailRequest.class, ((request, response, requestBean) -> {
+            int status = IronDataHelper.getIronDataHelper().getIronBuyStatus(requestBean.ironId);
+            if (status != 0) {
+                return error("该求购无法忽略");
+            }
+            IronDataHelper.getIronDataHelper().missIronBuyOffer(requestBean.ironId, requestBean.getUserId());
+            return success("操作成功");
+        }));
+
         post("offerIronBuy", OfferIronRequest.class, ((request, response, requestBean) -> {
             IronDataHelper.getIronDataHelper().updateBuyStatusByIronId(requestBean.ironId);
 

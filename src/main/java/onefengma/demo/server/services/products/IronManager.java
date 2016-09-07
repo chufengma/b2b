@@ -413,6 +413,10 @@ public class IronManager extends BaseManager {
         get("myIronOfferHistory", AuthSession.class, ((request, response, requestBean) -> {
             return success(IronDataHelper.getIronDataHelper().getMyOfferHistoryInfo(requestBean.getUserId()));
         }));
+
+        get("myIronAllHistory", AuthSession.class, ((request, response, requestBean) -> {
+            return success(IronDataHelper.getIronDataHelper().getMyAllHistoryInfo(requestBean.getUserId()));
+        }));
     }
 
     @Override
