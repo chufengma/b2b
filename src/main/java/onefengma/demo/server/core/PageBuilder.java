@@ -81,6 +81,31 @@ public class PageBuilder {
         }
     }
 
+    public static class NotInWhere extends Where {
+        public NotInWhere(String key, List<String> value) {
+            super(key, value);
+        }
+
+        @Override
+        public String generate() {
+            StringBuilder stringBuilder = new StringBuilder(" " + key + " not in (");
+            List<String> vas = (List<String>) value;
+            if (vas.isEmpty()) {
+                return  " ";
+            }
+            for (int i = 0; i < vas.size(); i++) {
+                String va = vas.get(i);
+                stringBuilder.append("'" + va + "'");
+                if (i != vas.size() - 1) {
+                    stringBuilder.append(",");
+                }
+            }
+            stringBuilder.append(")");
+            return stringBuilder.toString();
+        }
+    }
+
+
     public static class InWhereNumber extends Where {
 
         public InWhereNumber(String key, List<Integer> value) {
@@ -143,6 +168,14 @@ public class PageBuilder {
             return this;
         }
         this.wereList.add(new InWhere(key, value));
+        return this;
+    }
+
+    public PageBuilder addNotInWhere(String key, List<String> value) {
+        if (value == null || value.isEmpty()) {
+            return this;
+        }
+        this.wereList.add(new NotInWhere(key, value));
         return this;
     }
 

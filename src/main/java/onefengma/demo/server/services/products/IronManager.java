@@ -1,6 +1,7 @@
 package onefengma.demo.server.services.products;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import onefengma.demo.common.StringUtils;
@@ -42,6 +43,8 @@ public class IronManager extends BaseManager {
 
     private IronDataHelper ironDataHelper;
 
+    public static List<String> ironBlackListForIron = Arrays.asList("gVwBlxOqEjyf");
+
     public IronDataHelper getIronDataHelper() {
         if (ironDataHelper == null) {
             ironDataHelper = new IronDataHelper();
@@ -67,6 +70,7 @@ public class IronManager extends BaseManager {
                     .addEqualWhere("isSpec", requestBean.isSpec)
                     .addEqualWhere("reviewed", true)
                     .addEqualWhere("deleteStatus", 0)
+                    .addNotInWhere("proId", ironBlackListForIron)
                     .addInWhere("sourceCityId", CityDataHelper.instance().getCitiesById(new ArrayList<>(), requestBean.cityId))
                     .setOrderByRequest(requestBean);
 
