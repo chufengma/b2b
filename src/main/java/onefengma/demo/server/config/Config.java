@@ -36,6 +36,8 @@ public class Config {
 
     private static final String DOWN_LOAD_FILE_PATH = "./res/files/";
     private static final String DOWN_LOAD_FILE_REQUEST_PATH = "files/";
+    private static final String DOWN_LOAD_FILE_REQUEST_PATH_ALL= "download/";
+    private static final String DOWN_LOAD_FILE_REQUEST_PATH_ALL_FILE= "./res/download/";
     private static final String VALIDATE_PATH = "./res/validate/";
     private static final String BASE_PAGE_PATH = "./res/B2BPlatformFront/";
     private static final String BASE_META_PATH = "./res/meta/";
@@ -209,6 +211,14 @@ public class Config {
 
     public static String getDownLoadFileRequestPath() {
         return DOWN_LOAD_FILE_REQUEST_PATH;
+    }
+
+    public static String getDownLoadFileRequestPathAll() {
+        return DOWN_LOAD_FILE_REQUEST_PATH_ALL;
+    }
+
+    public static String getDownLoadFileRequestPathAllFile() {
+        return DOWN_LOAD_FILE_REQUEST_PATH_ALL_FILE;
     }
 
     public static String getAddressPrefix() {

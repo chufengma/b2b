@@ -7,7 +7,6 @@ import onefengma.demo.common.FileHelper;
 import onefengma.demo.common.VerifyUtils;
 import onefengma.demo.rx.MetaDataFetcher;
 import onefengma.demo.server.config.Config;
-import onefengma.demo.server.config.MetaDataHelper;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.MsgCodeHelper;
 import onefengma.demo.server.core.PageBuilder;
@@ -89,6 +88,23 @@ public class FuncManager extends BaseManager {
             if (file.exists()) {
                 response.type(FileHelper.getContentType(fileName));
                 IOUtils.copy(new FileInputStream(file.getAbsoluteFile()), response.raw().getOutputStream());
+            } else {
+                return null;
+            }
+            return "";
+        }));
+
+        // 下载apk
+        get(Config.getDownLoadFileRequestPathAll() + "*", BaseBean.class, ((request, response, requestBean) -> {
+            if (request.splat().length == 0) {
+                return null;
+            }
+            String fileName = request.splat()[0];
+            File file = new File(Config.getDownLoadFileRequestPathAllFile() + fileName);
+            if (file.exists()) {
+                response.type(FileHelper.getContentType(fileName));
+                IOUtils.copy(new FileInputStream(file.getAbsoluteFile()), response.raw().getOutputStream());
+                DownloadDataHelper.instance().addAppDownloadTimes(fileName);
             } else {
                 return null;
             }
