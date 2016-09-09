@@ -122,7 +122,13 @@ public class SalesDataHelper extends BaseDataHelper {
         }
     }
     public void updateQtStatus(String qtId, int status) {
-        String sql = "update iron_buy_qt set status=:status where qtId=:qtId";
+        String updateStr = " ";
+        if (status == 3) {
+            updateStr = ", startTime=" + System.currentTimeMillis();
+        } else if (status == 1 || status == 2) {
+            updateStr = ", finishTime=" + System.currentTimeMillis();
+        }
+        String sql = "update iron_buy_qt set status=:status " + updateStr + " where qtId=:qtId";
         try(Connection conn = getConn()) {
             conn.createQuery(sql).addParameter("qtId", qtId)
                     .addParameter("status", status).executeUpdate();

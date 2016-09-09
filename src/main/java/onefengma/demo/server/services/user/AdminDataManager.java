@@ -772,11 +772,12 @@ public class AdminDataManager extends BaseDataHelper {
     public AdminQtResponse getQtListResponse(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String where = StringUtils.isEmpty(pageBuilder.generateWherePlus(true)) ? " where " : pageBuilder.generateWherePlus(true) + " and ";
 
-        String sql = "select " + generateFiledStringExclude(QtItem.class, "userMobile", "sellerMobile", "sellerCompany", "desc") + " from iron_buy_qt " + where
+        String sql = "select " + generateFiledStringExclude(QtItem.class, "userMobile", "sellerMobile", "sellerCompany", "desc", "buyFinishTime", "buyTotalMoney") + " from iron_buy_qt " + where
                 + " pushTime<:endTime and pushTime>=:startTime order by pushTime desc " + pageBuilder.generateLimit() ;
 
         String countSql = "select count(*) from iron_buy_qt " + where
-                + " pushTime<:endTime and pushTime>=:startTime order by pushTime desc " + pageBuilder.generateLimit() ;
+                + " pushTime<:endTime and pushTime>=:startTime ";
+
         try(Connection conn = getConn()) {
             AdminQtResponse qtResponse = new AdminQtResponse();
             qtResponse.currentPage = pageBuilder.currentPage;
@@ -800,6 +801,12 @@ public class AdminDataManager extends BaseDataHelper {
                         + ironBuyBrief.numbers + "" + ironBuyBrief.unit + " "
                         + "收货城市：" + CityDataHelper.instance().getCityDescById(ironBuyBrief.locationCityId) + " " + ironBuyBrief.message;
 
+                if (ironBuyBrief.status == 1) {
+                    IronBuyOfferDetail ironBuyOfferDetail = IronDataHelper.getIronDataHelper().getWinSellerOffer(ironBuyBrief.id, ironBuyBrief.supplyUserId);
+                    qtItem.buyFinishTime = ironBuyBrief.supplyWinTime;
+                    qtItem.buyTotalMoney = NumberUtils.round(ironBuyOfferDetail.supplyPrice * ironBuyBrief.numbers.floatValue(), 2);
+                }
+
                 qtItem.sellerMobile = UserDataHelper.instance().getUserMobile(ironBuyBrief.supplyUserId);
             }
 
@@ -812,11 +819,14 @@ public class AdminDataManager extends BaseDataHelper {
         public String ironBuyId;
         public int status; // 0等待质检 1质检完成 2质检取消
         public long pushTime;
+        public long startTime;
         public long finishTime;
         public String userId;
         public String userMobile;
         public String sellerMobile;
         public String sellerCompany;
+        public long buyFinishTime;
+        public float buyTotalMoney;
         public String desc;
     }
 

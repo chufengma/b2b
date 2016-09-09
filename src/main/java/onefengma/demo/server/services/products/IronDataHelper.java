@@ -899,7 +899,7 @@ public class IronDataHelper extends BaseDataHelper {
         String todayBuySql = "select count(*) from iron_buy_supply where offerTime<:todayEnd and offerTime>=:todayStart and sellerId=:userId ";
         String todayBuyDoneSql = "select count(*) from iron_buy where supplyWinTime<:todayEnd and supplyWinTime>=:todayStart and supplyUserId=:userId and status=1 ";
         String monthBuySql = "select count(*) from iron_buy_supply where offerTime<:monthEnd and offerTime>=:monthStart and sellerId=:userId ";
-        String monthBuyDoneSql = "select count(*) from iron_buy_supply where supplyWinTime<:monthEnd and supplyWinTime>=:monthStart and supplyUserId=:userId and status=1 ";
+        String monthBuyDoneSql = "select count(*) from iron_buy_supply where offerTime<:monthEnd and offerTime>=:monthStart and sellerId=:userId and status=1 ";
 
         try(Connection conn = getConn()) {
             MyOfferHistoryInfo myOfferHistoryInfo = new MyOfferHistoryInfo();
