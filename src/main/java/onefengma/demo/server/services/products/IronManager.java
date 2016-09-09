@@ -70,9 +70,12 @@ public class IronManager extends BaseManager {
                     .addEqualWhere("isSpec", requestBean.isSpec)
                     .addEqualWhere("reviewed", true)
                     .addEqualWhere("deleteStatus", 0)
-                    .addNotInWhere("proId", ironBlackListForIron)
                     .addInWhere("sourceCityId", CityDataHelper.instance().getCitiesById(new ArrayList<>(), requestBean.cityId))
                     .setOrderByRequest(requestBean);
+
+            if (requestBean.pageCount <= 7) {
+                pageBuilder.addNotInWhere("proId", ironBlackListForIron);
+            }
 
             ironsGetResponse.maxCount = IronDataHelper.getIronDataHelper().getMaxIronCounts(pageBuilder);
             ironsGetResponse.irons = IronDataHelper.getIronDataHelper()
