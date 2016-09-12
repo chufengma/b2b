@@ -1,11 +1,13 @@
 package onefengma.demo.server.model.apibeans.sales;
 
 import onefengma.demo.server.model.SalesMan;
+import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.product.IronBuyBrief;
 import onefengma.demo.server.model.product.SupplyBrief;
 import onefengma.demo.server.model.qt.QtDetail;
 import onefengma.demo.server.services.products.IronDataHelper;
 import onefengma.demo.server.services.user.SalesDataHelper;
+import onefengma.demo.server.services.user.SalesDataHelper.SellerInfo;
 import onefengma.demo.server.services.user.SalesDataHelper.UserInfo;
 
 import java.util.List;
@@ -20,4 +22,5 @@ public class SalesIronBuyDetailResponse {
     public SalesMan salesMan;
     public QtDetail qtDetail;
     public UserInfo userInfo;
+    public Seller sellerInfo;
 }

@@ -48,6 +48,7 @@ public class IronBuyRequest extends AuthSession {
         ironBuy.numbers = numbers;
         ironBuy.timeLimit = timeLimit;
         ironBuy.unit = unit;
+        ironBuy.appFlag = getMobileFlag();
         return ironBuy;
     }
 }

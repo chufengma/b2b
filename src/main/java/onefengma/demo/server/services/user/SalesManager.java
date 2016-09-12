@@ -76,6 +76,7 @@ public class SalesManager extends BaseManager {
 
             myIronBuyDetailResponse.buy = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.ironId);
             myIronBuyDetailResponse.supplies = IronDataHelper.getIronDataHelper().getIronBuySupplies(requestBean.ironId);
+            myIronBuyDetailResponse.sellerInfo = SellerDataHelper.instance().getSeller(myIronBuyDetailResponse.buy.userId);
 
             if (myIronBuyDetailResponse.supplies!= null
                     && myIronBuyDetailResponse.buy != null) {
