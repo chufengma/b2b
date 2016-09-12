@@ -12,6 +12,7 @@ import onefengma.demo.server.model.product.SupplyBrief;
 public class MyIronBuyDetailResponse {
     public IronBuyBrief buy;
     public List<SupplyBrief> supplies;
+    public List<SupplyBrief> missSupplies;
     public String salesManPhone;
     public SalesMan salesMan;
 }

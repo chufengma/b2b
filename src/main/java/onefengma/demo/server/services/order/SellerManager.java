@@ -5,6 +5,7 @@ import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.VerifyUtils;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.core.PushManager;
 import onefengma.demo.server.core.UpdateBuilder;
 import onefengma.demo.server.model.SalesMan;
 import onefengma.demo.server.model.Seller;
@@ -20,6 +21,8 @@ import onefengma.demo.server.model.apibeans.product.SellerHandingBuyDetailRespon
 import onefengma.demo.server.model.apibeans.product.SellerIronBuyDetailRequest;
 import onefengma.demo.server.model.apibeans.product.SellerIronBuyDetailResponse;
 import onefengma.demo.server.model.metaData.City;
+import onefengma.demo.server.model.mobile.BasePushData;
+import onefengma.demo.server.model.mobile.BuyPushData;
 import onefengma.demo.server.model.product.HandingBuyBrief;
 import onefengma.demo.server.model.product.IronBuyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
@@ -162,8 +165,6 @@ public class SellerManager extends BaseManager {
                     return error("无法对自己的求购进行报价");
                 }
             }
-
-            System.out.println("---offerIronBuy--" + requestBean.ironId + ", " + requestBean.msg + ", " + requestBean.unit + "," + requestBean.price);
 
             IronDataHelper.getIronDataHelper().offerIronBuy(requestBean.getUserId(), requestBean.ironId, requestBean.price, requestBean.msg, requestBean.unit);
             UserMessageDataHelper.instance().setUserMessage(ironBuyBrief.userId, "有人报价您的不锈钢求购 请去【后台管理--不锈钢报价管理】刷新查看。");

@@ -418,6 +418,7 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
+
     public List<SupplyBrief> getIronBuySupplies(String ironId) {
         String sql = "select * from iron_buy_supply,seller where ironId=:ironId and sellerId=userId";
         try (Connection conn = getConn()) {
@@ -442,6 +443,41 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
+    public List<SupplyBrief> getIronBuySuppliesMissed(String ironId) {
+        String sql = "select * from iron_buy_seller_miss,seller where ironId=:ironId and sellerId=userId";
+        try (Connection conn = getConn()) {
+            List<Row> rows = conn.createQuery(sql)
+                    .addParameter("ironId", ironId).executeAndFetchTable().rows();
+            List<SupplyBrief> supplyBriefs = new ArrayList<>();
+            for (Row row : rows) {
+                SupplyBrief supplyBrief = new SupplyBrief();
+                supplyBrief.companyName = row.getString("companyName");
+                supplyBrief.score = row.getFloat("score");
+                supplyBrief.sellerId = row.getString("userId");
+                supplyBrief.supplyMsg = "-1";
+                supplyBrief.supplyPrice = -1;
+                supplyBrief.winningTimes = SellerDataHelper.instance().getUserSupplyWinnerTimes(supplyBrief.sellerId);
+                supplyBrief.contact = row.getString("contact");
+                supplyBriefs.add(supplyBrief);
+            }
+            return supplyBriefs;
+        }
+    }
+
+    private SupplyBrief generageSupplyBrief(Row row) {
+        SupplyBrief supplyBrief = new SupplyBrief();
+        supplyBrief.companyName = row.getString("companyName");
+        supplyBrief.score = row.getFloat("score");
+        supplyBrief.sellerId = row.getString("userId");
+        supplyBrief.status = row.getInteger("status");
+        supplyBrief.supplyMsg = row.getString("supplyMsg");
+        supplyBrief.winningTimes = SellerDataHelper.instance().getUserSupplyWinnerTimes(supplyBrief.sellerId);
+        supplyBrief.supplyPrice = row.getFloat("supplyPrice");
+        supplyBrief.unit = row.getString("unit");
+        supplyBrief.offerTime = row.getLong("offerTime");
+        supplyBrief.contact = row.getString("contact");
+        return supplyBrief;
+    }
 
     public String getSupplyUserId(String ironId) {
         String sql = "select supplyUserId from iron_buy where id=:ironId";
@@ -623,10 +659,36 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
-    public void missIronBuyOffer(String ironId, String sellerId) {
+    public void missIronBuyOffer(String ironId, String sellerId) throws NoSuchFieldException, IllegalAccessException {
+        String copySql = "insert into iron_buy_seller_miss select * from iron_buy_seller where sellerId=:sellerId and ironId=:ironId";
         String sql = "delete from iron_buy_seller where sellerId=:sellerId and ironId=:ironId";
+
+        String updateIronBuySql = "update iron_buy set newSupplyNum=(newSupplyNum+1) where id=:id";
+
         try(Connection conn = getConn()) {
+            conn.createQuery(copySql).addParameter("ironId", ironId).addParameter("sellerId", sellerId).executeUpdate();
             conn.createQuery(sql).addParameter("ironId", ironId).addParameter("sellerId", sellerId).executeUpdate();
+
+            // add new offer count
+            conn.createQuery(updateIronBuySql).addParameter("id", ironId).executeUpdate();
+
+            // 推送至mobile
+            IronBuyBrief ironBuyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(ironId);
+            String message = generateIronBuyMessage(ironBuyBrief);
+            Seller seller = SellerDataHelper.instance().getSeller(sellerId);
+            if (seller != null) {
+                message = seller.companyName + "公司 已放弃对您的" + message + "求购报价.";
+            }
+            BuyPushData pushData = new BuyPushData(ironBuyBrief.userId, BasePushData.PUSH_TYPE_OFFER_MISS);
+            pushData.title = "有商家已放弃您的求购";
+            pushData.desc = message;
+            pushData.ironBuyBrief = ironBuyBrief;
+            PageBuilder pageBuilder = new PageBuilder(0, 10)
+                    .addEqualWhere("userId", ironBuyBrief.userId)
+                    .addEqualWhere("status", 0);
+            pushData.newSupplyNums = IronDataHelper.getIronDataHelper().getMaxIronBuyNewSupplyNum(pageBuilder);
+
+            PushManager.instance().pushData(pushData);
         }
     }
 

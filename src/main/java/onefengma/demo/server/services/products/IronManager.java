@@ -271,6 +271,7 @@ public class IronManager extends BaseManager {
 
             myIronBuyDetailResponse.buy = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.ironId);
             myIronBuyDetailResponse.supplies = IronDataHelper.getIronDataHelper().getIronBuySupplies(requestBean.ironId);
+            myIronBuyDetailResponse.missSupplies = IronDataHelper.getIronDataHelper().getIronBuySuppliesMissed(requestBean.ironId);
 
             if (myIronBuyDetailResponse.supplies!= null
                     && myIronBuyDetailResponse.buy != null) {
@@ -278,6 +279,12 @@ public class IronManager extends BaseManager {
                     if (StringUtils.equals(myIronBuyDetailResponse.buy.supplyUserId, supplyBrief.sellerId)) {
                         supplyBrief.isWinner = true;
                     }
+                    supplyBrief.mobile = UserDataHelper.instance().getUserMobile(supplyBrief.sellerId);
+                }
+            }
+
+            if (myIronBuyDetailResponse.missSupplies != null) {
+                for(SupplyBrief supplyBrief : myIronBuyDetailResponse.missSupplies) {
                     supplyBrief.mobile = UserDataHelper.instance().getUserMobile(supplyBrief.sellerId);
                 }
             }
