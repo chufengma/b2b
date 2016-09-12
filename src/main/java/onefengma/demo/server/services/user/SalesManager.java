@@ -77,6 +77,7 @@ public class SalesManager extends BaseManager {
             myIronBuyDetailResponse.buy = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.ironId);
             myIronBuyDetailResponse.supplies = IronDataHelper.getIronDataHelper().getIronBuySupplies(requestBean.ironId);
             myIronBuyDetailResponse.sellerInfo = SellerDataHelper.instance().getSeller(myIronBuyDetailResponse.buy.userId);
+            myIronBuyDetailResponse.missSupplies = IronDataHelper.getIronDataHelper().getIronBuySuppliesMissed(requestBean.ironId);
 
             if (myIronBuyDetailResponse.supplies!= null
                     && myIronBuyDetailResponse.buy != null) {
@@ -88,11 +89,19 @@ public class SalesManager extends BaseManager {
                 }
             }
 
+            if (myIronBuyDetailResponse.missSupplies != null) {
+                for(SupplyBrief supplyBrief : myIronBuyDetailResponse.missSupplies) {
+                    supplyBrief.mobile = UserDataHelper.instance().getUserMobile(supplyBrief.sellerId);
+                }
+            }
+
             SalesMan salesMan = UserDataHelper.instance().getSalesManById(Integer.parseInt(requestBean.getSalesId()));
             myIronBuyDetailResponse.salesMan = salesMan;
             myIronBuyDetailResponse.salesManPhone = salesMan == null ? "" : salesMan.tel;
             myIronBuyDetailResponse.qtDetail = SalesDataHelper.instance().getQtDetail(requestBean.ironId);
             myIronBuyDetailResponse.userInfo = SalesDataHelper.instance().getUserInfo(myIronBuyDetailResponse.buy.userId);
+
+
 
             return success(myIronBuyDetailResponse);
         }));
