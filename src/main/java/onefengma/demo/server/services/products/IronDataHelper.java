@@ -660,13 +660,13 @@ public class IronDataHelper extends BaseDataHelper {
     }
 
     public void missIronBuyOffer(String ironId, String sellerId) throws NoSuchFieldException, IllegalAccessException {
-        String copySql = "insert into iron_buy_seller_miss select * from iron_buy_seller where sellerId=:sellerId and ironId=:ironId";
+        String copySql = "insert into iron_buy_seller_miss set sellerId=:sellerId , ironId=:ironId,  missTime=:missTime";
         String sql = "delete from iron_buy_seller where sellerId=:sellerId and ironId=:ironId";
 
         String updateIronBuySql = "update iron_buy set newSupplyNum=(newSupplyNum+1) where id=:id";
 
         try(Connection conn = getConn()) {
-            conn.createQuery(copySql).addParameter("ironId", ironId).addParameter("sellerId", sellerId).executeUpdate();
+            conn.createQuery(copySql).addParameter("ironId", ironId).addParameter("sellerId", sellerId).addParameter("missTime", System.currentTimeMillis()).executeUpdate();
             conn.createQuery(sql).addParameter("ironId", ironId).addParameter("sellerId", sellerId).executeUpdate();
 
             // add new offer count
