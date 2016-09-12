@@ -286,7 +286,12 @@ public class AdminManager extends BaseManager {
                     return error("手机号格式不正确");
                 }
             }
-            AdminDataManager.instance().updateSalesman(requestBean.id, requestBean.name, requestBean.mobile);
+
+            String password = "";
+            if (!StringUtils.isEmpty(requestBean.password) && !StringUtils.equals(StringUtils.DEFAULT_PASSWORD, requestBean.password)) {
+                password = IdUtils.md5(requestBean.password);
+            }
+            AdminDataManager.instance().updateSalesman(requestBean.id, requestBean.name, requestBean.mobile, password);
             return success("操作成功");
         }));
 

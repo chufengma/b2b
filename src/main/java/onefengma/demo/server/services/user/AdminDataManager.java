@@ -351,6 +351,7 @@ public class AdminDataManager extends BaseDataHelper {
                 salesManAdmin.id = row.getInteger("id");
                 salesManAdmin.name = row.getString("name");
                 salesManAdmin.mobile = row.getString("tel");
+                salesManAdmin.password = StringUtils.isEmpty(row.getString("password")) ? "" : StringUtils.DEFAULT_PASSWORD;
                 Integer userNum = conn.createQuery(userCountSql)
                         .addParameter("endTime", endTime)
                         .addParameter("startTime", startTime)
@@ -602,10 +603,13 @@ public class AdminDataManager extends BaseDataHelper {
         }
     }
 
-    public void updateSalesman(int id, String name, String mobile) {
+    public void updateSalesman(int id, String name, String mobile, String password) {
         UpdateBuilder updateBuilder = new UpdateBuilder();
         updateBuilder.addStringMap("name", name);
         updateBuilder.addStringMap("tel", mobile);
+        if (!StringUtils.isEmpty(password)) {
+            updateBuilder.addStringMap("password", password);
+        };
         String sql = "update salesman set " + updateBuilder.generateSql() + " where id=:id";
         try(Connection conn = getConn()) {
             conn.createQuery(sql).addParameter("id", id).executeUpdate();
@@ -862,6 +866,7 @@ public class AdminDataManager extends BaseDataHelper {
         public String mobile;
         public int userCount;
         public float totalMoney;
+        public String password;
     }
 
     public static class BuyForAdmin {

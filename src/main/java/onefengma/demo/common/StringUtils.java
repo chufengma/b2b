@@ -9,6 +9,8 @@ import java.net.URLDecoder;
  */
 public class StringUtils {
 
+    public static final String DEFAULT_PASSWORD = "******";
+
     public static boolean isEmpty(String str) {
         return str == null || str.isEmpty();
     }

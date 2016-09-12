@@ -13,4 +13,6 @@ public class AdminChangeSalesmanRequest extends AdminAuthSession {
     public String mobile;
     @NotRequired
     public String name;
+    @NotRequired
+    public String password;
 }
