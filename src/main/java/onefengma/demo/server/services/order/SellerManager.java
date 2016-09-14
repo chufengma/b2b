@@ -5,7 +5,6 @@ import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.VerifyUtils;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
-import onefengma.demo.server.core.PushManager;
 import onefengma.demo.server.core.UpdateBuilder;
 import onefengma.demo.server.model.SalesMan;
 import onefengma.demo.server.model.Seller;
@@ -21,8 +20,6 @@ import onefengma.demo.server.model.apibeans.product.SellerHandingBuyDetailRespon
 import onefengma.demo.server.model.apibeans.product.SellerIronBuyDetailRequest;
 import onefengma.demo.server.model.apibeans.product.SellerIronBuyDetailResponse;
 import onefengma.demo.server.model.metaData.City;
-import onefengma.demo.server.model.mobile.BasePushData;
-import onefengma.demo.server.model.mobile.BuyPushData;
 import onefengma.demo.server.model.product.HandingBuyBrief;
 import onefengma.demo.server.model.product.IronBuyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
@@ -130,6 +127,7 @@ public class SellerManager extends BaseManager {
             }
 
             sellerIronBuyDetailResponse.userBuyInfo = SellerDataHelper.instance().getUserBuyInfo(ironBuyBrief.userId);
+            sellerIronBuyDetailResponse.buyerSeller = SellerDataHelper.instance().getSeller(ironBuyBrief.userId);
 
             return success(sellerIronBuyDetailResponse);
         }));

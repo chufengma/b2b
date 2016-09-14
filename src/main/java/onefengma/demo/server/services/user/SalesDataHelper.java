@@ -1,22 +1,23 @@
 package onefengma.demo.server.services.user;
 
-import onefengma.demo.common.StringUtils;
-import onefengma.demo.server.core.PageBuilder;
-import onefengma.demo.server.model.apibeans.qt.QtListResponse;
-import onefengma.demo.server.model.apibeans.sales.SalesIronBuysResponse;
-import onefengma.demo.server.model.apibeans.sales.SalesManSellerResponse;
-import onefengma.demo.server.model.apibeans.sales.SalesManUserResponse;
-import onefengma.demo.server.model.product.IronBuyBrief;
-import onefengma.demo.server.model.qt.QtDetail;
-import onefengma.demo.server.services.funcs.CityDataHelper;
-import onefengma.demo.server.services.products.IronDataHelper;
 import org.sql2o.Connection;
-
-import onefengma.demo.server.core.BaseDataHelper;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+
+import onefengma.demo.server.core.BaseDataHelper;
+import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.core.PushManager;
+import onefengma.demo.server.model.apibeans.qt.QtListResponse;
+import onefengma.demo.server.model.apibeans.sales.SalesIronBuysResponse;
+import onefengma.demo.server.model.apibeans.sales.SalesManSellerResponse;
+import onefengma.demo.server.model.apibeans.sales.SalesManUserResponse;
+import onefengma.demo.server.model.mobile.IronQtPushData;
+import onefengma.demo.server.model.product.IronBuyBrief;
+import onefengma.demo.server.model.qt.QtDetail;
+import onefengma.demo.server.services.funcs.CityDataHelper;
+import onefengma.demo.server.services.products.IronDataHelper;
 
 /**
  * @author yfchu
@@ -121,7 +122,7 @@ public class SalesDataHelper extends BaseDataHelper {
             return conn.createQuery(sql).addParameter("qtId", qtId).executeAndFetchFirst(QtDetail.class);
         }
     }
-    public void updateQtStatus(String qtId, int status) {
+    public void updateQtStatus(String qtId, int status) throws NoSuchFieldException, IllegalAccessException {
         String updateStr = " ";
         if (status == 3) {
             updateStr = ", startTime=" + System.currentTimeMillis();
@@ -132,6 +133,21 @@ public class SalesDataHelper extends BaseDataHelper {
         try(Connection conn = getConn()) {
             conn.createQuery(sql).addParameter("qtId", qtId)
                     .addParameter("status", status).executeUpdate();
+
+            QtDetail qtDetail = getQtDetailByQtId(qtId);
+            IronBuyBrief ironBuyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(qtDetail.ironBuyId);
+            IronQtPushData ironQtPushData = new IronQtPushData(ironBuyBrief.userId);
+            String statusStr = "";
+            if (status == 3) {
+                statusStr = "开始质检";
+            } else if (status == 2) {
+                statusStr = "已取消质检";
+            } else {
+                statusStr = "已完成质检";
+            }
+            ironQtPushData.title = "您的求购" + statusStr;
+            ironQtPushData.desc = "您的求购" + IronDataHelper.getIronDataHelper().generateIronBuyMessage(ironBuyBrief);
+            PushManager.instance().pushData(ironQtPushData);
         }
     }
 
