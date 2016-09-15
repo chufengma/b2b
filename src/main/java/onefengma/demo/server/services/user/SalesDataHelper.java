@@ -153,7 +153,7 @@ public class SalesDataHelper extends BaseDataHelper {
 
     public SalesIronBuysResponse getSalesIronBuy(String salesId, PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(IronBuyBrief.class) + " from iron_buy where userId in (select userId from user where salesManId=:salesId) " + pageBuilder.generateWherePlus(false) + " order by pushTime desc " + pageBuilder.generateLimit();
-        String countSql = "select count(*) from iron_buy where userId in (select userId from user where salesManId=:salesId) " + pageBuilder.generateWherePlus(false) + " order by pushTime desc " + pageBuilder.generateLimit();
+        String countSql = "select count(*) from iron_buy where userId in (select userId from user where salesManId=:salesId) " + pageBuilder.generateWherePlus(false) + " order by pushTime desc ";
         String supplyCountSql = "select count(*) from iron_buy_supply where ironId=:ironId";
 
         try(Connection conn = getConn()) {
