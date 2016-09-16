@@ -1,8 +1,7 @@
 package onefengma.demo.rx;
 
-import java.math.BigDecimal;
-
-import onefengma.demo.common.NumberUtils;
+import onefengma.demo.server.config.ConfigBean;
+import onefengma.demo.server.services.products.IronDataHelper;
 
 /**
  * @author yfchu
@@ -29,9 +28,16 @@ public class RxDemo {
 
 //        try(Connection connection = OrderDataHelper.instance().getConn()) {
 //            OrderDataHelper.instance().addIntegralByBuy(connection, "527cec6a380046b5b813537e10d065e9", "5afa98c48214438dad364113e3a82ce9", 1323);
-//        }
-        BigDecimal bd = new BigDecimal(1233.1129134 + "");
-        System.out.println("---" + NumberUtils.round(bd, 3));
+////        }
+//        BigDecimal bd = new BigDecimal(1233.1129134 + "");
+//        System.out.println("---" + NumberUtils.round(bd, 3));
+
+        try {
+            ConfigBean.configDev();
+            IronDataHelper.getIronDataHelper().offerIronBuy("k9Z7L1F3xd3A", "Z27e2ceuayIe", 183, "test" + System.currentTimeMillis(), "kg");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

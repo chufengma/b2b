@@ -17,10 +17,7 @@ import onefengma.demo.server.core.request.BaseResult;
 import onefengma.demo.server.core.request.PageRoute;
 import onefengma.demo.server.core.request.ParamsMissException;
 import onefengma.demo.server.core.request.TypedRoute;
-import onefengma.demo.server.model.apibeans.AdminAuthSession;
-import onefengma.demo.server.model.apibeans.AuthData;
-import onefengma.demo.server.model.apibeans.AuthSession;
-import onefengma.demo.server.model.apibeans.BaseBean;
+import onefengma.demo.server.model.apibeans.*;
 import onefengma.demo.server.services.user.SellerDataHelper;
 import spark.ModelAndView;
 import spark.Request;
@@ -104,6 +101,10 @@ public abstract class BaseManager {
                 setupAuth(requestBean, request);
                 addHeaders(response);
                 response.raw().setCharacterEncoding("UTF-8");
+                if (!salesSessionCheck(requestBean)) {
+                    cleanTmpFiles(requestBean.extra);
+                    return error(STATUS_NOT_ADMIN, "您还没有登录, 请登录后再试", null);
+                }
                 if (!adminSessionCheck(requestBean)) {
                     cleanTmpFiles(requestBean.extra);
                     return error(STATUS_NOT_ADMIN, "not admin", null);
@@ -131,6 +132,10 @@ public abstract class BaseManager {
                 T reqBean = getRequest(request, tClass);
                 addHeaders(response);
                 response.raw().setCharacterEncoding("UTF-8");
+                if (!salesSessionCheck(reqBean)) {
+                    cleanTmpFiles(reqBean.extra);
+                    return error(STATUS_NOT_LOGIN, "您还没有登录, 请登录后再试", null);
+                }
                 if (!adminSessionCheck(reqBean)) {
                     cleanTmpFiles(reqBean.extra);
                     return error(STATUS_NOT_ADMIN, "not admin", null);
@@ -351,6 +356,10 @@ public abstract class BaseManager {
 
     private static boolean adminSessionCheck(Object object) {
         return object instanceof AdminAuthSession ? !((AdminAuthSession) object).isNotValid() : true;
+    }
+
+    private static boolean salesSessionCheck(Object object) {
+        return object instanceof SalesAuthSession ? !((SalesAuthSession) object).isNotValid() : true;
     }
 
     private static void gotoPage(String page) {

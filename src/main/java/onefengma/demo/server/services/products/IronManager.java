@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import onefengma.demo.common.IdUtils;
+import onefengma.demo.common.NumberUtils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.config.Config;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.model.SalesMan;
+import onefengma.demo.server.model.apibeans.AuthSession;
 import onefengma.demo.server.model.apibeans.BaseAuthPageBean;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.product.DeleteIronProductRequest;
@@ -20,16 +24,20 @@ import onefengma.demo.server.model.apibeans.product.IronsGetRequest;
 import onefengma.demo.server.model.apibeans.product.IronsGetResponse;
 import onefengma.demo.server.model.apibeans.product.MyIronBuyDetail;
 import onefengma.demo.server.model.apibeans.product.MyIronBuyDetailResponse;
+import onefengma.demo.server.model.apibeans.product.MyIronBuysNewNums;
 import onefengma.demo.server.model.apibeans.product.MyIronBuysResponse;
 import onefengma.demo.server.model.apibeans.product.MyIronProductResponse;
 import onefengma.demo.server.model.apibeans.product.SelectIronSupply;
 import onefengma.demo.server.model.apibeans.product.UpdateIronProductRequest;
+import onefengma.demo.server.model.apibeans.qt.QtRequest;
 import onefengma.demo.server.model.metaData.IconDataCategory;
 import onefengma.demo.server.model.product.IronBuy;
 import onefengma.demo.server.model.product.IronBuyBrief;
 import onefengma.demo.server.model.product.IronDetail;
 import onefengma.demo.server.model.product.ShopBrief;
 import onefengma.demo.server.model.product.SupplyBrief;
+import onefengma.demo.server.model.qt.QtBrief;
+import onefengma.demo.server.model.qt.QtDetail;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.order.OrderDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
@@ -80,6 +88,7 @@ public class IronManager extends BaseManager {
             ironsGetResponse.maxCount = IronDataHelper.getIronDataHelper().getMaxIronCounts(pageBuilder);
             ironsGetResponse.irons = IronDataHelper.getIronDataHelper()
                     .getIronProducts(pageBuilder);
+
             return success(ironsGetResponse);
         }));
 
@@ -117,7 +126,6 @@ public class IronManager extends BaseManager {
 
             IronDataHelper.getIronDataHelper().pushIronProduct(requestBean.generateIconProduct());
             SellerDataHelper.instance().addIronType(requestBean.getUserId(), requestBean.ironType);
-
             return success();
         }));
 
@@ -150,6 +158,47 @@ public class IronManager extends BaseManager {
             IronBuy ironBuy = requestBean.generateIronBug();
             ironBuy.salesmanId = UserDataHelper.instance().getSalesManId(requestBean.getUserId());
             IronDataHelper.getIronDataHelper().pushIronBuy(ironBuy);
+            return success();
+        }));
+
+        post("editBuy", IronBuyRequest.class, ((request, response, requestBean) -> {
+
+
+            if (!SellerDataHelper.instance().isSeller(requestBean.getUserId())) {
+                return error("您不是企业用户，不能发布求购, 请前往后台点击成为商家上传公司三证等相关资料");
+            }
+
+            // 材料种类
+            if (!IconDataCategory.get().materials.contains(requestBean.material)) {
+                return errorAndClear(requestBean, "材料种类填写不正确");
+            }
+            // 表面种类
+            if (!IconDataCategory.get().surfaces.contains(requestBean.surface)) {
+                return errorAndClear(requestBean, "表面种类填写不正确");
+            }
+            // 不锈钢品类
+            if (!IconDataCategory.get().types.contains(requestBean.ironType)) {
+                return errorAndClear(requestBean, "不锈钢品类填写不正确");
+            }
+            // 不锈钢产地
+            if (!IconDataCategory.get().productPlaces.contains(requestBean.proPlace)) {
+                return errorAndClear(requestBean, "不锈钢产地填写不正确");
+            }
+
+            if (!CityDataHelper.instance().isCityExist(requestBean.locationCityId)) {
+                return errorAndClear(requestBean, "交货地点不存在");
+            }
+
+            IronBuyBrief ironBuyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.ironId);
+            if (ironBuyBrief == null) {
+                return error("无此次求购");
+            }
+            if (ironBuyBrief.editStatus != 0) {
+                return error("该求购无法再次编辑");
+            }
+            IronBuy ironBuy = requestBean.generateIronBug();
+            ironBuy.salesmanId = UserDataHelper.instance().getSalesManId(requestBean.getUserId());
+            IronDataHelper.getIronDataHelper().editIronBuy(ironBuy);
             return success();
         }));
 
@@ -206,12 +255,16 @@ public class IronManager extends BaseManager {
 
             if (requestBean.status != -1) {
                 pageBuilder.addEqualWhere("status", requestBean.status);
+            } else {
+                pageBuilder.addInWhereNumber("status", Arrays.asList(0, 1, 2));
             }
 
             handingGetResponse.canceledCount = IronDataHelper.getIronDataHelper().getCancledCount(requestBean.getUserId());
             handingGetResponse.buys = IronDataHelper.getIronDataHelper().getIronsBuy(pageBuilder);
             handingGetResponse.maxCount = IronDataHelper.getIronDataHelper().getMaxIronBuyCounts(pageBuilder);
             handingGetResponse.lossRate = (float) handingGetResponse.canceledCount / (float) handingGetResponse.maxCount;
+            handingGetResponse.lossRate = (float) handingGetResponse.canceledCount / (float) handingGetResponse.maxCount;
+            handingGetResponse.newSupplyNums = IronDataHelper.getIronDataHelper().getMaxIronBuyNewSupplyNum(pageBuilder);
             return success(handingGetResponse);
         }));
 
@@ -219,8 +272,12 @@ public class IronManager extends BaseManager {
             IronDataHelper.getIronDataHelper().updateBuyStatusByUserId(requestBean.getUserId());
 
             MyIronBuyDetailResponse myIronBuyDetailResponse = new MyIronBuyDetailResponse();
+            // reset iron new offer count
+            IronDataHelper.getIronDataHelper().resetIronBuyNewOffersCount(requestBean.ironId);
+
             myIronBuyDetailResponse.buy = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.ironId);
             myIronBuyDetailResponse.supplies = IronDataHelper.getIronDataHelper().getIronBuySupplies(requestBean.ironId);
+            myIronBuyDetailResponse.missSupplies = IronDataHelper.getIronDataHelper().getIronBuySuppliesMissed(requestBean.ironId);
 
             if (myIronBuyDetailResponse.supplies!= null
                     && myIronBuyDetailResponse.buy != null) {
@@ -232,7 +289,16 @@ public class IronManager extends BaseManager {
                 }
             }
 
-            myIronBuyDetailResponse.salesManPhone = UserDataHelper.instance().getSalesManTel(requestBean.getUserId());
+            if (myIronBuyDetailResponse.missSupplies != null) {
+                for(SupplyBrief supplyBrief : myIronBuyDetailResponse.missSupplies) {
+                    supplyBrief.mobile = UserDataHelper.instance().getUserMobile(supplyBrief.sellerId);
+                }
+            }
+
+            SalesMan salesMan = UserDataHelper.instance().getSalesMan(requestBean.getUserId());
+            myIronBuyDetailResponse.salesMan = salesMan;
+            myIronBuyDetailResponse.salesManPhone = salesMan == null ? "" : salesMan.tel;
+
             return success(myIronBuyDetailResponse);
         }));
 
@@ -283,6 +349,87 @@ public class IronManager extends BaseManager {
             return success();
         }));
 
+        get("newBuyNums", AuthSession.class, ((request, response, requestBean) -> {
+            IronDataHelper.getIronDataHelper().updateBuyStatusByUserId(requestBean.getUserId());
+            PageBuilder pageBuilder = new PageBuilder(0, 15)
+                    .addEqualWhere("userId", requestBean.getUserId())
+                    .addEqualWhere("status", 0);
+            return success(new MyIronBuysNewNums(IronDataHelper.getIronDataHelper().getMaxIronBuyNewSupplyNum(pageBuilder)));
+        }));
+
+        post("deleteIronBuy", DeleteIronProductRequest.class, ((request, response, requestBean) -> {
+            IronDataHelper.getIronDataHelper().updateBuyStatusByUserId(requestBean.getUserId());
+
+            IronBuyBrief ironBuyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.ironId);
+            if (ironBuyBrief == null || !StringUtils.equals(requestBean.getUserId(), ironBuyBrief.userId)) {
+                return error("您没有相应求购");
+            }
+            if (IronDataHelper.getIronDataHelper().getIronBuyStatus(requestBean.ironId) != 0) {
+                return error("此次求购已经结束");
+            }
+            IronDataHelper.getIronDataHelper().deleteIronBuyByUser(requestBean.ironId);
+            return success();
+        }));
+
+        post("qt", QtRequest.class, ((request, response, requestBean) -> {
+            IronBuyBrief ironBuyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.ironId);
+            if (ironBuyBrief == null) {
+                return error("没有该条求购");
+            }
+            if (ironBuyBrief.status != 1 && StringUtils.isEmpty(ironBuyBrief.supplyUserId)) {
+                return error("该条求购无法申请质检");
+            }
+            float price = IronDataHelper.getIronDataHelper().getIronBuySupplyPrice(requestBean.ironId);
+            float totalMoney = NumberUtils.round(ironBuyBrief.numbers.floatValue() * price, 2);
+            if (totalMoney < 5000) {
+                return error("总价过低无法申请质检");
+            }
+
+            SalesMan salesMan = UserDataHelper.instance().getSalesMan(ironBuyBrief.userId);
+            if (salesMan == null) {
+                return error("您好没有绑定专员,请到淘不锈网站后台绑定!");
+            }
+
+            QtDetail qtDetail = IronDataHelper.getIronDataHelper().getQtDetail(ironBuyBrief.id);
+            if (qtDetail != null) {
+                return error("该求购已经提交过申请!");
+            }
+
+            QtBrief qtBrief = new QtBrief();
+            qtBrief.qtId = IdUtils.id();
+            qtBrief.ironBuyId = requestBean.ironId;
+            qtBrief.status = 0;
+            qtBrief.pushTime = System.currentTimeMillis();
+            qtBrief.salesmanId = salesMan.id;
+            qtBrief.userId = ironBuyBrief.userId;
+            IronDataHelper.getIronDataHelper().insertQt(qtBrief);
+
+            return success("申请质检成功!");
+        }));
+
+        get("qt", BaseAuthPageBean.class, ((request, response, requestBean) -> {
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
+                    .addEqualWhere("userId", requestBean.getUserId())
+                    .addOrderBy("pushTime", true);
+
+            if (requestBean.status != -1) {
+                pageBuilder.addEqualWhere("status", requestBean.status);
+            }
+
+            return success(IronDataHelper.getIronDataHelper().qtList(pageBuilder));
+        }));
+
+        get("myIronBuyHistory", AuthSession.class, ((request, response, requestBean) -> {
+            return success(IronDataHelper.getIronDataHelper().getMyBuyHistoryInfo(requestBean.getUserId()));
+        }));
+
+        get("myIronOfferHistory", AuthSession.class, ((request, response, requestBean) -> {
+            return success(IronDataHelper.getIronDataHelper().getMyOfferHistoryInfo(requestBean.getUserId()));
+        }));
+
+        get("myIronAllHistory", AuthSession.class, ((request, response, requestBean) -> {
+            return success(IronDataHelper.getIronDataHelper().getMyAllHistoryInfo(requestBean.getUserId()));
+        }));
     }
 
     @Override

@@ -1,5 +1,7 @@
 package onefengma.demo.server.services.user;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import onefengma.demo.common.DateHelper;
@@ -19,6 +21,8 @@ import onefengma.demo.server.model.admin.AdminSellersRequest;
 import onefengma.demo.server.model.admin.AdminSellersResponse;
 import onefengma.demo.server.model.admin.AdminUsersRequest;
 import onefengma.demo.server.model.admin.AdminUsersResponse;
+import onefengma.demo.server.model.SalesMan;
+import onefengma.demo.server.model.admin.*;
 import onefengma.demo.server.model.apibeans.admin.AdminBuysRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminChangeSalesmanRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminDeleteBuyRequest;
@@ -254,6 +258,10 @@ public class AdminManager extends BaseManager {
                 pageBuilder.addInWhere("supplyUserId", ids);
             }
 
+            if (requestBean.appFlag != -1) {
+                pageBuilder.addInWhereNumber("appFlag", Arrays.asList(requestBean.appFlag));
+            }
+
             return success(AdminDataManager.instance().getBuysForAdmin(pageBuilder, requestBean.productType));
         }));
 
@@ -294,7 +302,12 @@ public class AdminManager extends BaseManager {
                     return error("手机号格式不正确");
                 }
             }
-            AdminDataManager.instance().updateSalesman(requestBean.id, requestBean.name, requestBean.mobile);
+
+            String password = "";
+            if (!StringUtils.isEmpty(requestBean.password) && !StringUtils.equals(StringUtils.DEFAULT_PASSWORD, requestBean.password)) {
+                password = IdUtils.md5(requestBean.password);
+            }
+            AdminDataManager.instance().updateSalesman(requestBean.id, requestBean.name, requestBean.mobile, password);
             return success("操作成功");
         }));
 
@@ -478,6 +491,32 @@ public class AdminManager extends BaseManager {
             } else {
                 return success(AdminDataManager.instance().getSiteInfoAllTrans(requestBean.startTime, requestBean.endTime));
             }
+        }));
+
+        get("qtList", AdminQtRequest.class, ((request, response, requestBean) -> {
+            PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount);
+            pageBuilder.setTime(requestBean.startTime, requestBean.endTime);
+            if (requestBean.status != -1) {
+                pageBuilder.addEqualWhere("status", requestBean.status);
+            }
+
+            if (requestBean.salesId != -1) {
+                pageBuilder.addEqualWhere("salesmanId", requestBean.salesId);
+            }
+
+            if (!StringUtils.isEmpty(requestBean.salesMobile)) {
+                String salesManID = UserDataHelper.instance().getSalesManIdByMobile(requestBean.salesMobile);
+                salesManID = salesManID == null ? "" : salesManID;
+                pageBuilder.addEqualWhereCanEmpty("salesmanId", salesManID);
+            }
+
+            if (!StringUtils.isEmpty(requestBean.userMobile)) {
+                String buyerId = UserDataHelper.instance().getUserIdByMobile(requestBean.userMobile);
+                buyerId = buyerId == null ? "" : buyerId;
+                pageBuilder.addEqualWhereCanEmpty("userId", buyerId);
+            }
+
+            return success(AdminDataManager.instance().getQtListResponse(pageBuilder));
         }));
     }
 

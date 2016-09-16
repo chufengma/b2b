@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import onefengma.demo.annotation.NotRequired;
+import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.request.ParamsMissException;
 import spark.Request;
 import spark.Response;
@@ -31,6 +32,8 @@ public class BaseBean {
     public Request request;
     @NotRequired
     public Response response;
+    @NotRequired
+    public int appFlag = -1;
 
     public boolean checkParams(JSONObject jsonObject) throws ParamsMissException {
         for(String key : getRequiredParams()) {
@@ -39,6 +42,18 @@ public class BaseBean {
             }
         }
         return true;
+    }
+
+    public boolean isMobile() {
+        return !StringUtils.isEmpty(request.headers("X-Mobile-Flag"));
+    }
+
+    public int getMobileFlag() {
+         if (!StringUtils.isEmpty(request.headers("X-Mobile-Flag"))) {
+             return StringUtils.equals(request.headers("X-Mobile-Flag"), "Android") ? 1 : 2;
+         } else {
+             return 0;
+         }
     }
 
     public Set<String> getRequiredParams() {

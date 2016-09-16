@@ -15,9 +15,18 @@ import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.ThreadUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.core.PushManager;
+import onefengma.demo.server.model.MyAllHistoryInfo;
+import onefengma.demo.server.model.MyBuyHistoryInfo;
+import onefengma.demo.server.model.MyOfferHistoryInfo;
 import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.apibeans.others.HelpFindProduct;
 import onefengma.demo.server.model.apibeans.product.SellerIronBuysResponse;
+import onefengma.demo.server.model.apibeans.qt.QtListResponse;
+import onefengma.demo.server.model.mobile.BasePushData;
+import onefengma.demo.server.model.mobile.BuyPushData;
+import onefengma.demo.server.model.mobile.NewIronBuyPushData;
+import onefengma.demo.server.model.mobile.WinOfferPushData;
 import onefengma.demo.server.model.product.IronBuy;
 import onefengma.demo.server.model.product.IronBuyBrief;
 import onefengma.demo.server.model.product.IronDetail;
@@ -25,6 +34,8 @@ import onefengma.demo.server.model.product.IronProduct;
 import onefengma.demo.server.model.product.IronProductBrief;
 import onefengma.demo.server.model.product.IronRecommend;
 import onefengma.demo.server.model.product.SupplyBrief;
+import onefengma.demo.server.model.qt.QtBrief;
+import onefengma.demo.server.model.qt.QtDetail;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import onefengma.demo.server.services.order.OrderDataHelper;
@@ -105,6 +116,16 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
+    public int getMaxIronBuyNewSupplyNum(PageBuilder pageBuilder) {
+        String sql = "select sum(newSupplyNum)" +
+                " from iron_buy " + generateWhereKey(pageBuilder, false);
+
+        try (Connection conn = getConn()) {
+            Integer num = conn.createQuery(sql).executeScalar(Integer.class);
+            return num == null ? 0 : num;
+        }
+    }
+
     public List<IronBuyBrief> getIronsBuy(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(IronBuyBrief.class) +
                 " from iron_buy " + generateWhereKey(pageBuilder, true);
@@ -179,6 +200,43 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
+    public void editIronBuy(IronBuy ironBuy) throws InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException, IllegalAccessException {
+        String sql = "update iron_buy set ironType=:ironType," +
+                "    material=:material," +
+                "    surface=:surface," +
+                "    proPlace=:proPlace," +
+                "    locationCityId=:locationCityId," +
+                "    message=:message," +
+                "    length=:length," +
+                "    width=:width," +
+                "    height=:height," +
+                "    tolerance=:tolerance," +
+                "    numbers=:numbers," +
+                "    timeLimit=:timeLimit," +
+                "    salesmanId=:salesmanId," +
+                "    unit=:unit,editStatus=1 where id=:id";
+        try (Connection conn = getConn()) {
+            conn.createQuery(sql)
+                    .addParameter("ironType", ironBuy.ironType)
+                    .addParameter("material", ironBuy.material)
+                    .addParameter("surface", ironBuy.surface)
+                    .addParameter("proPlace", ironBuy.proPlace)
+                    .addParameter("locationCityId", ironBuy.locationCityId)
+                    .addParameter("message", ironBuy.message)
+                    .addParameter("length", ironBuy.length)
+                    .addParameter("width", ironBuy.width)
+                    .addParameter("height", ironBuy.height)
+                    .addParameter("tolerance", ironBuy.tolerance)
+                    .addParameter("numbers", ironBuy.numbers)
+                    .addParameter("timeLimit", ironBuy.timeLimit)
+                    .addParameter("salesmanId", ironBuy.salesmanId)
+                    .addParameter("unit", ironBuy.unit)
+                    .addParameter("id", ironBuy.id)
+                    .executeUpdate();
+            pushToSellers(ironBuy);
+        }
+    }
+
     private void pushToSellers(IronBuy ironBuy) {
         ThreadUtils.instance().post(new Runnable() {
             @Override
@@ -187,29 +245,52 @@ public class IronDataHelper extends BaseDataHelper {
                         "or ironType like '%" + ironBuy.ironType + "%'" +
                         "or proPlace like '%" + ironBuy.proPlace + "%'" +
                         "or material like '%" + ironBuy.material + "%') and userId<> :userId group by userId";
+
+                String subSql = "select userId from seller_subscribe where (surfaces like '%" + ironBuy.surface + "%'" +
+                        "or types like '%" + ironBuy.ironType + "%'" +
+                        "or proPlaces like '%" + ironBuy.proPlace + "%'" +
+                        "or materials like '%" + ironBuy.material + "%') and userId<> :userId group by userId";
+
                 try (Connection conn = getConn()) {
                     List<String> users = conn.createQuery(userSql)
                             .addParameter("userId", ironBuy.userId)
                             .executeAndFetch(String.class);
-                    for (String userId : users) {
+
+                    List<String> subUsers = conn.createQuery(subSql)
+                            .addParameter("userId", ironBuy.userId)
+                            .executeAndFetch(String.class);
+
+                    List<String> tmpList = new ArrayList<String>(users);
+                    for(String newUser : subUsers) {
+                        if (!users.contains(newUser)) {
+                            tmpList.add(newUser);
+                        }
+                    }
+
+                    for (String userId : tmpList) {
                         addInBuySeller(conn, ironBuy.id, userId);
                         String message = "有人求购" + generateIroBuyMessage(ironBuy) + "，请前往淘求购或后台报价管理页面刷新查看";
                         UserMessageDataHelper.instance().setUserMessage(userId, message);
+
+                        NewIronBuyPushData newIronBuyPushData = new NewIronBuyPushData(userId);
+                        newIronBuyPushData.title = "有您感兴趣的求购";
+                        newIronBuyPushData.desc = "有人求购" + generateIroBuyMessage(ironBuy);
+                        PushManager.instance().pushData(newIronBuyPushData);
                     }
                 }
             }
         });
     }
 
-    private String generateIroBuyMessage(IronBuy ironBuy) {
+    public String generateIroBuyMessage(IronBuy ironBuy) {
         return ironBuy.ironType + " " + ironBuy.surface + "" + ironBuy.material + " "
                 + ironBuy.length + "*" + ironBuy.width + "*" + ironBuy.height + " "
                 + ironBuy.numbers + " " + ironBuy.unit;
     }
 
-    private String generateIronBuyMessage(IronBuyBrief ironBuy) {
+    public String generateIronBuyMessage(IronBuyBrief ironBuy) {
         return ironBuy.ironType + " " + ironBuy.surface + "" + ironBuy.material + " "
-                + ironBuy.length + "*" +ironBuy.width + "*" + ironBuy.height + " "
+                + ironBuy.length + "*" + ironBuy.width + "*" + ironBuy.height + " "
                 + ironBuy.numbers + " " + ironBuy.unit;
     }
 
@@ -329,6 +410,15 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
+    public void resetIronBuyNewOffersCount(String ironId) {
+        String sql = "update iron_buy set lastGetDetailTime=:lastGetDetailTime, newSupplyNum=0 where id=:id";
+        try (Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("lastGetDetailTime", System.currentTimeMillis())
+                    .addParameter("id", ironId).executeUpdate();
+        }
+    }
+
+
     public List<SupplyBrief> getIronBuySupplies(String ironId) {
         String sql = "select * from iron_buy_supply,seller where ironId=:ironId and sellerId=userId";
         try (Connection conn = getConn()) {
@@ -346,12 +436,48 @@ public class IronDataHelper extends BaseDataHelper {
                 supplyBrief.supplyPrice = row.getFloat("supplyPrice");
                 supplyBrief.unit = row.getString("unit");
                 supplyBrief.offerTime = row.getLong("offerTime");
+                supplyBrief.contact = row.getString("contact");
                 supplyBriefs.add(supplyBrief);
             }
             return supplyBriefs;
         }
     }
 
+    public List<SupplyBrief> getIronBuySuppliesMissed(String ironId) {
+        String sql = "select * from iron_buy_seller_miss,seller where ironId=:ironId and sellerId=userId";
+        try (Connection conn = getConn()) {
+            List<Row> rows = conn.createQuery(sql)
+                    .addParameter("ironId", ironId).executeAndFetchTable().rows();
+            List<SupplyBrief> supplyBriefs = new ArrayList<>();
+            for (Row row : rows) {
+                SupplyBrief supplyBrief = new SupplyBrief();
+                supplyBrief.companyName = row.getString("companyName");
+                supplyBrief.score = row.getFloat("score");
+                supplyBrief.sellerId = row.getString("userId");
+                supplyBrief.supplyMsg = "-1";
+                supplyBrief.supplyPrice = -1;
+                supplyBrief.winningTimes = SellerDataHelper.instance().getUserSupplyWinnerTimes(supplyBrief.sellerId);
+                supplyBrief.contact = row.getString("contact");
+                supplyBriefs.add(supplyBrief);
+            }
+            return supplyBriefs;
+        }
+    }
+
+    private SupplyBrief generageSupplyBrief(Row row) {
+        SupplyBrief supplyBrief = new SupplyBrief();
+        supplyBrief.companyName = row.getString("companyName");
+        supplyBrief.score = row.getFloat("score");
+        supplyBrief.sellerId = row.getString("userId");
+        supplyBrief.status = row.getInteger("status");
+        supplyBrief.supplyMsg = row.getString("supplyMsg");
+        supplyBrief.winningTimes = SellerDataHelper.instance().getUserSupplyWinnerTimes(supplyBrief.sellerId);
+        supplyBrief.supplyPrice = row.getFloat("supplyPrice");
+        supplyBrief.unit = row.getString("unit");
+        supplyBrief.offerTime = row.getLong("offerTime");
+        supplyBrief.contact = row.getString("contact");
+        return supplyBrief;
+    }
 
     public String getSupplyUserId(String ironId) {
         String sql = "select supplyUserId from iron_buy where id=:ironId";
@@ -403,6 +529,13 @@ public class IronDataHelper extends BaseDataHelper {
                 UserMessageDataHelper.instance().setUserMessage(supplyUserId, message);
                 // 增加站内信
                 InnerMessageDataHelper.instance().addInnerMessage(supplyUserId, "恭喜您成功中标", message);
+
+                // 推送至mobile
+                WinOfferPushData pushData = new WinOfferPushData(ironBuyBrief.userId);
+                pushData.title = "恭喜您成功中标！";
+                pushData.desc = message;
+                pushData.ironBuyBrief = ironBuyBrief;
+                PushManager.instance().pushData(pushData);
             }
         });
 
@@ -417,15 +550,38 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
-    public SellerIronBuysResponse getSellerIronBuys(PageBuilder pageBuilder, String sellerId) throws NoSuchFieldException, IllegalAccessException {
-        String sql = "select iron_buy.id as id,supplyUserId,supplyWinTime, ironType, material, surface, proPlace, locationCityId, userId, message, pushTime, length, width, height, tolerance, numbers, timeLimit, status " +
-                " from iron_buy,iron_buy_seller " +
-                "where iron_buy_seller.ironId = iron_buy.id and sellerId=:sellerId and status<>2 order by pushTime desc  " + pageBuilder.generateLimit();
+    public SellerIronBuysResponse getSellerIronBuys(PageBuilder pageBuilder, String sellerId, int status) throws NoSuchFieldException, IllegalAccessException {
+        String statusStr = status == -1 ? " and iron_buy.status<>2 " : " and iron_buy.status=" + status + " ";
+        if (status == 6) {
+            statusStr = " and iron_buy.status <> 0 and iron_buy.supplyUserId<>sellerId ";
+        } else if (status == 3) {
+            statusStr = " and iron_buy.status = 0 ";
+        } else if (status == 4) {
+            statusStr = " and iron_buy.status = 1 and iron_buy.supplyUserId=sellerId ";
+        } else if (status == 0 ) {
+            statusStr = " and iron_buy.status = 0 and iron_buy.id not in (select ironId from iron_buy_supply where sellerId=:sellerId) ";
+        }
+        String fileds = " iron_buy.id as id,supplyUserId,supplyWinTime, ironType, material, surface, proPlace, locationCityId, userId, message, pushTime, length, width, height, tolerance, numbers, timeLimit, iron_buy.unit, iron_buy.status as status ";
+
+        String sql = "";
+        if (status == 6 || status == 3 || status == 4) {
+            sql = "select " + fileds + " from iron_buy,iron_buy_supply " +
+                    "where iron_buy_supply.ironId = iron_buy.id and sellerId=:sellerId " + statusStr + "  order by pushTime desc  " + pageBuilder.generateLimit();
+        } else {
+            sql = "select " + fileds + " from iron_buy,iron_buy_seller " +
+                    "where iron_buy_seller.ironId = iron_buy.id and sellerId=:sellerId " + statusStr + "  order by pushTime desc  " + pageBuilder.generateLimit();
+        }
 
         String supplyCountSql = "select count(*) from iron_buy_supply where ironId=:ironId";
 
-        String maxCountSql = "select count(*)" +
-                " from iron_buy,iron_buy_seller where iron_buy_seller.ironId = iron_buy.id and sellerId=:sellerId and status<>2 ";
+        String maxCountSql = "";
+        if (status == 6 || status == 3 || status == 4) {
+            maxCountSql = "select count(*)" +
+                    " from iron_buy,iron_buy_supply where iron_buy_supply.ironId = iron_buy.id and sellerId=:sellerId " + statusStr;
+        } else {
+            maxCountSql = "select count(*)" +
+                    " from iron_buy,iron_buy_seller where iron_buy_seller.ironId = iron_buy.id and sellerId=:sellerId " + statusStr;
+        }
 
         String winTimesSql = "select count(supplyUserId) as winningTimes from iron_buy where supplyUserId=:sellerId";
         String offerTimesSql = "select count(*) from iron_buy_supply where sellerId=:sellerId";
@@ -452,6 +608,10 @@ public class IronDataHelper extends BaseDataHelper {
                 // 候选中
                 if (ironBuyBrief != null && ironBuyBrief.status == 0 && sellerOffer != null) {
                     ironBuyBrief.status = 3;
+                }
+
+                if (status == 6) {
+                    ironBuyBrief.status = 6;
                 }
 
                 ironBuyBrief.setSourceCity(CityDataHelper.instance().getCityDescById(ironBuyBrief.locationCityId));
@@ -499,6 +659,39 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
+    public void missIronBuyOffer(String ironId, String sellerId) throws NoSuchFieldException, IllegalAccessException {
+        String copySql = "insert into iron_buy_seller_miss set sellerId=:sellerId , ironId=:ironId,  missTime=:missTime";
+        String sql = "delete from iron_buy_seller where sellerId=:sellerId and ironId=:ironId";
+
+        String updateIronBuySql = "update iron_buy set newSupplyNum=(newSupplyNum+1) where id=:id";
+
+        try(Connection conn = getConn()) {
+            conn.createQuery(copySql).addParameter("ironId", ironId).addParameter("sellerId", sellerId).addParameter("missTime", System.currentTimeMillis()).executeUpdate();
+            conn.createQuery(sql).addParameter("ironId", ironId).addParameter("sellerId", sellerId).executeUpdate();
+
+            // add new offer count
+            conn.createQuery(updateIronBuySql).addParameter("id", ironId).executeUpdate();
+
+            // 推送至mobile
+            IronBuyBrief ironBuyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(ironId);
+            String message = generateIronBuyMessage(ironBuyBrief);
+            Seller seller = SellerDataHelper.instance().getSeller(sellerId);
+            if (seller != null) {
+                message = seller.companyName + "公司 已放弃对您的" + message + "求购报价.";
+            }
+            BuyPushData pushData = new BuyPushData(ironBuyBrief.userId, BasePushData.PUSH_TYPE_OFFER_MISS);
+            pushData.title = "有商家已放弃您的求购";
+            pushData.desc = message;
+            pushData.ironBuyBrief = ironBuyBrief;
+            PageBuilder pageBuilder = new PageBuilder(0, 10)
+                    .addEqualWhere("userId", ironBuyBrief.userId)
+                    .addEqualWhere("status", 0);
+            pushData.newSupplyNums = IronDataHelper.getIronDataHelper().getMaxIronBuyNewSupplyNum(pageBuilder);
+
+            PushManager.instance().pushData(pushData);
+        }
+    }
+
     public void offerIronBuy(String sellerId, String ironId, float price, String msg, String unit) throws Exception {
         String sql = "insert into iron_buy_supply set " +
                 "ironId=:ironId, " +
@@ -508,6 +701,8 @@ public class IronDataHelper extends BaseDataHelper {
                 "unit=:unit, " +
                 "salesmanId=0," +
                 "offerTime=:time";
+
+        String updateIronBuySql = "update iron_buy set newSupplyNum=(newSupplyNum+1) where id=:id";
 
         transaction((conn) -> {
             conn.createQuery(sql)
@@ -521,16 +716,31 @@ public class IronDataHelper extends BaseDataHelper {
 
             addInBuySeller(conn, ironId, sellerId);
 
+            // add new offer count
+            conn.createQuery(updateIronBuySql).addParameter("id", ironId).executeUpdate();
+
             IronBuyBrief ironBuyBrief = getIronBuyBrief(ironId);
             if (ironBuyBrief != null) {
                 String message = generateIronBuyMessage(ironBuyBrief);
                 Seller seller = SellerDataHelper.instance().getSeller(sellerId);
                 if (seller != null) {
+                    // 推送至 websockets
                     message = seller.companyName + "公司 已对您的" + message + "求购进行报价，请前往求购管理进行刷新查看";
                     UserMessageDataHelper.instance().setUserMessage(ironBuyBrief.userId, message);
-                }
-            }
 
+                    // 推送至mobile
+                    BuyPushData pushData = new BuyPushData(ironBuyBrief.userId, BasePushData.PUSH_TYPE_BUY);
+                    pushData.title = "您的求购有新报价";
+                    pushData.desc = message;
+                    pushData.ironBuyBrief = ironBuyBrief;
+                    PageBuilder pageBuilder = new PageBuilder(0, 10)
+                            .addEqualWhere("userId", ironBuyBrief.userId)
+                            .addEqualWhere("status", 0);
+                    pushData.newSupplyNums = IronDataHelper.getIronDataHelper().getMaxIronBuyNewSupplyNum(pageBuilder);
+                    PushManager.instance().pushData(pushData);
+                }
+
+            }
         });
     }
 
@@ -602,6 +812,14 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
+    public void deleteIronBuyByUser(String ironId) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "update iron_buy set status=5 where id=:id";
+        try (Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("id", ironId).executeUpdate();
+        }
+    }
+
+
     public void deleteIronBuy(String id) throws NoSuchFieldException, IllegalAccessException {
         // delete iron buy
         String sql = "delete from iron_buy where id=:id";
@@ -645,6 +863,46 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
+    public QtDetail getQtDetail(String ironId) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "select " + generateFiledString(QtDetail.class) + " from iron_buy_qt where ironBuyId=:id";
+        try (Connection conn = getConn()) {
+            QtDetail qtDetail = conn.createQuery(sql).addParameter("id", ironId).executeAndFetchFirst(QtDetail.class);
+            if (qtDetail == null) {
+                return null;
+            } else {
+                qtDetail.setIronBuyBrief(IronDataHelper.getIronDataHelper().getIronBuyBrief(ironId));
+            }
+            return qtDetail;
+        }
+    }
+
+    public void insertQt(QtBrief qtBrief) throws InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException, IllegalAccessException {
+        try (Connection conn = getConn()) {
+            createInsertQuery(conn, "iron_buy_qt", qtBrief).executeUpdate();
+        }
+    }
+
+    public QtListResponse qtList(PageBuilder pageBuilder) throws InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException, IllegalAccessException, NoSuchFieldException {
+        String where = pageBuilder.generateWhere();
+        where = StringUtils.isEmpty(where) ? "" : " where " + where;
+        String sql = "select " + generateFiledString(QtDetail.class) + " from iron_buy_qt " + where + pageBuilder.generateLimit();
+
+        String countSql = "select count(*) from iron_buy_qt " + where;
+
+        QtListResponse qtListResponse = new QtListResponse(pageBuilder.currentPage, pageBuilder.pageCount);
+        try (Connection conn = getConn()) {
+            List<QtDetail> qtDetails = conn.createQuery(sql).executeAndFetch(QtDetail.class);
+            for (QtDetail qtDetail : qtDetails) {
+                qtDetail.setIronBuyBrief(IronDataHelper.getIronDataHelper().getIronBuyBrief(qtDetail.ironBuyId));
+            }
+            qtListResponse.qts = qtDetails;
+            Integer count = conn.createQuery(countSql).executeScalar(Integer.class);
+            count = count == null ? 0 : count;
+            qtListResponse.maxCount = count;
+        }
+        return qtListResponse;
+    }
+
     public void voteIron(String ironId, float vote) {
         String currentScoreSql = "select score from iron_product where proId=:proId";
         String updateScoreSql = "update iron_product set score=:score where proId=:proId";
@@ -662,6 +920,101 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
+    public MyBuyHistoryInfo getMyBuyHistoryInfo(String userId) {
+        String todayBuySql = "select count(*) from iron_buy where pushTime<:todayEnd and pushTime>=:todayStart and userId=:userId ";
+        String todayBuyDoneSql = "select count(*) from iron_buy where supplyWinTime<:todayEnd and supplyWinTime>=:todayStart and userId=:userId and status=1 ";
+        String monthBuySql = "select count(*) from iron_buy where pushTime<:monthEnd and pushTime>=:monthStart and userId=:userId ";
+        String monthBuyDoneSql = "select count(*) from iron_buy where supplyWinTime<:monthEnd and supplyWinTime>=:monthStart and userId=:userId and status=1 ";
+
+        try(Connection conn = getConn()) {
+            MyBuyHistoryInfo myBuyHistoryInfo = new MyBuyHistoryInfo();
+            Integer todayBuyCount = conn.createQuery(todayBuySql).addParameter("todayEnd", System.currentTimeMillis())
+                    .addParameter("todayStart", DateHelper.getTodayStart())
+                    .addParameter("userId", userId).executeScalar(Integer.class);
+            Integer todayBuyDoneCount = conn.createQuery(todayBuyDoneSql).addParameter("todayEnd", System.currentTimeMillis())
+                    .addParameter("todayStart", DateHelper.getTodayStart())
+                    .addParameter("userId", userId).executeScalar(Integer.class);
+            myBuyHistoryInfo.todayBuy = todayBuyCount == null ? 0 : todayBuyCount;
+            myBuyHistoryInfo.todayDone = todayBuyDoneCount == null ? 0 : todayBuyDoneCount;
+            if (myBuyHistoryInfo.todayBuy != 0) {
+                myBuyHistoryInfo.todayDoneRate = myBuyHistoryInfo.todayDone / myBuyHistoryInfo.todayBuy;
+            }
+
+            Integer monthBuyCount = conn.createQuery(monthBuySql).addParameter("monthEnd", System.currentTimeMillis())
+                    .addParameter("monthStart", DateHelper.getThisMonthStartTimestamp())
+                    .addParameter("userId", userId).executeScalar(Integer.class);
+            Integer monthBuyDoneCount = conn.createQuery(monthBuyDoneSql).addParameter("monthEnd", System.currentTimeMillis())
+                    .addParameter("monthStart",DateHelper.getThisMonthStartTimestamp())
+                    .addParameter("userId", userId).executeScalar(Integer.class);
+            myBuyHistoryInfo.monthBuy = monthBuyCount == null ? 0 : monthBuyCount;
+            myBuyHistoryInfo.monthDone = monthBuyDoneCount == null ? 0 : monthBuyDoneCount;
+            if (myBuyHistoryInfo.monthBuy != 0) {
+                myBuyHistoryInfo.monthDoneRate = myBuyHistoryInfo.monthDone / myBuyHistoryInfo.monthBuy;
+            }
+
+            return myBuyHistoryInfo;
+        }
+    }
+
+
+    public MyOfferHistoryInfo getMyOfferHistoryInfo(String userId) {
+        String todayBuySql = "select count(*) from iron_buy_supply where offerTime<:todayEnd and offerTime>=:todayStart and sellerId=:userId ";
+        String todayBuyDoneSql = "select count(*) from iron_buy where supplyWinTime<:todayEnd and supplyWinTime>=:todayStart and supplyUserId=:userId and status=1 ";
+        String monthBuySql = "select count(*) from iron_buy_supply where offerTime<:monthEnd and offerTime>=:monthStart and sellerId=:userId ";
+        String monthBuyDoneSql = "select count(*) from iron_buy_supply where offerTime<:monthEnd and offerTime>=:monthStart and sellerId=:userId and status=1 ";
+
+        try(Connection conn = getConn()) {
+            MyOfferHistoryInfo myOfferHistoryInfo = new MyOfferHistoryInfo();
+            Integer todayOfferCount = conn.createQuery(todayBuySql).addParameter("todayEnd", System.currentTimeMillis())
+                    .addParameter("todayStart", DateHelper.getTodayStart())
+                    .addParameter("userId", userId).executeScalar(Integer.class);
+            Integer todayOfferDoneCount = conn.createQuery(todayBuyDoneSql).addParameter("todayEnd", System.currentTimeMillis())
+                    .addParameter("todayStart", DateHelper.getTodayStart())
+                    .addParameter("userId", userId).executeScalar(Integer.class);
+            myOfferHistoryInfo.todayOffer = todayOfferCount == null ? 0 : todayOfferCount;
+            myOfferHistoryInfo.todayWin = todayOfferDoneCount == null ? 0 : todayOfferDoneCount;
+            if (myOfferHistoryInfo.todayOffer != 0) {
+                myOfferHistoryInfo.todayWinRate = myOfferHistoryInfo.todayWin / myOfferHistoryInfo.todayOffer;
+            }
+
+            Integer monthOfferCount = conn.createQuery(monthBuySql).addParameter("monthEnd", System.currentTimeMillis())
+                    .addParameter("monthStart", DateHelper.getThisMonthStartTimestamp())
+                    .addParameter("userId", userId).executeScalar(Integer.class);
+            Integer monthOfferDoneCount = conn.createQuery(monthBuyDoneSql).addParameter("monthEnd", System.currentTimeMillis())
+                    .addParameter("monthStart",DateHelper.getThisMonthStartTimestamp())
+                    .addParameter("userId", userId).executeScalar(Integer.class);
+            myOfferHistoryInfo.monthOffer = monthOfferCount == null ? 0 : monthOfferCount;
+            myOfferHistoryInfo.monthWin = monthOfferDoneCount == null ? 0 : monthOfferDoneCount;
+            if (myOfferHistoryInfo.monthOffer != 0) {
+                myOfferHistoryInfo.monthWinRate = myOfferHistoryInfo.monthWin / myOfferHistoryInfo.monthOffer;
+            }
+
+            return myOfferHistoryInfo;
+        }
+    }
+
+    public MyAllHistoryInfo getMyAllHistoryInfo(String userId) {
+        String buyTimesSql = "select count(*) from iron_buy where userId=:userId ";
+        String buyWinTimesSql = "select count(*) from iron_buy where userId=:userId and status=1 ";
+        String offerTimesSql = "select count(*) from iron_buy_supply where sellerId=:userId ";
+        String offerWinSql = "select count(*) from iron_buy where supplyUserId=:userId and status=1 ";
+
+        try(Connection conn = getConn()) {
+            MyAllHistoryInfo myOfferHistoryInfo = new MyAllHistoryInfo();
+            Integer buyTimes = conn.createQuery(buyTimesSql)
+                    .addParameter("userId", userId).executeScalar(Integer.class);
+            Integer buyWinTimes = conn.createQuery(buyWinTimesSql).addParameter("userId", userId).executeScalar(Integer.class);
+            myOfferHistoryInfo.buyTimes = buyTimes == null ? 0 : buyTimes;
+            myOfferHistoryInfo.buyWinTimes = buyWinTimes == null ? 0 : buyWinTimes;
+
+            Integer offerTimes = conn.createQuery(offerTimesSql).addParameter("userId", userId).executeScalar(Integer.class);
+            Integer offerWinTimes = conn.createQuery(offerWinSql).addParameter("userId", userId).executeScalar(Integer.class);
+            myOfferHistoryInfo.offerTimes = offerTimes == null ? 0 : offerTimes;
+            myOfferHistoryInfo.offerWinTimes = offerWinTimes == null ? 0 : offerWinTimes;
+            return myOfferHistoryInfo;
+        }
+    }
+
     public static class IronBuyOfferDetail {
         public String id;
         public String ironId;
@@ -676,6 +1029,11 @@ public class IronDataHelper extends BaseDataHelper {
         public float price;
         public String unit;
         public String supplyMsg;
+    }
+
+    public static class UserBuyInfo {
+        public int buyTimes;
+        public float buySuccessRate;
     }
 
 

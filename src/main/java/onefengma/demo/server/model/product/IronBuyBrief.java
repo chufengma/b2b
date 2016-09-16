@@ -23,9 +23,13 @@ public class IronBuyBrief {
     public String unit;
     public BigDecimal numbers;
     public long timeLimit;
-    public int status; // 0 待报价, 1 交易完成 , 2 过期, 3 已报价候选中, 4 我已中标
+    public int status; // 0 待报价, 1 交易完成 , 2 过期,  3 已报价候选中, 4 我已中标, 5 已删除, 6 流标
     public String supplyUserId;
     public long supplyWinTime;
+    public long lastGetDetailTime;
+    public int newSupplyNum;
+    public int editStatus; // 0表示未编辑,1 表示已编辑
+    public int appFlag;// 0 非app, 1 Android , 2 IOS
 
     private int supplyCount;
 

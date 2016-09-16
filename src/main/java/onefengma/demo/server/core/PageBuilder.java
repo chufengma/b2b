@@ -105,6 +105,22 @@ public class PageBuilder {
         }
     }
 
+    public static class LikeWhereString extends Where {
+
+        public LikeWhereString(String key, String value) {
+            super(key, value);
+        }
+
+        @Override
+        public String generate() {
+            String value = this.value == null ? "" : (String) this.value;
+            if (StringUtils.isEmpty(value)) {
+                return " ";
+            } else {
+                return " " + key + " like '%" + value + "%' ";
+            }
+        }
+    }
 
     public static class InWhereNumber extends Where {
 
@@ -176,6 +192,14 @@ public class PageBuilder {
             return this;
         }
         this.wereList.add(new NotInWhere(key, value));
+        return this;
+    }
+
+    public PageBuilder addLikeWhere(String key, String value) {
+        if (StringUtils.isEmpty(value)) {
+            return this;
+        }
+        this.wereList.add(new LikeWhereString(key, value));
         return this;
     }
 
@@ -276,6 +300,22 @@ public class PageBuilder {
         }
         return stringBuilder.toString();
     }
+
+    public String generateWherePlus(boolean needWhere) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < wereList.size(); i++) {
+            Where where = wereList.get(i);
+            stringBuilder.append(where.generate());
+            if (i != wereList.size() - 1) {
+                stringBuilder.append(" and");
+            }
+        }
+        if (!StringUtils.isEmpty(stringBuilder.toString())) {
+            return needWhere ? " where " + stringBuilder.toString() : " and " + stringBuilder.toString();
+        }
+        return stringBuilder.toString();
+    }
+
 
     public String generateLimit() {
         return " limit " + currentPage * pageCount + ", " + pageCount;

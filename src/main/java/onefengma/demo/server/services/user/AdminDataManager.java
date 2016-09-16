@@ -1,5 +1,8 @@
 package onefengma.demo.server.services.user;
 
+import onefengma.demo.server.model.admin.AdminQtResponse;
+import onefengma.demo.server.model.product.IronBuyBrief;
+import onefengma.demo.server.model.qt.QtBrief;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -285,7 +288,7 @@ public class AdminDataManager extends BaseDataHelper {
                             + " " + row.getString("height") + "*" + row.getString("width") + "*" + row.getString("length") + " 公差：" + row.getString("tolerance") + " "
                             + row.getString("numbers") + "" + row.getString("unit") + " "
                             + "收货城市：" + CityDataHelper.instance().getCityDescById(row.getString("locationCityId")) + " " + row.getString("message");
-
+                    buyForAdmin.appFlag = row.getInteger("appFlag");
                 } else {
                     HandingBuyOfferDetail detail = HandingDataHelper.getHandingDataHelper().getWinSellerOffer(buyForAdmin.buyId, supplyUserId);
                     if (detail != null) {
@@ -348,6 +351,7 @@ public class AdminDataManager extends BaseDataHelper {
                 salesManAdmin.id = row.getInteger("id");
                 salesManAdmin.name = row.getString("name");
                 salesManAdmin.mobile = row.getString("tel");
+                salesManAdmin.password = StringUtils.isEmpty(row.getString("password")) ? "" : StringUtils.DEFAULT_PASSWORD;
                 Integer userNum = conn.createQuery(userCountSql)
                         .addParameter("endTime", endTime)
                         .addParameter("startTime", startTime)
@@ -599,10 +603,13 @@ public class AdminDataManager extends BaseDataHelper {
         }
     }
 
-    public void updateSalesman(int id, String name, String mobile) {
+    public void updateSalesman(int id, String name, String mobile, String password) {
         UpdateBuilder updateBuilder = new UpdateBuilder();
         updateBuilder.addStringMap("name", name);
         updateBuilder.addStringMap("tel", mobile);
+        if (!StringUtils.isEmpty(password)) {
+            updateBuilder.addStringMap("password", password);
+        };
         String sql = "update salesman set " + updateBuilder.generateSql() + " where id=:id";
         try(Connection conn = getConn()) {
             conn.createQuery(sql).addParameter("id", id).executeUpdate();
@@ -766,6 +773,67 @@ public class AdminDataManager extends BaseDataHelper {
         }
     }
 
+    public AdminQtResponse getQtListResponse(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
+        String where = StringUtils.isEmpty(pageBuilder.generateWherePlus(true)) ? " where " : pageBuilder.generateWherePlus(true) + " and ";
+
+        String sql = "select " + generateFiledStringExclude(QtItem.class, "userMobile", "sellerMobile", "sellerCompany", "desc", "buyFinishTime", "buyTotalMoney") + " from iron_buy_qt " + where
+                + " pushTime<:endTime and pushTime>=:startTime order by pushTime desc " + pageBuilder.generateLimit() ;
+
+        String countSql = "select count(*) from iron_buy_qt " + where
+                + " pushTime<:endTime and pushTime>=:startTime ";
+
+        try(Connection conn = getConn()) {
+            AdminQtResponse qtResponse = new AdminQtResponse();
+            qtResponse.currentPage = pageBuilder.currentPage;
+            qtResponse.pageCount = pageBuilder.pageCount;
+            qtResponse.qtBriefList = conn.createQuery(sql).addParameter("startTime", pageBuilder.startTime)
+                    .addParameter("endTime", pageBuilder.endTime).executeAndFetch(QtItem.class);
+            Integer maxCount = conn.createQuery(countSql).addParameter("startTime", pageBuilder.startTime)
+                    .addParameter("endTime", pageBuilder.endTime).executeScalar(Integer.class);
+            maxCount = maxCount == null ? 0 : maxCount;
+            qtResponse.maxCount = maxCount;
+
+            for(QtItem qtItem : qtResponse.qtBriefList) {
+                IronBuyBrief ironBuyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(qtItem.ironBuyId);
+                qtItem.userMobile = UserDataHelper.instance().getUserMobile(ironBuyBrief.userId);
+                Seller seller = SellerDataHelper.instance().getSeller(ironBuyBrief.supplyUserId);
+                if (seller != null) {
+                    qtItem.sellerCompany = seller.companyName;
+                }
+                qtItem.desc =  ironBuyBrief.ironType + " " + ironBuyBrief.surface  + " " + ironBuyBrief.material
+                        + " " + ironBuyBrief.height + "*" + ironBuyBrief.width + "*" + ironBuyBrief.length + " 公差：" + ironBuyBrief.tolerance + " "
+                        + ironBuyBrief.numbers + "" + ironBuyBrief.unit + " "
+                        + "收货城市：" + CityDataHelper.instance().getCityDescById(ironBuyBrief.locationCityId) + " " + ironBuyBrief.message;
+
+                if (ironBuyBrief.status == 1) {
+                    IronBuyOfferDetail ironBuyOfferDetail = IronDataHelper.getIronDataHelper().getWinSellerOffer(ironBuyBrief.id, ironBuyBrief.supplyUserId);
+                    qtItem.buyFinishTime = ironBuyBrief.supplyWinTime;
+                    qtItem.buyTotalMoney = NumberUtils.round(ironBuyOfferDetail.supplyPrice * ironBuyBrief.numbers.floatValue(), 2);
+                }
+
+                qtItem.sellerMobile = UserDataHelper.instance().getUserMobile(ironBuyBrief.supplyUserId);
+            }
+
+            return qtResponse;
+        }
+    }
+    public static class QtItem {
+        public String qtId;
+        public int salesmanId;
+        public String ironBuyId;
+        public int status; // 0等待质检 1质检完成 2质检取消
+        public long pushTime;
+        public long startTime;
+        public long finishTime;
+        public String userId;
+        public String userMobile;
+        public String sellerMobile;
+        public String sellerCompany;
+        public long buyFinishTime;
+        public float buyTotalMoney;
+        public String desc;
+    }
+
     public static class SiteInfo {
         public long startTime;
         public long endTime;
@@ -798,6 +866,7 @@ public class AdminDataManager extends BaseDataHelper {
         public String mobile;
         public int userCount;
         public float totalMoney;
+        public String password;
     }
 
     public static class BuyForAdmin {
@@ -816,6 +885,7 @@ public class AdminDataManager extends BaseDataHelper {
         public int salesManId;   // ok
         public String salesManMobile; // ok
 
+        public int appFlag;
         public String desc;
     }
 
