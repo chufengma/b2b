@@ -702,7 +702,7 @@ public class IronDataHelper extends BaseDataHelper {
                 "salesmanId=0," +
                 "offerTime=:time";
 
-        String updateIronBuySql = "update iron_buy set newSupplyNum=(newSupplyNum+1) where id=:id";
+        String updateIronBuySql = "update iron_buy set newSupplyNum=(newSupplyNum+1),editStatus=1 where id=:id";
 
         transaction((conn) -> {
             conn.createQuery(sql)
