@@ -26,7 +26,7 @@ public class IronProduct {
     public long numbers;
     public boolean reviewed = false;
     public String unit;
-//    public int appFlag;
+    public int appFlag;
 
     @NotRequired
     private String sourceCity;
