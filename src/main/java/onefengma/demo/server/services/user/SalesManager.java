@@ -57,6 +57,9 @@ public class SalesManager extends BaseManager {
             if (!StringUtils.isEmpty(requestBean.mobile)) {
                 pageBuilder.addLikeWhere("mobile", requestBean.mobile);
             }
+            if (!StringUtils.isEmpty(requestBean.companyName)) {
+                pageBuilder.addLikeWhere("companyName", requestBean.companyName);
+            }
             return success(SalesDataHelper.instance().getBindSellerResponse(requestBean.getSalesId(), pageBuilder));
         }));
 

@@ -829,6 +829,10 @@ public class IronDataHelper extends BaseDataHelper {
         String ironBuySupplySql = "delete from iron_buy_seller where ironId=:id";
         // delete seller_transactions
         String ironBuyTransactionsSql = "delete from seller_transactions where productId=:id and productType=0 ";
+        // delete qt
+        String qtSql = "delete from iron_buy_qt where ironBuyId=:id";
+        // delete iron buy miss
+        String ironBuyMissSql = "delete from iron_buy_seller_miss where ironId=:id";
 
         String transactionSql = "select * from seller_transactions where  productId=:id and productType=0";
 
@@ -847,6 +851,8 @@ public class IronDataHelper extends BaseDataHelper {
             conn.createQuery(ironBuySellerSql).addParameter("id", id).executeUpdate();
             conn.createQuery(ironBuySupplySql).addParameter("id", id).executeUpdate();
             conn.createQuery(ironBuyTransactionsSql).addParameter("id", id).executeUpdate();
+            conn.createQuery(qtSql).addParameter("id", id).executeUpdate();
+            conn.createQuery(ironBuyMissSql).addParameter("id", id).executeUpdate();
         }
     }
 
@@ -961,7 +967,7 @@ public class IronDataHelper extends BaseDataHelper {
         String todayBuySql = "select count(*) from iron_buy_supply where offerTime<:todayEnd and offerTime>=:todayStart and sellerId=:userId ";
         String todayBuyDoneSql = "select count(*) from iron_buy where supplyWinTime<:todayEnd and supplyWinTime>=:todayStart and supplyUserId=:userId and status=1 ";
         String monthBuySql = "select count(*) from iron_buy_supply where offerTime<:monthEnd and offerTime>=:monthStart and sellerId=:userId ";
-        String monthBuyDoneSql = "select count(*) from iron_buy_supply where offerTime<:monthEnd and offerTime>=:monthStart and sellerId=:userId and status=1 ";
+        String monthBuyDoneSql = "select count(*) from iron_buy where supplyWinTime<:monthEnd and supplyWinTime>=:monthStart and supplyUserId=:userId and status=1 ";
 
         try(Connection conn = getConn()) {
             MyOfferHistoryInfo myOfferHistoryInfo = new MyOfferHistoryInfo();
