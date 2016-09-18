@@ -9,4 +9,6 @@ import onefengma.demo.server.model.apibeans.SalesAuthPageBean;
 public class SalesManUserRequest extends SalesAuthPageBean {
     @NotRequired
     public String mobile;
+    @NotRequired
+    public String companyName;
 }
