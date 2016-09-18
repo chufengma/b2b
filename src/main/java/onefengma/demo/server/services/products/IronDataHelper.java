@@ -242,14 +242,14 @@ public class IronDataHelper extends BaseDataHelper {
             @Override
             public void run() {
                 String userSql = "select userId from iron_product where (surface like '%" + ironBuy.surface + "%'" +
-                        "or ironType like '%" + ironBuy.ironType + "%'" +
-                        "or proPlace like '%" + ironBuy.proPlace + "%'" +
-                        "or material like '%" + ironBuy.material + "%') and userId<> :userId group by userId";
+                        "and ironType like '%" + ironBuy.ironType + "%'" +
+                        "and proPlace like '%" + ironBuy.proPlace + "%'" +
+                        "and material like '%" + ironBuy.material + "%') and userId<> :userId group by userId";
 
                 String subSql = "select userId from seller_subscribe where (surfaces like '%" + ironBuy.surface + "%'" +
-                        "or types like '%" + ironBuy.ironType + "%'" +
-                        "or proPlaces like '%" + ironBuy.proPlace + "%'" +
-                        "or materials like '%" + ironBuy.material + "%') and userId<> :userId group by userId";
+                        "and types like '%" + ironBuy.ironType + "%'" +
+                        "and proPlaces like '%" + ironBuy.proPlace + "%'" +
+                        "and materials like '%" + ironBuy.material + "%') and userId<> :userId group by userId";
 
                 try (Connection conn = getConn()) {
                     List<String> users = conn.createQuery(userSql)
@@ -531,7 +531,8 @@ public class IronDataHelper extends BaseDataHelper {
                 InnerMessageDataHelper.instance().addInnerMessage(supplyUserId, "恭喜您成功中标", message);
 
                 // 推送至mobile
-                WinOfferPushData pushData = new WinOfferPushData(ironBuyBrief.userId);
+                System.out.println("-------userId-" + supplyUserId);
+                WinOfferPushData pushData = new WinOfferPushData(supplyUserId);
                 pushData.title = "恭喜您成功中标！";
                 pushData.desc = message;
                 pushData.ironBuyBrief = ironBuyBrief;
@@ -729,6 +730,7 @@ public class IronDataHelper extends BaseDataHelper {
                     UserMessageDataHelper.instance().setUserMessage(ironBuyBrief.userId, message);
 
                     // 推送至mobile
+                    System.out.println("-----offerIronBuy--userId-" + ironBuyBrief.userId);
                     BuyPushData pushData = new BuyPushData(ironBuyBrief.userId, BasePushData.PUSH_TYPE_BUY);
                     pushData.title = "您的求购有新报价";
                     pushData.desc = message;
