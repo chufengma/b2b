@@ -945,7 +945,7 @@ public class IronDataHelper extends BaseDataHelper {
             myBuyHistoryInfo.todayBuy = todayBuyCount == null ? 0 : todayBuyCount;
             myBuyHistoryInfo.todayDone = todayBuyDoneCount == null ? 0 : todayBuyDoneCount;
             if (myBuyHistoryInfo.todayBuy != 0) {
-                myBuyHistoryInfo.todayDoneRate = myBuyHistoryInfo.todayDone / myBuyHistoryInfo.todayBuy;
+                myBuyHistoryInfo.todayDoneRate = (float)myBuyHistoryInfo.todayDone / (float) myBuyHistoryInfo.todayBuy;
             }
 
             Integer monthBuyCount = conn.createQuery(monthBuySql).addParameter("monthEnd", System.currentTimeMillis())
@@ -957,7 +957,7 @@ public class IronDataHelper extends BaseDataHelper {
             myBuyHistoryInfo.monthBuy = monthBuyCount == null ? 0 : monthBuyCount;
             myBuyHistoryInfo.monthDone = monthBuyDoneCount == null ? 0 : monthBuyDoneCount;
             if (myBuyHistoryInfo.monthBuy != 0) {
-                myBuyHistoryInfo.monthDoneRate = myBuyHistoryInfo.monthDone / myBuyHistoryInfo.monthBuy;
+                myBuyHistoryInfo.monthDoneRate = (float) myBuyHistoryInfo.monthDone / (float) myBuyHistoryInfo.monthBuy;
             }
 
             return myBuyHistoryInfo;
@@ -982,7 +982,7 @@ public class IronDataHelper extends BaseDataHelper {
             myOfferHistoryInfo.todayOffer = todayOfferCount == null ? 0 : todayOfferCount;
             myOfferHistoryInfo.todayWin = todayOfferDoneCount == null ? 0 : todayOfferDoneCount;
             if (myOfferHistoryInfo.todayOffer != 0) {
-                myOfferHistoryInfo.todayWinRate = myOfferHistoryInfo.todayWin / myOfferHistoryInfo.todayOffer;
+                myOfferHistoryInfo.todayWinRate = (float) myOfferHistoryInfo.todayWin / (float) myOfferHistoryInfo.todayOffer;
             }
 
             Integer monthOfferCount = conn.createQuery(monthBuySql).addParameter("monthEnd", System.currentTimeMillis())
@@ -994,7 +994,7 @@ public class IronDataHelper extends BaseDataHelper {
             myOfferHistoryInfo.monthOffer = monthOfferCount == null ? 0 : monthOfferCount;
             myOfferHistoryInfo.monthWin = monthOfferDoneCount == null ? 0 : monthOfferDoneCount;
             if (myOfferHistoryInfo.monthOffer != 0) {
-                myOfferHistoryInfo.monthWinRate = myOfferHistoryInfo.monthWin / myOfferHistoryInfo.monthOffer;
+                myOfferHistoryInfo.monthWinRate = (float) myOfferHistoryInfo.monthWin / (float) myOfferHistoryInfo.monthOffer;
             }
 
             return myOfferHistoryInfo;
