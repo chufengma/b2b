@@ -284,14 +284,14 @@ public class IronDataHelper extends BaseDataHelper {
 
     public String generateIroBuyMessage(IronBuy ironBuy) {
         return ironBuy.ironType + " " + ironBuy.surface + "" + ironBuy.material + " "
-                + ironBuy.length + "*" + ironBuy.width + "*" + ironBuy.height + " "
-                + ironBuy.numbers + " " + ironBuy.unit;
+                + ironBuy.height + "*" + ironBuy.width + "*" + ironBuy.length  + " "
+                + ironBuy.tolerance + " " + ironBuy.numbers + " " + ironBuy.unit;
     }
 
     public String generateIronBuyMessage(IronBuyBrief ironBuy) {
         return ironBuy.ironType + " " + ironBuy.surface + "" + ironBuy.material + " "
-                + ironBuy.length + "*" + ironBuy.width + "*" + ironBuy.height + " "
-                + ironBuy.numbers + " " + ironBuy.unit;
+                + ironBuy.height + "*" + ironBuy.width + "*" + ironBuy.length  + " "
+                + ironBuy.tolerance + " " + ironBuy.numbers + " " + ironBuy.unit;
     }
 
 
