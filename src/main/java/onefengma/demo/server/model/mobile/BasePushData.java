@@ -10,6 +10,8 @@ public class BasePushData {
     public String userId;
     public String type;
 
+    public int bageCount = -1;
+
     public BasePushData(String userId, String type) {
         this.userId = userId;
         this.type = type;

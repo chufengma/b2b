@@ -735,6 +735,7 @@ public class IronDataHelper extends BaseDataHelper {
                     pushData.title = "您的求购有新报价";
                     pushData.desc = message;
                     pushData.ironBuyBrief = ironBuyBrief;
+                    pushData.bageCount = pushData.newSupplyNums;
                     PageBuilder pageBuilder = new PageBuilder(0, 10)
                             .addEqualWhere("userId", ironBuyBrief.userId)
                             .addEqualWhere("status", 0);

@@ -19,6 +19,7 @@ public class PushManager {
     public static final String ANDROID_PAKAGE = "com.onefengma.taobuxiu";
     public static final String APP_ID = "2882303761517500719";
     public static final String SECRET_KEY = "d6JcRax80B2SqHQfQEpYwQ==";
+    public static final String SECRET_KEY_IOS = "d6JcRax80B2SqHQfQEpYwQ==";
 
 
     public static PushManager instance() {
@@ -34,7 +35,41 @@ public class PushManager {
 
     public void pushData(BasePushData pushData) {
         pushAndroidMessage(pushData);
+        pushIOSMessage(pushData);
     }
+
+    private void pushIOSMessage(BasePushData basePushData) {
+        if (StringUtils.isEmpty(basePushData.userId)) {
+            return;
+        }
+
+        String content = JSON.toJSONString(basePushData);
+        LogUtils.i("push data " + content, false);
+
+        ThreadUtils.instance().post(() -> {
+            String messagePayload = content;
+            Message.IOSBuilder build = new Message.IOSBuilder()
+                    .description(basePushData.desc)
+                    .soundURL("default")    // 消息铃声
+                    .badge(basePushData.bageCount)
+                    .extra("type", basePushData.type)
+                    .extra("content", messagePayload)  // 自定义键值对
+                    .extra("flow_control", "4000");   // 设置平滑推送, 推送速度4000每秒(qps=4000)
+
+            if (basePushData.bageCount != -1) {
+                build.badge(basePushData.bageCount);
+            }
+
+            Sender sender = new Sender(SECRET_KEY);
+            try {
+                sender.sendToUserAccount(build.build(), ConfigBean.MOBILE_PUSH_PREFIX + basePushData.userId, 4);
+            } catch (Exception e) {
+                LogUtils.i("push data error:" + JSON.toJSONString(basePushData), true);
+                e.printStackTrace();
+            }
+        });
+    }
+
 
     private void pushAndroidMessage(BasePushData basePushData) {
         if (StringUtils.isEmpty(basePushData.userId)) {
