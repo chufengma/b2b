@@ -553,7 +553,7 @@ public class IronDataHelper extends BaseDataHelper {
                 // 推送至竞争失败者
                 List<SupplyBrief> losers = IronDataHelper.getIronDataHelper().getIronBuySupplies(ironId);
                 if (losers != null) {
-                    String loseMessage = "很遗憾！您报价的 " + generateIronBuyMessage(ironBuyBrief) + " 未中标，请联系对方吧 : " + UserDataHelper.instance().getUserMobile(buyerId);
+                    String loseMessage = "很遗憾！您报价的 " + generateIronBuyMessage(ironBuyBrief) + " 未中标.";
                     for(SupplyBrief supplyBrief : losers) {
                         if (StringUtils.equals(supplyBrief.sellerId, supplyUserId)) {
                             continue;

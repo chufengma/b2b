@@ -136,7 +136,7 @@ public class SalesDataHelper extends BaseDataHelper {
 
             QtDetail qtDetail = getQtDetailByQtId(qtId);
             IronBuyBrief ironBuyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(qtDetail.ironBuyId);
-            IronQtPushData ironQtPushData = new IronQtPushData(ironBuyBrief.userId);
+            IronQtPushData ironQtPushData = new IronQtPushData(ironBuyBrief.userId, qtDetail.qtId);
             String statusStr = "";
             if (status == 3) {
                 statusStr = "开始质检";
