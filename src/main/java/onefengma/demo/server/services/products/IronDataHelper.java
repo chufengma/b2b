@@ -25,6 +25,7 @@ import onefengma.demo.server.model.apibeans.product.SellerIronBuysResponse;
 import onefengma.demo.server.model.apibeans.qt.QtListResponse;
 import onefengma.demo.server.model.mobile.BasePushData;
 import onefengma.demo.server.model.mobile.BuyPushData;
+import onefengma.demo.server.model.mobile.LoseOfferPushData;
 import onefengma.demo.server.model.mobile.NewIronBuyPushData;
 import onefengma.demo.server.model.mobile.WinOfferPushData;
 import onefengma.demo.server.model.product.IronBuy;
@@ -384,6 +385,17 @@ public class IronDataHelper extends BaseDataHelper {
         }
     }
 
+    public int getMySellerIronBuy(String sellerId, String ironId) {
+        IronDataHelper.getIronDataHelper().updateBuyStatusBySellerId(sellerId);
+        String sql = "select count(*) from iron_buy,iron_buy_seller " +
+                "where iron_buy.id = iron_buy_seller.ironId and iron_buy.id = :ironId and sellerId=:sellerId";
+        try(Connection conn = getConn()) {
+            Integer count = conn.createQuery(sql).addParameter("ironId", ironId)
+                    .addParameter("sellerId", sellerId).executeScalar(Integer.class);
+            return count == null ? 0 : count;
+        }
+    }
+
     public void updateBuyStatus() {
         String sql = "update iron_buy " +
                 "set status = 2 where (pushTime+timeLimit) < :currentTime and status = 0 ";
@@ -537,6 +549,22 @@ public class IronDataHelper extends BaseDataHelper {
                 pushData.desc = message;
                 pushData.ironBuyBrief = ironBuyBrief;
                 PushManager.instance().pushData(pushData);
+
+                // 推送至竞争失败者
+                List<SupplyBrief> losers = IronDataHelper.getIronDataHelper().getIronBuySupplies(ironId);
+                if (losers != null) {
+                    String loseMessage = "很遗憾！您报价的 " + generateIronBuyMessage(ironBuyBrief) + " 未中标，请联系对方吧 : " + UserDataHelper.instance().getUserMobile(buyerId);
+                    for(SupplyBrief supplyBrief : losers) {
+                        if (StringUtils.equals(supplyBrief.sellerId, supplyUserId)) {
+                            continue;
+                        }
+                        LoseOfferPushData losepushData = new LoseOfferPushData(supplyUserId);
+                        pushData.title = "很遗憾您竞标失败";
+                        pushData.desc = loseMessage;
+                        pushData.ironBuyBrief = ironBuyBrief;
+                        PushManager.instance().pushData(losepushData);
+                    }
+                }
             }
         });
 
@@ -733,9 +761,9 @@ public class IronDataHelper extends BaseDataHelper {
                     System.out.println("-----offerIronBuy--userId-" + ironBuyBrief.userId);
                     BuyPushData pushData = new BuyPushData(ironBuyBrief.userId, BasePushData.PUSH_TYPE_BUY);
                     pushData.title = "您的求购有新报价";
-                    pushData.desc = message;
+                    pushData.desc = seller.companyName + "公司 已对您的" + message + "求购进行报价，点击查看";
                     pushData.ironBuyBrief = ironBuyBrief;
-                    pushData.bageCount = pushData.newSupplyNums;
+                    pushData.bageCount = pushData.newSupplyNums + getMySellerIronBuy(sellerId, ironId);
                     PageBuilder pageBuilder = new PageBuilder(0, 10)
                             .addEqualWhere("userId", ironBuyBrief.userId)
                             .addEqualWhere("status", 0);
