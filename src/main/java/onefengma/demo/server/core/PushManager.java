@@ -44,7 +44,7 @@ public class PushManager {
         }
 
         String content = JSON.toJSONString(basePushData);
-        LogUtils.i("push data " + content, false);
+        LogUtils.i("push data for ios " + content, true);
 
         ThreadUtils.instance().post(() -> {
             String messagePayload = content;
