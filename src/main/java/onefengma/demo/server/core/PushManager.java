@@ -45,12 +45,13 @@ public class PushManager {
         }
 
         String content = JSON.toJSONString(basePushData);
-        LogUtils.i("push data for ios " + content, true);
 
         if (Config.ENV == Config.ENVI.DEV) {
             Constants.useSandbox();
+            LogUtils.i("push data for ios useSandbox " + content, true);
         } else {
             Constants.useOfficial();
+            LogUtils.i("push data for ios useOfficial " + content, true);
         }
 
         ThreadUtils.instance().post(() -> {
