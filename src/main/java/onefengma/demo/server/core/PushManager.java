@@ -7,6 +7,7 @@ import com.xiaomi.xmpush.server.Sender;
 
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.ThreadUtils;
+import onefengma.demo.server.config.Config;
 import onefengma.demo.server.config.ConfigBean;
 import onefengma.demo.server.model.mobile.BasePushData;
 
@@ -46,6 +47,12 @@ public class PushManager {
         String content = JSON.toJSONString(basePushData);
         LogUtils.i("push data for ios " + content, true);
 
+        if (Config.ENV == Config.ENVI.DEV) {
+            Constants.useSandbox();
+        } else {
+            Constants.useOfficial();
+        }
+
         ThreadUtils.instance().post(() -> {
             String messagePayload = content;
             Message.IOSBuilder build = new Message.IOSBuilder()
@@ -76,6 +83,7 @@ public class PushManager {
             return;
         }
 
+        Constants.useOfficial();
         String content = JSON.toJSONString(basePushData);
         LogUtils.i("push data " + content, false);
 
