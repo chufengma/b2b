@@ -19,7 +19,7 @@ public class PushManager {
     public static final String ANDROID_PAKAGE = "com.onefengma.taobuxiu";
     public static final String APP_ID = "2882303761517500719";
     public static final String SECRET_KEY = "d6JcRax80B2SqHQfQEpYwQ==";
-    public static final String SECRET_KEY_IOS = "d6JcRax80B2SqHQfQEpYwQ==";
+    public static final String SECRET_KEY_IOS = "ZVKIndYhqdYNTvn2PCtppg==";
 
 
     public static PushManager instance() {
@@ -60,7 +60,7 @@ public class PushManager {
                 build.badge(basePushData.bageCount);
             }
 
-            Sender sender = new Sender(SECRET_KEY);
+            Sender sender = new Sender(SECRET_KEY_IOS);
             try {
                 sender.sendToUserAccount(build.build(), ConfigBean.MOBILE_PUSH_PREFIX + basePushData.userId, 4);
             } catch (Exception e) {
