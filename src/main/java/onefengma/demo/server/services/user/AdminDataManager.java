@@ -1,8 +1,5 @@
 package onefengma.demo.server.services.user;
 
-import onefengma.demo.server.model.admin.AdminQtResponse;
-import onefengma.demo.server.model.product.IronBuyBrief;
-import onefengma.demo.server.model.qt.QtBrief;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -18,6 +15,7 @@ import onefengma.demo.server.core.UpdateBuilder;
 import onefengma.demo.server.model.Admin;
 import onefengma.demo.server.model.SalesMan;
 import onefengma.demo.server.model.Seller;
+import onefengma.demo.server.model.admin.AdminQtResponse;
 import onefengma.demo.server.model.admin.AdminSellersResponse;
 import onefengma.demo.server.model.admin.AdminUsersResponse;
 import onefengma.demo.server.model.apibeans.admin.AdminBuysResponse;
@@ -28,6 +26,7 @@ import onefengma.demo.server.model.apibeans.admin.AdminOrdersResponse;
 import onefengma.demo.server.model.apibeans.admin.AdminSalessResponse;
 import onefengma.demo.server.model.apibeans.admin.AdminSellerVerifyResponse;
 import onefengma.demo.server.model.apibeans.others.HelpFindProduct;
+import onefengma.demo.server.model.product.IronBuyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import onefengma.demo.server.services.products.HandingDataHelper;
@@ -113,7 +112,7 @@ public class AdminDataManager extends BaseDataHelper {
                 "from (select userId,integral, mobile,registerTime,salesmanId,tel from user left join salesman on salesmanId=salesman.id) as userComplete " +
                 " left join seller_transactions on (userId=buyerId and finishTime <=:endTime and finishTime>:startTime ) "
                 + (StringUtils.isEmpty(pageBuilder.generateWhere()) ? "" : " where " + whereSql)
-                + " group by userId  order by buyMoney desc" + pageBuilder.generateLimit();
+                + " group by userId  order by buyMoney desc,registerTime desc" + pageBuilder.generateLimit();
         try (Connection conn = getConn()) {
             AdminUsersResponse usersResponse = new AdminUsersResponse();
             usersResponse.buyers = conn.createQuery(userSalesMoneySql)
@@ -157,7 +156,7 @@ public class AdminDataManager extends BaseDataHelper {
                 " where applyTime<:registerEndTime and applyTime>=:registerStartTime " + companySql +
                 (StringUtils.isEmpty(pageBuilder.generateWhere()) ? "" : " and " + whereSql) +
                 " group by userId " +
-                " order by sellerTotalMoney desc " + pageBuilder.generateLimit();
+                " order by sellerTotalMoney desc, applyTime desc " + pageBuilder.generateLimit();
 
         String buyerSql = "select sum(money) from seller_transactions where buyerId=:buyerId and finishTime>=:dataStartTime and finishTime<:dataEndTime ";
 
@@ -193,8 +192,8 @@ public class AdminDataManager extends BaseDataHelper {
 
 
     public AdminOrdersResponse getOrdersForAdmin(PageBuilder pageBuilder) {
-        String sql = "select * from product_orders where status<>4  " + (pageBuilder.hasWhere() ? " and " : " ") + pageBuilder.generateWhere() + " order by sellTime desc " + pageBuilder.generateLimit();
-        String countSql = "select count(*) from product_orders where status<>4   " + (pageBuilder.hasWhere() ? " and " : " ") + pageBuilder.generateWhere();
+        String sql = "select * from product_orders_mock where status<>4  " + (pageBuilder.hasWhere() ? " and " : " ") + pageBuilder.generateWhere() + " order by sellTime desc " + pageBuilder.generateLimit();
+        String countSql = "select count(*) from product_orders_mock where status<>4   " + (pageBuilder.hasWhere() ? " and " : " ") + pageBuilder.generateWhere();
 
         AdminOrdersResponse adminOrdersResponse = new AdminOrdersResponse();
         adminOrdersResponse.currentPage = pageBuilder.currentPage;
@@ -776,10 +775,10 @@ public class AdminDataManager extends BaseDataHelper {
     public AdminQtResponse getQtListResponse(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String where = StringUtils.isEmpty(pageBuilder.generateWherePlus(true)) ? " where " : pageBuilder.generateWherePlus(true) + " and ";
 
-        String sql = "select " + generateFiledStringExclude(QtItem.class, "userMobile", "sellerMobile", "sellerCompany", "desc", "buyFinishTime", "buyTotalMoney") + " from iron_buy_qt " + where
+        String sql = "select " + generateFiledStringExclude(QtItem.class, "userMobile", "sellerMobile", "sellerCompany", "desc", "buyFinishTime", "buyTotalMoney") + " from iron_buy_qt_mock " + where
                 + " pushTime<:endTime and pushTime>=:startTime order by pushTime desc " + pageBuilder.generateLimit() ;
 
-        String countSql = "select count(*) from iron_buy_qt " + where
+        String countSql = "select count(*) from iron_buy_qt_mock " + where
                 + " pushTime<:endTime and pushTime>=:startTime ";
 
         try(Connection conn = getConn()) {

@@ -1,7 +1,5 @@
 package onefengma.demo.server.services.user;
 
-import onefengma.demo.server.model.SubscribeInfo;
-import onefengma.demo.server.services.products.IronDataHelper.UserBuyInfo;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -17,6 +15,7 @@ import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.core.UpdateBuilder;
 import onefengma.demo.server.model.Seller;
+import onefengma.demo.server.model.SubscribeInfo;
 import onefengma.demo.server.model.product.HandingBuyBrief;
 import onefengma.demo.server.model.product.HandingDetail;
 import onefengma.demo.server.model.product.IronBuyBrief;
@@ -25,6 +24,7 @@ import onefengma.demo.server.model.product.ShopBrief;
 import onefengma.demo.server.model.product.ShopDetail;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper;
+import onefengma.demo.server.services.products.IronDataHelper.UserBuyInfo;
 
 /**
  * Created by chufengma on 16/6/2.
@@ -256,7 +256,7 @@ public class SellerDataHelper extends BaseDataHelper {
                 "from seller_transactions where " + productTypeSql + " and finishTime < :endTime and finishTime >= :startTime " +
                 "group by sellerId) as trans " +
                 "on seller.userId = trans.sellerId " +
-                "where passed = true "
+                "where passed = true and isMock=0"
                 + genereateProductTypeSql(productType)
                 + generateWhereKey(pageBuilder, true);
 
