@@ -25,8 +25,8 @@ public class DataManager extends BaseDataHelper {
     }
 
     public void justCopyIt() {
-//        changeUserSellerData();
-//        changeProductOrdersMockData();
+        changeUserSellerData();
+        changeProductOrdersMockData();
         changeIronBuyQtData();
     }
 
@@ -138,15 +138,11 @@ public class DataManager extends BaseDataHelper {
             List<String> ordersIdList = conn.createQuery(fetchOrdersSql).executeAndFetch(String.class);
             conn.createQuery(deleteAllData).executeUpdate();
 
-            System.out.println("-------------" + ordersIdList.size());
-
             Random random = new Random(8686239);
             List<String> ironBuys = conn.createQuery(ironBuySql).executeAndFetch(String.class);
             for (int i = 0; i < 234 + 11; i++) {
                 int index = random.nextInt(ironBuys.size());
                 String qtId = ordersIdList.get(i % ordersIdList.size());
-
-                System.out.println("-------------" + qtId);
 
                 conn.createQuery(productOrdersSql)
                         .addParameter("newId", IdUtils.id())

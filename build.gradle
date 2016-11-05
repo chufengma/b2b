@@ -1,8 +1,8 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
-//mainClassName = 'onefengma.demo.server.Enter'
-mainClassName = 'onefengma.demo.rx.MysqlDump'
+mainClassName = 'onefengma.demo.server.Enter'
+//mainClassName = 'onefengma.demo.rx.MysqlDump'
 
 repositories {
     mavenCentral()
