@@ -123,7 +123,7 @@ public class DataManager extends BaseDataHelper {
                 conn.createQuery(productOrdersSql)
                         .addParameter("buyerId", companyBriefInfos.get(index).userId)
                         .addParameter("id", id)
-                        .addParameter("sellerId", companyBriefInfos.get(companyBriefInfos.size() - index).userId).executeUpdate();
+                        .addParameter("sellerId", companyBriefInfos.get(indexAnother).userId).executeUpdate();
             }
         }
     }
