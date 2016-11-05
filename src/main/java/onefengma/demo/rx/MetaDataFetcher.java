@@ -32,6 +32,7 @@ public class MetaDataFetcher {
             public void run() {
                 fetch();
                 fetchGraph();
+                MysqlDump.main(new String[]{"0"});
             }
         }, 0, 1000 * 60 * 60 * 12);
     }

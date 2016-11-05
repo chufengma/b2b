@@ -8,8 +8,8 @@ import onefengma.demo.server.services.funcs.DataManager;
  */
 public class MysqlDump {
 
-    public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException {
-        ConfigBean.configDev();
+    public static void main(String[] args) {
+//        ConfigBean.configDev();
         DataManager.instance().justCopyIt();
     }
 

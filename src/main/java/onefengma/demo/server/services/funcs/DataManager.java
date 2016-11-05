@@ -16,6 +16,7 @@ import onefengma.demo.server.core.BaseDataHelper;
 public class DataManager extends BaseDataHelper {
 
     private static DataManager instance;
+    private static boolean userHasChanged;
 
     public static DataManager instance() {
         if (instance == null) {
@@ -25,7 +26,10 @@ public class DataManager extends BaseDataHelper {
     }
 
     public void justCopyIt() {
-        changeUserSellerData();
+        if (!userHasChanged) {
+            changeUserSellerData();
+            userHasChanged = true;
+        }
         changeProductOrdersMockData();
         changeIronBuyQtData();
     }
