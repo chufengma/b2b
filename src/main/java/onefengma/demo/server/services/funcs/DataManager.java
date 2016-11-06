@@ -31,7 +31,7 @@ public class DataManager extends BaseDataHelper {
 
     public void justCopyIt() {
         if (!userHasChanged) {
-            changeUserSellerData();
+//            changeUserSellerData();
             userHasChanged = true;
         }
         changeProductOrdersMockData();
@@ -114,7 +114,7 @@ public class DataManager extends BaseDataHelper {
         String fetchOrdersSql = "select id from product_orders";
         String productOrdersSql = "insert into " +
                 "product_orders_mock(`id`,  `buyerId`,  `sellerId`,  `productId`,  `productType`, `count`,  `salesmanId`,  `sellTime`,  `timeLimit`,  `status`,  `ironCount`,  `ironPrice`,  `singleScore`, `totalMoney`,  `deleteBy`,  `cancelBy`,  `finishTime`, `message`, `productPrice`)" +
-                "select `id`,  :buyerId,  :sellerId,  :productId,  0,  :count,  `salesmanId`,  `sellTime`,  `timeLimit`,  `status`,  `ironCount`,  `ironPrice`,  `singleScore`, :totalMoney,  `deleteBy`,  `cancelBy`,  `finishTime`, `message`, `productPrice`" +
+                "select `id`,  :buyerId,  :sellerId,  :productId,  0,  :count,  :salesmanId,  `sellTime`,  `timeLimit`,  `status`,  `ironCount`,  `ironPrice`,  `singleScore`, :totalMoney,  `deleteBy`,  `cancelBy`,  `finishTime`, `message`, `productPrice`" +
                 "from product_orders where id=:id";
 
         try (Connection conn = getConn()) {
@@ -137,6 +137,7 @@ public class DataManager extends BaseDataHelper {
                 conn.createQuery(productOrdersSql)
                         .addParameter("buyerId", companyBriefInfos.get(index).userId)
                         .addParameter("productId", ironProductInfo.proId)
+                        .addParameter("salesmanId", new Random().nextInt(12) + 4)
                         .addParameter("count", count)
                         .addParameter("totalMoney", NumberUtils.round(count * ironProductInfo.price, 2))
                         .addParameter("id", id)
