@@ -6,6 +6,7 @@ import org.sql2o.data.Row;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import onefengma.demo.common.NumberUtils;
 import onefengma.demo.common.StringUtils;
@@ -381,8 +382,8 @@ public class AdminDataManager extends BaseDataHelper {
     }
 
     public AdminSellerVerifyResponse getSellerVerify(PageBuilder pageBuilder) {
-        String sql = "select * from seller where passed=false order by applyTime desc " + pageBuilder.generateLimit();
-        String countSql = "select count(*) from seller where passed=false ";
+        String sql = "select * from seller where passed=false and isMock=0 order by applyTime desc " + pageBuilder.generateLimit();
+        String countSql = "select count(*) from seller where passed=false  and isMock=0 ";
         AdminSellerVerifyResponse adminSellerVerifyResponse = new AdminSellerVerifyResponse();
         adminSellerVerifyResponse.currentPage = pageBuilder.currentPage;
         adminSellerVerifyResponse.pageCount = pageBuilder.pageCount;
@@ -806,7 +807,7 @@ public class AdminDataManager extends BaseDataHelper {
 
                 if (ironBuyBrief.status == 1) {
                     IronBuyOfferDetail ironBuyOfferDetail = IronDataHelper.getIronDataHelper().getWinSellerOffer(ironBuyBrief.id, ironBuyBrief.supplyUserId);
-                    qtItem.buyFinishTime = ironBuyBrief.supplyWinTime;
+                    qtItem.buyFinishTime = qtItem.pushTime;
                     qtItem.buyTotalMoney = NumberUtils.round(ironBuyOfferDetail.supplyPrice * ironBuyBrief.numbers.floatValue(), 2);
                 }
 
