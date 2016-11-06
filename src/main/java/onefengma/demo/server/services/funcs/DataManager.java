@@ -51,7 +51,7 @@ public class DataManager extends BaseDataHelper {
         String sellerSql = "insert into " +
                 "seller(`userId`,  `companyName`,  `regMoney`,  `contact`,  `cantactTel`,  `fax`,  `cityId`,  `officeAddress`,  `qq`, `shopProfile`,  `allCer`,  `businessLic`,  `codeLic`,  `financeLic`,  `cover`,  `ironTypeDesc`, `handingTypeDesc`,  `salesmanId`,  `productCount`,  `monthSellCount`,  `monthSellMoney`,  `score`,  `passed`,  `passTime`,  `winningTimes`,`integral`,  `reviewed`,  `applyTime`, `refuseMessage`, isMock )" +
                 "select :newUserID,  :companyName,  `regMoney`,  `contact`,  `cantactTel`,  `fax`,  `cityId`,  LEFT(`officeAddress`, 256),  `qq`,  LEFT(`shopProfile`, 256),  `allCer`,  `businessLic`,  `codeLic`,  `financeLic`,  `cover`,  LEFT(`ironTypeDesc`, 256),  LEFT(`handingTypeDesc`, 256),  `salesmanId`,  `productCount`,  `monthSellCount`,  `monthSellMoney`,  `score`,  `passed`,  `passTime`,  `winningTimes`,  LEFT(`integral`, 256),  `reviewed`, 1469349892277,  LEFT(`refuseMessage`, 256), 1 " +
-                "FROM `b2b_dev`.`seller` where userId like :oldUserId limit 1";
+                "FROM `b2b_dev`.`seller` where userId=oldUserId limit 1";
 
         String fetchSellerSql = "select companyName from seller where userId=:userId limit 1";
 
@@ -79,10 +79,6 @@ public class DataManager extends BaseDataHelper {
                         .addParameter("userId", realUserIdArray[0])
                         .executeScalar(String.class);
 
-                if (companyName == null) {
-                    continue;
-                }
-
                 StringBuilder newCompayName = new StringBuilder();
                 int cpCount = companyName.codePointCount(0, companyName.length());
                 for (int i = 0; i < cpCount; i++) {
@@ -96,7 +92,7 @@ public class DataManager extends BaseDataHelper {
                 conn.createQuery(sellerSql)
                         .addParameter("newUserID", userId)
                         .addParameter("companyName", newCompayName.toString())
-                        .addParameter("oldUserId", "%" + realUserIdArray[0] + "%").executeUpdate();
+                        .addParameter("oldUserId", realUserIdArray[0]).executeUpdate();
             }
         }
     }
@@ -147,7 +143,7 @@ public class DataManager extends BaseDataHelper {
         String fetchOrdersSql = "select qtId from iron_buy_qt";
         String productOrdersSql = "insert into " +
                 "iron_buy_qt_mock (`qtId`, `salesmanId`, `ironBuyId`, `status`, `pushTime`, `finishTime`, `userId`, `startTime`)" +
-                "select :newId, :salesManId, :ironBuyId, 1, :pushTime, :finishTime, `userId`, :startTime " +
+                "select :newId, :salesManId, :ironBuyId, :status, :pushTime, :finishTime, `userId`, :startTime " +
                 "from iron_buy_qt where qtId=:id";
 
         try (Connection conn = getConn()) {
@@ -188,9 +184,15 @@ public class DataManager extends BaseDataHelper {
                 thisCalendar.set(Calendar.MINUTE, new Random().nextInt(60) + 1);
                 qtFinishTime = thisCalendar.getTimeInMillis();
 
+                int status = new Random().nextInt(100) == 8 ? 2 : 1;
+                if (status == 2) {
+                    qtFinishTime = 0;
+                }
+
                 conn.createQuery(productOrdersSql)
                         .addParameter("newId", IdUtils.id())
                         .addParameter("pushTime", pushTime)
+                        .addParameter("status", status)
                         .addParameter("startTime", qtStartTime)
                         .addParameter("finishTime", qtFinishTime)
                         .addParameter("salesManId", new Random().nextInt(21) + 7)
