@@ -16,6 +16,7 @@ import onefengma.demo.server.model.apibeans.order.OrderCarAddRequest;
 import onefengma.demo.server.model.apibeans.order.OrderDeleteRequest;
 import onefengma.demo.server.model.apibeans.order.OrderRequest;
 import onefengma.demo.server.model.apibeans.order.VoteOrderRequest;
+import onefengma.demo.server.model.order.OrderDynamic;
 import onefengma.demo.server.model.product.HandingDetail;
 import onefengma.demo.server.model.product.IronDetail;
 import onefengma.demo.server.model.product.IronProduct;
@@ -24,6 +25,10 @@ import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper;
 import onefengma.demo.server.services.user.SellerDataHelper;
 import onefengma.demo.server.services.user.UserMessageDataHelper;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Created by chufengma on 16/6/18.
@@ -38,7 +43,27 @@ public class OrderManager extends BaseManager{
         }));
 
         get("orderDynamic", BaseBean.class, ((request, response, requestBean) -> {
-            return success(OrderDataHelper.instance().getOrdersDynamic());
+//            return success(OrderDataHelper.instance().getOrdersDynamic());
+            List<OrderDynamic> orderDynamicList = OrderDataHelper.instance().getOrdersDynamic();
+            for(OrderDynamic orderDynamic : orderDynamicList) {
+                orderDynamic.price = 122;
+                orderDynamic.ironType = "不锈钢卷";
+
+                int type = new Random().nextInt(3);
+
+                if (type == 0) {
+                    orderDynamic.material = "316L";
+                    orderDynamic.price = (new Random().nextInt(50) + 1750) * 10;
+                } else if (type == 1) {
+                    orderDynamic.material = "304(30408)";
+                    orderDynamic.price = (new Random().nextInt(50) + 1450) * 10;
+                } else {
+                    orderDynamic.material = "201";
+                    orderDynamic.price = (new Random().nextInt(20) + 910) * 10;
+                }
+
+            }
+            return orderDynamicList;
         }));
 
         post("translate", OrderRequest.class, ((request, response, requestBean) -> {
