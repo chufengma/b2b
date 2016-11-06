@@ -51,7 +51,7 @@ public class DataManager extends BaseDataHelper {
         String sellerSql = "insert into " +
                 "seller(`userId`,  `companyName`,  `regMoney`,  `contact`,  `cantactTel`,  `fax`,  `cityId`,  `officeAddress`,  `qq`, `shopProfile`,  `allCer`,  `businessLic`,  `codeLic`,  `financeLic`,  `cover`,  `ironTypeDesc`, `handingTypeDesc`,  `salesmanId`,  `productCount`,  `monthSellCount`,  `monthSellMoney`,  `score`,  `passed`,  `passTime`,  `winningTimes`,`integral`,  `reviewed`,  `applyTime`, `refuseMessage`, isMock )" +
                 "select :newUserID,  :companyName,  `regMoney`,  `contact`,  `cantactTel`,  `fax`,  `cityId`,  LEFT(`officeAddress`, 256),  `qq`,  LEFT(`shopProfile`, 256),  `allCer`,  `businessLic`,  `codeLic`,  `financeLic`,  `cover`,  LEFT(`ironTypeDesc`, 256),  LEFT(`handingTypeDesc`, 256),  `salesmanId`,  `productCount`,  `monthSellCount`,  `monthSellMoney`,  `score`,  `passed`,  `passTime`,  `winningTimes`,  LEFT(`integral`, 256),  `reviewed`, 1469349892277,  LEFT(`refuseMessage`, 256), 1 " +
-                "FROM `b2b_dev`.`seller` where userId=:oldUserId limit 1";
+                "FROM `seller` where userId=:oldUserId limit 1";
 
         String fetchSellerSql = "select companyName from seller where userId=:userId limit 1";
 
