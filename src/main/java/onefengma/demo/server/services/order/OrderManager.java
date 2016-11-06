@@ -1,6 +1,7 @@
 package onefengma.demo.server.services.order;
 
 import onefengma.demo.common.DateHelper;
+import onefengma.demo.common.NumberUtils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
@@ -53,13 +54,13 @@ public class OrderManager extends BaseManager{
 
                 if (type == 0) {
                     orderDynamic.material = "316L";
-                    orderDynamic.price = (new Random().nextInt(50) + 1750) * 10;
+                    orderDynamic.price = NumberUtils.round((new Random().nextInt(50) + 1750) * 10 / 1000f, 2);
                 } else if (type == 1) {
                     orderDynamic.material = "304(30408)";
-                    orderDynamic.price = (new Random().nextInt(50) + 1450) * 10;
+                    orderDynamic.price = NumberUtils.round((new Random().nextInt(50) + 1450) * 10 / 1000f, 2);
                 } else {
                     orderDynamic.material = "201";
-                    orderDynamic.price = (new Random().nextInt(20) + 910) * 10;
+                    orderDynamic.price = NumberUtils.round(((new Random().nextInt(20) + 910) * 10) / 1000f, 2);
                 }
 
             }
