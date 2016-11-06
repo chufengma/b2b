@@ -69,6 +69,8 @@ public class DataManager extends BaseDataHelper {
             // 2. 根据扩充的userId扩充Seller
             List<String> userIdList = conn.createQuery(fetchSql).executeScalarList(String.class);
 
+            int count = 1;
+
             for (String userId : userIdList) {
                 String[] realUserIdArray = userId.split("_");
                 if (realUserIdArray.length <= 1) {
@@ -78,6 +80,10 @@ public class DataManager extends BaseDataHelper {
                 String companyName = conn.createQuery(fetchSellerSql)
                         .addParameter("userId", realUserIdArray[0])
                         .executeScalar(String.class);
+
+                if (companyName == null) {
+                    continue;
+                }
 
                 StringBuilder newCompayName = new StringBuilder();
                 int cpCount = companyName.codePointCount(0, companyName.length());
@@ -93,6 +99,9 @@ public class DataManager extends BaseDataHelper {
                         .addParameter("newUserID", userId)
                         .addParameter("companyName", newCompayName.toString())
                         .addParameter("oldUserId", realUserIdArray[0]).executeUpdate();
+
+                System.out.println("-------system count:" + count);
+                count++;
             }
         }
     }
