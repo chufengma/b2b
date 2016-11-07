@@ -219,7 +219,7 @@ public class SellerDataHelper extends BaseDataHelper {
                 "from seller_transactions " +
                 "group by sellerId) as trans " +
                 "on seller.userId = trans.sellerId " +
-                "where passed = true " + genereateProductTypeSql(productType) +  generateWhereKey(pageBuilder, false);
+                "where passed = true and isMock=0 " + genereateProductTypeSql(productType) +  generateWhereKey(pageBuilder, false);
         try (Connection connection = getConn()){
             Integer count =  connection.createQuery(sql).executeScalar(Integer.class);
             return count == 0 ? 0 : count;
