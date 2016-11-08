@@ -38,7 +38,7 @@ public class DataManager extends BaseDataHelper {
             userHasChanged = true;
         }
         changeProductOrdersMockData();
-//        changeIronBuyQtData();
+        changeIronBuyQtData();
     }
 
     public void changeUserSellerData() {
@@ -180,12 +180,15 @@ public class DataManager extends BaseDataHelper {
                             thisCalendar.set(Calendar.MINUTE, new Random().nextInt(60));
                             thisCalendar.set(Calendar.SECOND, new Random().nextInt(60));
 
+                            float totalMoney = new Random().nextInt(380000) + 20000;
+                            float proCount = (float) (NumberUtils.round(totalMoney / info.price, 0) + (new Random().nextInt(3) == 0 ? 0.5 : 0));
+
                             conn.createQuery(productOrdersSqlForTime)
                                     .addParameter("buyerId", companyBriefInfos.get(index).userId)
                                     .addParameter("productId", info.proId)
                                     .addParameter("salesmanId", new Random().nextInt(12) + 4)
-                                    .addParameter("count", count)
-                                    .addParameter("totalMoney", NumberUtils.round(count * info.price, 2))
+                                    .addParameter("count", proCount)
+                                    .addParameter("totalMoney", NumberUtils.round(proCount * info.price, 2))
                                     .addParameter("newId", proId + new Random().nextInt(10000))
                                     .addParameter("oldId", proId)
                                     .addParameter("sellTime", thisCalendar.getTimeInMillis())
