@@ -112,7 +112,7 @@ public class DataManager extends BaseDataHelper {
     public void changeProductOrdersMockData() {
         String deleteAllData = "delete from product_orders_mock";
         String fetchAllSellerNameSql = "select userId,companyName,cantactTel from seller where isMock=0 and companyName <> '' and cantactTel <> ''";
-        String fetchIronProductSql = "select proId,price from iron_product where status=1 limit 0,1000";
+        String fetchIronProductSql = "select proId,price from iron_product limit 0,1000";
 
         String fetchOrdersSql = "select id from product_orders";
         String productOrdersSql = "insert into " +
