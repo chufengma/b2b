@@ -165,7 +165,7 @@ public class DataManager extends BaseDataHelper {
                 try(Connection conn = getConn()) {
                     Calendar calendar = Calendar.getInstance();
                     if (calendar.get(Calendar.HOUR_OF_DAY) <= 17 && calendar.get(Calendar.HOUR_OF_DAY) >= 9) {
-                        int count = new Random().nextInt(10) + 30;
+                        int count = new Random().nextInt(5) + 10;
                         for (int i = 0; i < count; i++) {
                             IronProductInfo info = ironProductInfos.get(new Random().nextInt(ironProductInfos.size()));
                             String proId = ordersIdList.get(new Random().nextInt(ordersIdList.size()));
@@ -200,7 +200,7 @@ public class DataManager extends BaseDataHelper {
                     }
                 }
             }
-        }, 0, 1000 * 60 * 60);
+        }, 0, 1000 * 60 * 20);
     }
 
     public void changeIronBuyQtData() {
