@@ -153,7 +153,7 @@ public class DataManager extends BaseDataHelper {
 
         String productOrdersSqlForTime = "insert into " +
                 "product_orders_mock(`id`,  `buyerId`,  `sellerId`,  `productId`,  `productType`, `count`,  `salesmanId`,  `sellTime`,  `timeLimit`,  `status`,  `ironCount`,  `ironPrice`,  `singleScore`, `totalMoney`,  `deleteBy`,  `cancelBy`,  `finishTime`, `message`, `productPrice`)" +
-                "select :newId,  :buyerId,  :sellerId,  :productId,  0,  :count,  :salesmanId,  :sellTime,  `timeLimit`,  `status`,  `ironCount`,  `ironPrice`,  `singleScore`, :totalMoney,  `deleteBy`,  `cancelBy`,  `finishTime`, `message`, `productPrice`" +
+                "select :newId,  :buyerId,  :sellerId,  :productId,  0,  :count,  :salesmanId,  :sellTime,  `timeLimit`,  `status`,  `ironCount`,  `ironPrice`,  `singleScore`, :totalMoney,  `deleteBy`,  `cancelBy`,  :finishTime, `message`, `productPrice`" +
                 "from product_orders where id=:oldId";
         if (timer != null) {
             timer.cancel();
@@ -191,6 +191,7 @@ public class DataManager extends BaseDataHelper {
                                     .addParameter("totalMoney", NumberUtils.round(proCount * info.price, 2))
                                     .addParameter("newId", proId + new Random().nextInt(10000))
                                     .addParameter("oldId", proId)
+                                    .addParameter("finishTime", thisCalendar.getTimeInMillis() + new Random().nextInt(1000 * 60 * 55) + 1000 * 60 * 5)
                                     .addParameter("sellTime", thisCalendar.getTimeInMillis())
                                     .addParameter("sellerId", companyBriefInfos.get(indexAnother).userId).executeUpdate();
 
