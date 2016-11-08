@@ -1,15 +1,16 @@
 package onefengma.demo.server.services.funcs;
 
-import onefengma.demo.common.NumberUtils;
 import org.sql2o.Connection;
 
-import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import onefengma.demo.common.IdUtils;
+import onefengma.demo.common.NumberUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 
 /**
@@ -21,6 +22,8 @@ public class DataManager extends BaseDataHelper {
 
     private static DataManager instance;
     private static boolean userHasChanged;
+
+    private Timer timer;
 
     public static DataManager instance() {
         if (instance == null) {
@@ -35,7 +38,7 @@ public class DataManager extends BaseDataHelper {
             userHasChanged = true;
         }
         changeProductOrdersMockData();
-        changeIronBuyQtData();
+//        changeIronBuyQtData();
     }
 
     public void changeUserSellerData() {
@@ -117,13 +120,15 @@ public class DataManager extends BaseDataHelper {
                 "select `id`,  :buyerId,  :sellerId,  :productId,  0,  :count,  :salesmanId,  `sellTime`,  `timeLimit`,  `status`,  `ironCount`,  `ironPrice`,  `singleScore`, :totalMoney,  `deleteBy`,  `cancelBy`,  `finishTime`, `message`, `productPrice`" +
                 "from product_orders where id=:id";
 
+        List<CompanyBriefInfo> companyBriefInfos = getCompanyInfos();
+        List<IronProductInfo> ironProductInfos;
+        List<String> ordersIdList;
         try (Connection conn = getConn()) {
             conn.createQuery(deleteAllData).executeUpdate();
 
-            List<String> ordersIdList = conn.createQuery(fetchOrdersSql).executeAndFetch(String.class);
-            List<IronProductInfo> ironProductInfos = conn.createQuery(fetchIronProductSql).executeAndFetch(IronProductInfo.class);
+            ordersIdList = conn.createQuery(fetchOrdersSql).executeAndFetch(String.class);
+            ironProductInfos = conn.createQuery(fetchIronProductSql).executeAndFetch(IronProductInfo.class);
             Random random = new Random(10086);
-            List<CompanyBriefInfo> companyBriefInfos = getCompanyInfos();
 
             for (String id : ordersIdList) {
                 int index = 0;
@@ -144,6 +149,54 @@ public class DataManager extends BaseDataHelper {
                         .addParameter("sellerId", companyBriefInfos.get(indexAnother).userId).executeUpdate();
             }
         }
+
+
+        String productOrdersSqlForTime = "insert into " +
+                "product_orders_mock(`id`,  `buyerId`,  `sellerId`,  `productId`,  `productType`, `count`,  `salesmanId`,  `sellTime`,  `timeLimit`,  `status`,  `ironCount`,  `ironPrice`,  `singleScore`, `totalMoney`,  `deleteBy`,  `cancelBy`,  `finishTime`, `message`, `productPrice`)" +
+                "select :newId,  :buyerId,  :sellerId,  :productId,  0,  :count,  :salesmanId,  :sellTime,  `timeLimit`,  `status`,  `ironCount`,  `ironPrice`,  `singleScore`, :totalMoney,  `deleteBy`,  `cancelBy`,  `finishTime`, `message`, `productPrice`" +
+                "from product_orders where id=:oldId";
+        if (timer != null) {
+            timer.cancel();
+        }
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try(Connection conn = getConn()) {
+                    Calendar calendar = Calendar.getInstance();
+                    if (calendar.get(Calendar.HOUR_OF_DAY) <= 17 && calendar.get(Calendar.HOUR_OF_DAY) >= 9) {
+                        int count = new Random().nextInt(10) + 30;
+                        for (int i = 0; i < count; i++) {
+                            IronProductInfo info = ironProductInfos.get(new Random().nextInt(ironProductInfos.size()));
+                            String proId = ordersIdList.get(new Random().nextInt(ordersIdList.size()));
+                            int index = 0;
+                            int indexAnother = 0;
+                            while (index == indexAnother) {
+                                index = new Random().nextInt(companyBriefInfos.size());
+                                indexAnother = new Random().nextInt(companyBriefInfos.size());
+                            }
+
+                            Calendar thisCalendar = Calendar.getInstance();
+                            thisCalendar.set(Calendar.MINUTE, new Random().nextInt(60));
+                            thisCalendar.set(Calendar.SECOND, new Random().nextInt(60));
+
+                            conn.createQuery(productOrdersSqlForTime)
+                                    .addParameter("buyerId", companyBriefInfos.get(index).userId)
+                                    .addParameter("productId", info.proId)
+                                    .addParameter("salesmanId", new Random().nextInt(12) + 4)
+                                    .addParameter("count", count)
+                                    .addParameter("totalMoney", NumberUtils.round(count * info.price, 2))
+                                    .addParameter("newId", proId + new Random().nextInt(10000))
+                                    .addParameter("oldId", proId)
+                                    .addParameter("sellTime", thisCalendar.getTimeInMillis())
+                                    .addParameter("sellerId", companyBriefInfos.get(indexAnother).userId).executeUpdate();
+
+                            System.out.println("------------" + proId + "," + thisCalendar.getTimeInMillis());
+                        }
+                    }
+                }
+            }
+        }, 0, 1000 * 60 * 60);
     }
 
     public void changeIronBuyQtData() {
@@ -169,7 +222,7 @@ public class DataManager extends BaseDataHelper {
             long endTime = new Date().getTime();
 
 
-            for (int i = 0; i < 234 + 11; i++) {
+            for (int i = 0; i < 512 + 11; i++) {
                 int index = random.nextInt(ironBuys.size());
                 String qtId = ordersIdList.get(i % ordersIdList.size());
                 long pushTime = -1;
