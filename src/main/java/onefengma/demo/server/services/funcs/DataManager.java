@@ -227,7 +227,7 @@ public class DataManager extends BaseDataHelper {
             long endTime = new Date().getTime();
 
 
-            for (int i = 0; i < 512 + 11; i++) {
+            for (int i = 0; i < 573; i++) {
                 int index = random.nextInt(ironBuys.size());
                 String qtId = ordersIdList.get(i % ordersIdList.size());
                 long pushTime = -1;
@@ -246,7 +246,7 @@ public class DataManager extends BaseDataHelper {
                 pushTime = thisCalendar.getTimeInMillis();
 
                 qtStartTime = pushTime + new Random().nextInt(1000 * 60 * 60 * 2) + 1000 * 60 * 5;
-                qtFinishTime = qtStartTime + new Random().nextInt(1000 * 60 * 60 * 24 * 3) + 1000 * 60 * 60 * 1;
+                qtFinishTime = qtStartTime + new Random().nextInt(1000 * 60 * 50) + 1000 * 60 * 10;
                 thisCalendar.setTimeInMillis(qtFinishTime);
                 thisCalendar.set(Calendar.HOUR_OF_DAY, new Random().nextInt(6) + 9);
                 thisCalendar.set(Calendar.MINUTE, new Random().nextInt(60) + 1);
