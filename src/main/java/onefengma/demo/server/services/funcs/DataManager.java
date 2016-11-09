@@ -178,8 +178,8 @@ public class DataManager extends BaseDataHelper {
 
                             Calendar thisCalendar = Calendar.getInstance();
                             thisCalendar.set(Calendar.HOUR_OF_DAY, thisCalendar.get(Calendar.HOUR_OF_DAY) - 1);
-                            thisCalendar.set(Calendar.MINUTE, new Random().nextInt(60));
-                            thisCalendar.set(Calendar.SECOND, new Random().nextInt(60));
+                            thisCalendar.set(Calendar.MINUTE, new Random().nextInt(thisCalendar.get(Calendar.MINUTE)));
+                            thisCalendar.set(Calendar.SECOND, new Random().nextInt(thisCalendar.get(Calendar.SECOND)));
 
                             float totalMoney = new Random().nextInt(380000) + 20000;
                             float proCount = (float) (NumberUtils.round(totalMoney / info.price, 0) + (new Random().nextInt(3) == 0 ? 0.5 : 0));
