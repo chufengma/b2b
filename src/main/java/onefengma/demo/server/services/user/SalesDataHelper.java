@@ -49,7 +49,7 @@ public class SalesDataHelper extends BaseDataHelper {
     }
 
     public SalesManUserResponse getBindUserResponse(String salesId, PageBuilder pageBuilder) {
-        String userSql = "select " + generateFiledString(UserInfo.class) + " from user where userId not in (select userId from seller) and salesManId=:salesId"
+        String userSql = "select " + generateFiledString(UserInfo.class) + " from user where userId not in (select userId from seller) and salesManId=:salesId and user.isMock = 0 "
                 + pageBuilder.generateWherePlus(false)
                 + " order by salesBindTime desc " + pageBuilder.generateLimit();
 
@@ -68,7 +68,7 @@ public class SalesDataHelper extends BaseDataHelper {
 
     public SalesManSellerResponse getBindSellerResponse(String salesId, PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String userSql = "select " + generateFiledString(SellerInfo.class) + " from seller,user where user.userId=seller.userId " +
-                " and user.salesManId=:salesId"
+                " and user.salesManId=:salesId and user.isMock = 0 "
                 + pageBuilder.generateWherePlus(false)
                 + " order by salesBindTime desc " + pageBuilder.generateLimit();
 
