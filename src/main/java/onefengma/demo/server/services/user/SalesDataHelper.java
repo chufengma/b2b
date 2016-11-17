@@ -155,8 +155,8 @@ public class SalesDataHelper extends BaseDataHelper {
     // need_merge
     public SalesIronBuysResponse getSalesIronBuy(String salesId, PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         long startTime = System.currentTimeMillis();
-        String sql = "select " + generateFiledStringExclude(IronBuyBrief.class) + " from iron_buy right join (select userId as userIdTmp from user where salesManId=:salesId and isMock=0) as userIds on (userIds.userIdTmp=iron_buy.userId) " + pageBuilder.generateWherePlus(false) + " order by pushTime desc " + pageBuilder.generateLimit();
-        String countSql = "select count(*) from iron_buy right join (select userId as userIdTmp from user where salesManId=:salesId and isMock=0) as userIds on (userIds.userIdTmp=iron_buy.userId) " + pageBuilder.generateWherePlus(false) + " order by pushTime desc ";
+        String sql = "select " + generateFiledStringExclude(IronBuyBrief.class) + " from iron_buy,(select userId as userIdTmp from user where salesManId=:salesId and isMock=0) as userIds where (userIds.userIdTmp=iron_buy.userId) " + pageBuilder.generateWherePlus(false) + " order by pushTime desc " + pageBuilder.generateLimit();
+        String countSql = "select count(*) from iron_buy,(select userId as userIdTmp from user where salesManId=:salesId and isMock=0) as userIds where (userIds.userIdTmp=iron_buy.userId) " + pageBuilder.generateWherePlus(false) + " order by pushTime desc ";
         String supplyCountSql = "select count(*) from iron_buy_supply where ironId=:ironId";
 
         try(Connection conn = getConn()) {
