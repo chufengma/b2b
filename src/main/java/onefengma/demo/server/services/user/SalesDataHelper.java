@@ -7,6 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import onefengma.demo.server.core.BaseDataHelper;
+import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.core.PushManager;
 import onefengma.demo.server.model.apibeans.qt.QtListResponse;
@@ -152,6 +153,7 @@ public class SalesDataHelper extends BaseDataHelper {
     }
 
     public SalesIronBuysResponse getSalesIronBuy(String salesId, PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
+        long startTime = System.currentTimeMillis();
         String sql = "select " + generateFiledString(IronBuyBrief.class) + " from iron_buy where userId in (select userId from user where salesManId=:salesId) " + pageBuilder.generateWherePlus(false) + " order by pushTime desc " + pageBuilder.generateLimit();
         String countSql = "select count(*) from iron_buy where userId in (select userId from user where salesManId=:salesId) " + pageBuilder.generateWherePlus(false) + " order by pushTime desc ";
         String supplyCountSql = "select count(*) from iron_buy_supply where ironId=:ironId";
@@ -171,9 +173,9 @@ public class SalesDataHelper extends BaseDataHelper {
             maxCount = maxCount == null ? 0 : maxCount;
             salesIronBuysResponse.maxCount = maxCount;
 
+            LogUtils.i("getSalesIronBuy mysql time: " + (System.currentTimeMillis() - startTime) + " ms", true);
             return salesIronBuysResponse;
         }
-
     }
 
     public static class SalesManDetail {
