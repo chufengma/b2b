@@ -431,8 +431,9 @@ public class IronDataHelper extends BaseDataHelper {
     }
 
 
+    // need_merge
     public List<SupplyBrief> getIronBuySupplies(String ironId) {
-        String sql = "select * from iron_buy_supply,seller where ironId=:ironId and sellerId=userId";
+        String sql = "select * from seller,(select * from iron_buy_supply where ironId=:ironId) as a where a.sellerId=seller.userId";
         try (Connection conn = getConn()) {
             List<Row> rows = conn.createQuery(sql)
                     .addParameter("ironId", ironId).executeAndFetchTable().rows();
@@ -456,7 +457,7 @@ public class IronDataHelper extends BaseDataHelper {
     }
 
     public List<SupplyBrief> getIronBuySuppliesMissed(String ironId) {
-        String sql = "select * from iron_buy_seller_miss,seller where ironId=:ironId and sellerId=userId";
+        String sql = "select * from seller,(select * from iron_buy_seller_miss where ironId=:ironId) as a where a.sellerId=seller.userId";
         try (Connection conn = getConn()) {
             List<Row> rows = conn.createQuery(sql)
                     .addParameter("ironId", ironId).executeAndFetchTable().rows();
