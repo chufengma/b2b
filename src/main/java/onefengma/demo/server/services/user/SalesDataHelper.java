@@ -173,7 +173,7 @@ public class SalesDataHelper extends BaseDataHelper {
             maxCount = maxCount == null ? 0 : maxCount;
             salesIronBuysResponse.maxCount = maxCount;
 
-            LogUtils.i("getSalesIronBuy mysql time: " + (System.currentTimeMillis() - startTime) + " ms", true);
+            LogUtils.saveToFiles("getSalesIronBuy mysql time: " + (System.currentTimeMillis() - startTime) + " ms", true);
             return salesIronBuysResponse;
         }
     }
