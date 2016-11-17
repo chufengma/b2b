@@ -1,6 +1,5 @@
 package onefengma.demo.server.services.user;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,13 +15,13 @@ import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.Admin;
 import onefengma.demo.server.model.SalesMan;
 import onefengma.demo.server.model.admin.AdminDetailRequest;
+import onefengma.demo.server.model.admin.AdminIronBuyDetailResponse;
 import onefengma.demo.server.model.admin.AdminOperationRequest;
+import onefengma.demo.server.model.admin.AdminQtRequest;
 import onefengma.demo.server.model.admin.AdminSellersRequest;
 import onefengma.demo.server.model.admin.AdminSellersResponse;
 import onefengma.demo.server.model.admin.AdminUsersRequest;
 import onefengma.demo.server.model.admin.AdminUsersResponse;
-import onefengma.demo.server.model.SalesMan;
-import onefengma.demo.server.model.admin.*;
 import onefengma.demo.server.model.apibeans.admin.AdminBuysRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminChangeSalesmanRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminDeleteBuyRequest;
@@ -42,7 +41,9 @@ import onefengma.demo.server.model.apibeans.others.EditRecruitRequest;
 import onefengma.demo.server.model.apibeans.others.InnerMessageRequest;
 import onefengma.demo.server.model.apibeans.others.NewsDetailRequest;
 import onefengma.demo.server.model.product.HandingDetail;
+import onefengma.demo.server.model.product.IronBuyBrief;
 import onefengma.demo.server.model.product.IronDetail;
+import onefengma.demo.server.model.product.SupplyBrief;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import onefengma.demo.server.services.funcs.NewsDataHelper;
@@ -52,6 +53,8 @@ import onefengma.demo.server.services.order.OrderDataHelper;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper;
 import spark.Session;
+
+import static onefengma.demo.server.services.products.IronDataHelper.getIronDataHelper;
 
 /**
  * Created by chufengma on 16/7/2.
@@ -217,7 +220,7 @@ public class AdminManager extends BaseManager {
 
 
         get("buys", AdminBuysRequest.class, ((request, response, requestBean) -> {
-            IronDataHelper.getIronDataHelper().updateBuyStatus();
+            getIronDataHelper().updateBuyStatus();
             HandingDataHelper.getHandingDataHelper().updateBuyStatus();
 
             PageBuilder pageBuilder = new PageBuilder(requestBean.currentPage, requestBean.pageCount)
@@ -269,7 +272,7 @@ public class AdminManager extends BaseManager {
         post("deleteBuy", AdminDeleteBuyRequest.class, ((request, response, requestBean) -> {
             LogUtils.i("admin delete buy data!  adminId:" + request.cookie("admin") + ", productType:" + requestBean.productType + ", productId=" + requestBean.proId, true);
             if (requestBean.productType == 0) {
-                IronDataHelper.getIronDataHelper().deleteIronBuy(requestBean.proId);
+                getIronDataHelper().deleteIronBuy(requestBean.proId);
             } else if (requestBean.productType == 1) {
                 HandingDataHelper.getHandingDataHelper().deleteHandingBuy(requestBean.proId);
             }
@@ -337,7 +340,7 @@ public class AdminManager extends BaseManager {
         }));
 
         get("ironVerifyDetail", AdminDetailRequest.class, ((request, response, requestBean) -> {
-            IronDetail ironDetail = IronDataHelper.getIronDataHelper().getIronProductById(requestBean.id);
+            IronDetail ironDetail = getIronDataHelper().getIronProductById(requestBean.id);
             if (ironDetail == null) {
                 return error("找不到该产品信息");
             }
@@ -346,7 +349,7 @@ public class AdminManager extends BaseManager {
         }));
 
         post("ironVerifyOp", AdminOperationRequest.class, ((request, response, requestBean) -> {
-            IronDetail ironDetail = IronDataHelper.getIronDataHelper().getIronProductById(requestBean.id);
+            IronDetail ironDetail = getIronDataHelper().getIronProductById(requestBean.id);
             if (ironDetail == null) {
                 return error("找不到该产品信息");
             }
@@ -517,6 +520,22 @@ public class AdminManager extends BaseManager {
             }
 
             return success(AdminDataManager.instance().getQtListResponse(pageBuilder));
+        }));
+
+        // need_merge
+        get("offerDetail", AdminDetailRequest.class, ((request, response, requestBean) -> {
+            AdminIronBuyDetailResponse data = new AdminIronBuyDetailResponse();
+            IronBuyBrief ironBuyBrief = IronDataHelper.getIronDataHelper().getIronBuyBrief(requestBean.id);
+            data.supplies = IronDataHelper.getIronDataHelper().getIronBuySupplies(requestBean.id);
+            if (ironBuyBrief != null && data.supplies != null) {
+                for(SupplyBrief brief : data.supplies) {
+                    if (StringUtils.equals(ironBuyBrief.supplyUserId, brief.sellerId)) {
+                        brief.isWinner = true;
+                    }
+                }
+            }
+            data.missSupplies = IronDataHelper.getIronDataHelper().getIronBuySuppliesMissed(requestBean.id);
+            return success(data);
         }));
     }
 

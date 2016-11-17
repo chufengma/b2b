@@ -441,6 +441,7 @@ public class IronDataHelper extends BaseDataHelper {
             for (Row row : rows) {
                 SupplyBrief supplyBrief = new SupplyBrief();
                 supplyBrief.companyName = row.getString("companyName");
+                supplyBrief.mobile = row.getString("cantactTel");
                 supplyBrief.score = row.getFloat("score");
                 supplyBrief.sellerId = row.getString("userId");
                 supplyBrief.status = row.getInteger("status");
