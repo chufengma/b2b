@@ -86,8 +86,7 @@ public class PushManager {
 
         Constants.useOfficial();
         String content = JSON.toJSONString(basePushData);
-        LogUtils.i("push data " + content, false);
-
+        LogUtils.i("push data for android " + content, true);
         ThreadUtils.instance().post(() -> {
             String messagePayload = content;
             String title = basePushData.title;
@@ -104,6 +103,7 @@ public class PushManager {
             Sender sender = new Sender(SECRET_KEY);
             try {
                 sender.sendToUserAccount(message, ConfigBean.MOBILE_PUSH_PREFIX + basePushData.userId, 4);
+                LogUtils.i("push data " + content, false);
             } catch (Exception e) {
                 LogUtils.i("push data error:" + JSON.toJSONString(basePushData), true);
                 e.printStackTrace();
