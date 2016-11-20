@@ -31,13 +31,17 @@ public class PushManager {
     }
 
     public void init() {
-        Constants.useOfficial();
+        if (Config.ENV == Config.ENVI.DEV) {
+            Constants.useSandbox();
+        } else {
+            Constants.useOfficial();
+        }
     }
 
     public void pushData(BasePushData pushData) {
         LogUtils.i("push data now ", true);
         pushAndroidMessage(pushData);
-        // pushIOSMessage(pushData);
+        pushIOSMessage(pushData);
     }
 
     private void pushIOSMessage(BasePushData basePushData) {
@@ -48,10 +52,8 @@ public class PushManager {
         String content = JSON.toJSONString(basePushData);
 
         if (Config.ENV == Config.ENVI.DEV) {
-            Constants.useSandbox();
             LogUtils.i("push data for ios useSandbox " + content, true);
         } else {
-            Constants.useOfficial();
             LogUtils.i("push data for ios useOfficial " + content, true);
         }
 
@@ -85,7 +87,6 @@ public class PushManager {
             return;
         }
 
-        Constants.useOfficial();
         String content = JSON.toJSONString(basePushData);
         LogUtils.i("push data for android " + content, true);
         ThreadUtils.instance().post(() -> {
