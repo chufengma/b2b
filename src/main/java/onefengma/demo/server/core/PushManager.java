@@ -37,7 +37,7 @@ public class PushManager {
     public void pushData(BasePushData pushData) {
         LogUtils.i("push data now ", true);
         pushAndroidMessage(pushData);
-        pushIOSMessage(pushData);
+        // pushIOSMessage(pushData);
     }
 
     private void pushIOSMessage(BasePushData basePushData) {
