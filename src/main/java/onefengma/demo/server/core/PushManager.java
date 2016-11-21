@@ -31,11 +31,11 @@ public class PushManager {
     }
 
     public void init() {
-        if (Config.ENV == Config.ENVI.DEV) {
-            Constants.useSandbox();
-        } else {
+//        if (Config.ENV == Config.ENVI.DEV) {
+//            Constants.useSandbox();
+//        } else {
             Constants.useOfficial();
-        }
+//        }
     }
 
     public void pushData(BasePushData pushData) {
@@ -74,6 +74,7 @@ public class PushManager {
             Sender sender = new Sender(SECRET_KEY_IOS);
             try {
                 sender.sendToUserAccount(build.build(), ConfigBean.MOBILE_PUSH_PREFIX + basePushData.userId, 4);
+                LogUtils.i("push data for ios " + ConfigBean.MOBILE_PUSH_PREFIX + basePushData.userId, true);
             } catch (Exception e) {
                 LogUtils.i("push data error:" + JSON.toJSONString(basePushData), true);
                 e.printStackTrace();
