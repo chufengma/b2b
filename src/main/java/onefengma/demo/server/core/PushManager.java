@@ -20,7 +20,7 @@ public class PushManager {
     public static final String ANDROID_PAKAGE = "com.onefengma.taobuxiu";
     public static final String APP_ID = "2882303761517500719";
     public static final String SECRET_KEY = "d6JcRax80B2SqHQfQEpYwQ==";
-    public static final String SECRET_KEY_IOS = "ZVKIndYhqdYNTvn2PCtppg==";
+    public static final String SECRET_KEY_IOS = "e103ftlN3WqpKA9N+I4c7w==";
 
 
     public static PushManager instance() {
