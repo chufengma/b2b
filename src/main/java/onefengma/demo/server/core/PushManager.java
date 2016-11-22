@@ -1,11 +1,8 @@
 package onefengma.demo.server.core;
 
 import com.alibaba.fastjson.JSON;
-import com.mysql.jdbc.log.Log;
-import com.xiaomi.push.sdk.ErrorCode;
 import com.xiaomi.xmpush.server.Constants;
 import com.xiaomi.xmpush.server.Message;
-import com.xiaomi.xmpush.server.Result;
 import com.xiaomi.xmpush.server.Sender;
 
 import onefengma.demo.common.StringUtils;
@@ -33,16 +30,12 @@ public class PushManager {
         return instance;
     }
 
-    public PushManager() {
-        init();
-    }
-
     public void init() {
-        if (Config.ENV == Config.ENVI.DEV) {
-            Constants.useSandbox();
-        } else {
+//        if (Config.ENV == Config.ENVI.DEV) {
+//            Constants.useSandbox();
+//        } else {
             Constants.useOfficial();
-        }
+//        }
     }
 
     public void pushData(BasePushData pushData) {
@@ -70,7 +63,6 @@ public class PushManager {
                     .description(basePushData.desc)
                     .soundURL("default")    // 消息铃声
                     .badge(basePushData.bageCount)
-                    .category("action")     // 快速回复类别
                     .extra("type", basePushData.type)
                     .extra("content", messagePayload)  // 自定义键值对
                     .extra("flow_control", "4000");   // 设置平滑推送, 推送速度4000每秒(qps=4000)
@@ -81,10 +73,7 @@ public class PushManager {
 
             Sender sender = new Sender(SECRET_KEY_IOS);
             try {
-                Result result = sender.sendToUserAccount(build.build(), ConfigBean.MOBILE_PUSH_PREFIX + basePushData.userId, 4);
-                boolean success = (result.getErrorCode() == ErrorCode.Success);
-                LogUtils.i("push data for ios " + ConfigBean.MOBILE_PUSH_PREFIX + basePushData.userId, true);
-                LogUtils.i("push data for ios " + success + "," + result.getReason(), true);
+                sender.sendToUserAccount(build.build(), ConfigBean.MOBILE_PUSH_PREFIX + basePushData.userId, 4);
             } catch (Exception e) {
                 LogUtils.i("push data error:" + JSON.toJSONString(basePushData), true);
                 e.printStackTrace();
