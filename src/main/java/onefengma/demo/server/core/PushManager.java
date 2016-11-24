@@ -64,6 +64,7 @@ public class PushManager {
                     .soundURL("default")    // 消息铃声
                     .badge(basePushData.bageCount)
                     .extra("type", basePushData.type)
+                    .extra("id", basePushData.id)
                     .extra("content", messagePayload)  // 自定义键值对
                     .extra("flow_control", "4000");   // 设置平滑推送, 推送速度4000每秒(qps=4000)
 

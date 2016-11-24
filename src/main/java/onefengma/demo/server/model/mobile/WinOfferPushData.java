@@ -11,5 +11,8 @@ public class WinOfferPushData extends BasePushData {
 
     public WinOfferPushData(String userId) {
         super(userId, PUSH_TYPE_WIN_OFFER);
+        if (ironBuyBrief != null) {
+            this.id = ironBuyBrief.id;
+        }
     }
 }

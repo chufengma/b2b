@@ -12,5 +12,8 @@ public class BuyPushData extends BasePushData {
 
     public BuyPushData(String userId, String type) {
         super(userId, type);
+        if (ironBuyBrief != null) {
+            this.id = ironBuyBrief.id;
+        }
     }
 }
