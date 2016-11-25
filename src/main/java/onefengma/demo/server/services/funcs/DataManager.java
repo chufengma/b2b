@@ -34,7 +34,7 @@ public class DataManager extends BaseDataHelper {
 
     public void justCopyIt() {
         if (!userHasChanged) {
-            changeUserSellerData();
+//            changeUserSellerData();
             userHasChanged = true;
         }
         changeProductOrdersMockData();
