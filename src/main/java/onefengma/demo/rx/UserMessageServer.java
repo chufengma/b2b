@@ -107,8 +107,12 @@ public class UserMessageServer extends WebSocketServer {
             UserMessage userMessage = new UserMessage();
             userMessage.userId = userId;
             userMessage.message = message;
-            for(WebSocket webSocket : webSockets) {
-                webSocket.send(JSON.toJSONString(userMessage));
+            try {
+                for(WebSocket webSocket : webSockets) {
+                    webSocket.send(JSON.toJSONString(userMessage));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
