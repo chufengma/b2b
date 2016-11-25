@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.config.ConfigBean;
+import onefengma.demo.server.core.PushManager;
 import onefengma.demo.server.model.mobile.LoseOfferPushData;
 import onefengma.demo.server.model.mobile.WinOfferPushData;
 import onefengma.demo.server.model.product.IronBuyBrief;
@@ -55,7 +56,7 @@ public class MysqlDump {
         pushData.desc = "很遗憾！您报价的XXX未中标.";
         pushData.ironBuyBrief = ironBuyBrief;
 
-        System.out.println(JSON.toJSONString(pushData));
+        PushManager.instance().pushData(pushData);
     }
 
 }

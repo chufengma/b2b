@@ -45,41 +45,43 @@ public class PushManager {
     }
 
     private void pushIOSMessage(BasePushData basePushData) {
-        if (StringUtils.isEmpty(basePushData.userId)) {
-            return;
-        }
+        JiGuangPushManager.pushIosMessage(basePushData);
 
-        String content = JSON.toJSONString(basePushData);
-
-        if (Config.ENV == Config.ENVI.DEV) {
-            LogUtils.i("push data for ios useSandbox " + content, true);
-        } else {
-            LogUtils.i("push data for ios useOfficial " + content, true);
-        }
-
-        ThreadUtils.instance().post(() -> {
-            String messagePayload = content;
-            Message.IOSBuilder build = new Message.IOSBuilder()
-                    .description(basePushData.desc)
-                    .soundURL("default")    // 消息铃声
-                    .badge(basePushData.bageCount)
-                    .extra("type", basePushData.type)
-                    .extra("id", basePushData.id)
-                    .extra("content", messagePayload)  // 自定义键值对
-                    .extra("flow_control", "4000");   // 设置平滑推送, 推送速度4000每秒(qps=4000)
-
-            if (basePushData.bageCount != -1) {
-                build.badge(basePushData.bageCount);
-            }
-
-            Sender sender = new Sender(SECRET_KEY_IOS);
-            try {
-                sender.sendToUserAccount(build.build(), ConfigBean.MOBILE_PUSH_PREFIX + basePushData.userId, 4);
-            } catch (Exception e) {
-                LogUtils.i("push data error:" + JSON.toJSONString(basePushData), true);
-                e.printStackTrace();
-            }
-        });
+//        if (StringUtils.isEmpty(basePushData.userId)) {
+//            return;
+//        }
+//
+//        String content = JSON.toJSONString(basePushData);
+//
+//        if (Config.ENV == Config.ENVI.DEV) {
+//            LogUtils.i("push data for ios useSandbox " + content, true);
+//        } else {
+//            LogUtils.i("push data for ios useOfficial " + content, true);
+//        }
+//
+//        ThreadUtils.instance().post(() -> {
+//            String messagePayload = content;
+//            Message.IOSBuilder build = new Message.IOSBuilder()
+//                    .description(basePushData.desc)
+//                    .soundURL("default")    // 消息铃声
+//                    .badge(basePushData.bageCount)
+//                    .extra("type", basePushData.type)
+//                    .extra("id", basePushData.id)
+//                    .extra("content", messagePayload)  // 自定义键值对
+//                    .extra("flow_control", "4000");   // 设置平滑推送, 推送速度4000每秒(qps=4000)
+//
+//            if (basePushData.bageCount != -1) {
+//                build.badge(basePushData.bageCount);
+//            }
+//
+//            Sender sender = new Sender(SECRET_KEY_IOS);
+//            try {
+//                sender.sendToUserAccount(build.build(), ConfigBean.MOBILE_PUSH_PREFIX + basePushData.userId, 4);
+//            } catch (Exception e) {
+//                LogUtils.i("push data error:" + JSON.toJSONString(basePushData), true);
+//                e.printStackTrace();
+//            }
+//        });
     }
 
 
