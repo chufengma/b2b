@@ -20,7 +20,7 @@ public class PushManager {
     public static final String ANDROID_PAKAGE = "com.onefengma.taobuxiu";
     public static final String APP_ID = "2882303761517500719";
     public static final String SECRET_KEY = "d6JcRax80B2SqHQfQEpYwQ==";
-    public static final String SECRET_KEY_IOS = "ZVKIndYhqdYNTvn2PCtppg==";
+    public static final String SECRET_KEY_IOS = "e103ftlN3WqpKA9N+I4c7w==";
 
 
     public static PushManager instance() {
@@ -31,10 +31,15 @@ public class PushManager {
     }
 
     public void init() {
-        Constants.useOfficial();
+//        if (Config.ENV == Config.ENVI.DEV) {
+//            Constants.useSandbox();
+//        } else {
+            Constants.useOfficial();
+//        }
     }
 
     public void pushData(BasePushData pushData) {
+        LogUtils.i("push data now ", true);
         pushAndroidMessage(pushData);
         pushIOSMessage(pushData);
     }
@@ -47,10 +52,8 @@ public class PushManager {
         String content = JSON.toJSONString(basePushData);
 
         if (Config.ENV == Config.ENVI.DEV) {
-            Constants.useSandbox();
             LogUtils.i("push data for ios useSandbox " + content, true);
         } else {
-            Constants.useOfficial();
             LogUtils.i("push data for ios useOfficial " + content, true);
         }
 
@@ -84,10 +87,8 @@ public class PushManager {
             return;
         }
 
-        Constants.useOfficial();
         String content = JSON.toJSONString(basePushData);
-        LogUtils.i("push data " + content, false);
-
+        LogUtils.i("push data for android " + content, true);
         ThreadUtils.instance().post(() -> {
             String messagePayload = content;
             String title = basePushData.title;
@@ -104,6 +105,7 @@ public class PushManager {
             Sender sender = new Sender(SECRET_KEY);
             try {
                 sender.sendToUserAccount(message, ConfigBean.MOBILE_PUSH_PREFIX + basePushData.userId, 4);
+                LogUtils.i("push data " + content, false);
             } catch (Exception e) {
                 LogUtils.i("push data error:" + JSON.toJSONString(basePushData), true);
                 e.printStackTrace();

@@ -51,7 +51,7 @@ public class Config {
     private static DataBaseModel dataBaseModel;
     private static FreeMarkerEngine freeMarkerEngine;
 
-    private static final int SESSION_DIE_TIME = 30 * 60;
+    private static final int SESSION_DIE_TIME = 60 * 60 * 8;
 
     private static Config instance;
 
