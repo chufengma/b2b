@@ -547,7 +547,7 @@ public class IronDataHelper extends BaseDataHelper {
                 WinOfferPushData pushData = new WinOfferPushData(supplyUserId);
                 pushData.title = "恭喜您成功中标！";
                 pushData.desc = message;
-                pushData.ironBuyBrief = ironBuyBrief;
+                pushData.setIronBuyBrief(ironBuyBrief);
                 PushManager.instance().pushData(pushData);
 
                 // 推送至竞争失败者
@@ -561,7 +561,7 @@ public class IronDataHelper extends BaseDataHelper {
                         LoseOfferPushData losepushData = new LoseOfferPushData(supplyUserId);
                         pushData.title = "很遗憾您竞标失败";
                         pushData.desc = loseMessage;
-                        pushData.ironBuyBrief = ironBuyBrief;
+                        pushData.setIronBuyBrief(ironBuyBrief);
                         PushManager.instance().pushData(losepushData);
                     }
                 }
@@ -762,7 +762,7 @@ public class IronDataHelper extends BaseDataHelper {
                     BuyPushData pushData = new BuyPushData(ironBuyBrief.userId, BasePushData.PUSH_TYPE_BUY);
                     pushData.title = "您的求购有新报价";
                     pushData.desc = seller.companyName + "公司 已对您的" + message + "求购进行报价，点击查看";
-                    pushData.ironBuyBrief = ironBuyBrief;
+                    pushData.setIronBuyBrief(ironBuyBrief);
                     pushData.bageCount = pushData.newSupplyNums + getMySellerIronBuy(sellerId, ironId);
                     PageBuilder pageBuilder = new PageBuilder(0, 10)
                             .addEqualWhere("userId", ironBuyBrief.userId)

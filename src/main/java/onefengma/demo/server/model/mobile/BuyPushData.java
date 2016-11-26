@@ -16,4 +16,11 @@ public class BuyPushData extends BasePushData {
             this.id = ironBuyBrief.id;
         }
     }
+
+    public void setIronBuyBrief(IronBuyBrief ironBuyBrief) {
+        this.ironBuyBrief = ironBuyBrief;
+        if (ironBuyBrief != null) {
+            this.id = ironBuyBrief.id;
+        }
+    }
 }
