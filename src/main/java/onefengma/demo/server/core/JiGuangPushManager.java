@@ -1,5 +1,7 @@
 package onefengma.demo.server.core;
 
+import com.alibaba.fastjson.JSON;
+
 import cn.jpush.api.JPushClient;
 import cn.jpush.api.push.PushResult;
 import cn.jpush.api.push.model.Message;
@@ -9,8 +11,6 @@ import cn.jpush.api.push.model.PushPayload;
 import cn.jpush.api.push.model.audience.Audience;
 import cn.jpush.api.push.model.notification.IosNotification;
 import cn.jpush.api.push.model.notification.Notification;
-import com.alibaba.fastjson.JSON;
-import onefengma.demo.server.config.Config;
 import onefengma.demo.server.config.ConfigBean;
 import onefengma.demo.server.model.mobile.BasePushData;
 
@@ -29,6 +29,7 @@ public class JiGuangPushManager {
                                 .setBadge(basePushData.bageCount)
                                 .addExtra("type", basePushData.type)
                                 .addExtra("id", basePushData.id)
+                                .setSound("happy")
                                 .addExtra("content", JSON.toJSONString(basePushData))
                                 .build())
                         .build())
