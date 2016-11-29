@@ -1,7 +1,5 @@
 package onefengma.demo.server.services.user;
 
-import onefengma.demo.server.model.SubscribeInfo;
-import onefengma.demo.server.services.products.IronDataHelper.UserBuyInfo;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -17,6 +15,7 @@ import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.core.UpdateBuilder;
 import onefengma.demo.server.model.Seller;
+import onefengma.demo.server.model.SubscribeInfo;
 import onefengma.demo.server.model.product.HandingBuyBrief;
 import onefengma.demo.server.model.product.HandingDetail;
 import onefengma.demo.server.model.product.IronBuyBrief;
@@ -25,6 +24,7 @@ import onefengma.demo.server.model.product.ShopBrief;
 import onefengma.demo.server.model.product.ShopDetail;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper;
+import onefengma.demo.server.services.products.IronDataHelper.UserBuyInfo;
 
 /**
  * Created by chufengma on 16/6/2.
@@ -542,16 +542,16 @@ public class SellerDataHelper extends BaseDataHelper {
     }
 
     public int getUserSupplyWinnerTimes(String userId) {
-        String handingSql = "SELECT count(*) FROM handing_buy where supplyUserId = :userId";
+//        String handingSql = "SELECT count(*) FROM handing_buy where supplyUserId = :userId";
         String ironSql = "SELECT count(*) FROM iron_buy where supplyUserId = :userId";
         try(Connection conn = getConn()) {
-            Integer handingCount = conn.createQuery(handingSql).addParameter("userId", userId).executeScalar(Integer.class);
-            handingCount = handingCount == null ? 0 : handingCount;
+//            Integer handingCount = conn.createQuery(handingSql).addParameter("userId", userId).executeScalar(Integer.class);
+//            handingCount = handingCount == null ? 0 : handingCount;
 
             Integer ironCount = conn.createQuery(ironSql).addParameter("userId", userId).executeScalar(Integer.class);
             ironCount = ironCount == null ? 0 : ironCount;
 
-            return ironCount + handingCount;
+            return ironCount;
         }
     }
 
