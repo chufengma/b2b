@@ -6,10 +6,8 @@ package onefengma.demo.server.model.mobile;
  */
 public class IronQtPushData extends BasePushData {
 
-    public String qtId;
-
     public IronQtPushData(String userId, String qtId) {
         super(userId, PUSH_TYPE_IRON_QT);
-        this.qtId = qtId;
+        this.id = qtId;
     }
 }

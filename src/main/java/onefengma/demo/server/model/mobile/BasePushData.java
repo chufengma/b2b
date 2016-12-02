@@ -9,6 +9,7 @@ public class BasePushData {
     public String desc;
     public String userId;
     public String type;
+    public String id;
 
     public int bageCount = -1;
 

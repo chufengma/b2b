@@ -11,5 +11,15 @@ public class LoseOfferPushData extends BasePushData {
 
     public LoseOfferPushData(String userId) {
         super(userId, PUSH_TYPE_LOSE_OFFER);
+        if (ironBuyBrief != null) {
+            this.id = ironBuyBrief.id;
+        }
+    }
+
+    public void setIronBuyBrief(IronBuyBrief ironBuyBrief) {
+        this.ironBuyBrief = ironBuyBrief;
+        if (ironBuyBrief != null) {
+            this.id = ironBuyBrief.id;
+        }
     }
 }
