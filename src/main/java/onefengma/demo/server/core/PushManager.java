@@ -31,11 +31,11 @@ public class PushManager {
     }
 
     public void init() {
-        if (Config.ENV == Config.ENVI.DEV) {
-            Constants.useSandbox();
-        } else {
+//        if (Config.ENV == Config.ENVI.DEV) {
+//            Constants.useSandbox();
+//        } else {
             Constants.useOfficial();
-        }
+//        }
     }
 
     public void pushData(BasePushData pushData) {
