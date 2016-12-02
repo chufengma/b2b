@@ -753,6 +753,7 @@ public class IronDataHelper extends BaseDataHelper {
             IronBuyBrief ironBuyBrief = getIronBuyBrief(ironId);
             if (ironBuyBrief != null) {
                 String message = generateIronBuyMessage(ironBuyBrief);
+                String message2 = generateIronBuyMessage(ironBuyBrief);
                 Seller seller = SellerDataHelper.instance().getSeller(sellerId);
                 if (seller != null) {
                     // 推送至 websockets
@@ -763,7 +764,7 @@ public class IronDataHelper extends BaseDataHelper {
                     System.out.println("-----offerIronBuy--userId-" + ironBuyBrief.userId);
                     BuyPushData pushData = new BuyPushData(ironBuyBrief.userId, BasePushData.PUSH_TYPE_BUY);
                     pushData.title = "您的求购有新报价";
-                    pushData.desc = seller.companyName + "公司 已对您的" + message + "求购进行报价，点击查看";
+                    pushData.desc = seller.companyName + "公司 已对您的" + message2 + "求购进行报价，点击查看";
                     pushData.setIronBuyBrief(ironBuyBrief);
                     pushData.bageCount = pushData.newSupplyNums + getMySellerIronBuy(sellerId, ironId);
                     PageBuilder pageBuilder = new PageBuilder(0, 10)
