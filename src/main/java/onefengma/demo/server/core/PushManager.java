@@ -26,6 +26,7 @@ public class PushManager {
     public static PushManager instance() {
         if (instance == null) {
             instance = new PushManager();
+            Constants.useOfficial();
         }
         return instance;
     }
@@ -108,9 +109,9 @@ public class PushManager {
             Sender sender = new Sender(SECRET_KEY);
             try {
                 sender.sendToUserAccount(message, ConfigBean.MOBILE_PUSH_PREFIX + basePushData.userId, 4);
-                LogUtils.i("push data " + content, false);
+                LogUtils.saveToFiles("push data " + ConfigBean.MOBILE_PUSH_PREFIX + ", " + content, false);
             } catch (Exception e) {
-                LogUtils.i("push data error:" + JSON.toJSONString(basePushData), true);
+                LogUtils.saveToFiles("push data error:" + JSON.toJSONString(basePushData), true);
                 e.printStackTrace();
             }
         });

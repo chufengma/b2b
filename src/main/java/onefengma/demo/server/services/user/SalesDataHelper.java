@@ -147,7 +147,7 @@ public class SalesDataHelper extends BaseDataHelper {
                 statusStr = "已完成质检";
             }
             ironQtPushData.title = "您的求购" + statusStr;
-            ironQtPushData.desc = "您的求购" + IronDataHelper.getIronDataHelper().generateIronBuyMessage(ironBuyBrief);
+            ironQtPushData.desc =  IronDataHelper.getIronDataHelper().generateIronBuyMessage(ironBuyBrief);
             PushManager.instance().pushData(ironQtPushData);
         }
     }
