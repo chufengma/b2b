@@ -73,7 +73,7 @@ public class SalesDataHelper extends BaseDataHelper {
                 + pageBuilder.generateWherePlus(false)
                 + " order by salesBindTime desc " + pageBuilder.generateLimit();
 
-        String countSql = "select count(*) from seller,user where user.userId=seller.userId and user.salesManId=:salesId"
+        String countSql = "select count(*) from seller,user where user.userId=seller.userId and user.salesManId=:salesId  and user.isMock = 0 "
                 + pageBuilder.generateWherePlus(false);
 
         try(Connection conn = getConn()) {
