@@ -40,7 +40,7 @@ public class PushManager {
     }
 
     public void pushData(BasePushData pushData) {
-        LogUtils.i("push data now ", true);
+        LogUtils.saveToFiles("push data now ", true);
         pushAndroidMessage(pushData);
         pushIOSMessage(pushData);
     }
@@ -87,12 +87,13 @@ public class PushManager {
 
 
     private void pushAndroidMessage(BasePushData basePushData) {
+        LogUtils.saveToFiles("push data for android start : " + basePushData.userId, true);
         if (StringUtils.isEmpty(basePushData.userId)) {
             return;
         }
 
         String content = JSON.toJSONString(basePushData);
-        LogUtils.i("push data for android " + content, true);
+        LogUtils.saveToFiles("push data for android " + content, true);
         ThreadUtils.instance().post(() -> {
             String messagePayload = content;
             String title = basePushData.title;
