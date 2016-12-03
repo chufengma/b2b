@@ -110,7 +110,7 @@ public class PushManager {
             Sender sender = new Sender(SECRET_KEY);
             try {
                 sender.sendToUserAccount(message, ConfigBean.MOBILE_PUSH_PREFIX + basePushData.userId, 4);
-                LogUtils.saveToFiles("push data " + ConfigBean.MOBILE_PUSH_PREFIX + ", " + content, false);
+                LogUtils.saveToFiles("push data " + ConfigBean.MOBILE_PUSH_PREFIX + ", " + content, true);
             } catch (Exception e) {
                 LogUtils.saveToFiles("push data error:" + JSON.toJSONString(basePushData), true);
                 e.printStackTrace();
