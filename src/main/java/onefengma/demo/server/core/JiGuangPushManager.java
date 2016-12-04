@@ -11,6 +11,7 @@ import cn.jpush.api.push.model.PushPayload;
 import cn.jpush.api.push.model.audience.Audience;
 import cn.jpush.api.push.model.notification.IosNotification;
 import cn.jpush.api.push.model.notification.Notification;
+import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.config.ConfigBean;
 import onefengma.demo.server.model.mobile.BasePushData;
 
@@ -20,6 +21,10 @@ import onefengma.demo.server.model.mobile.BasePushData;
 public class JiGuangPushManager {
 
     public static void pushIosMessage(BasePushData basePushData) {
+        if (StringUtils.isEmpty(basePushData.title) || StringUtils.isEmpty(basePushData.desc)) {
+            LogUtils.saveToFiles("title or desc null: " + basePushData.title + ", " + basePushData.desc , true);
+            return;
+        }
         PushPayload payload = PushPayload.newBuilder()
                 .setPlatform(Platform.ios())
                 .setAudience(Audience.alias(ConfigBean.MOBILE_PUSH_PREFIX + basePushData.userId))
