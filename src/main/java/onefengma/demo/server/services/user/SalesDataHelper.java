@@ -54,7 +54,7 @@ public class SalesDataHelper extends BaseDataHelper {
                 + pageBuilder.generateWherePlus(false)
                 + " order by salesBindTime desc " + pageBuilder.generateLimit();
 
-        String countSql = "select count(*) from user where  userId not in (select userId from seller) and salesManId=:salesId"
+        String countSql = "select count(*) from user where  userId not in (select userId from seller) and salesManId=:salesId  and isMock = 0 "
                 + pageBuilder.generateWherePlus(false);
 
         try(Connection conn = getConn()) {
