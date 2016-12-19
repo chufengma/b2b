@@ -817,6 +817,16 @@ public class AdminDataManager extends BaseDataHelper {
             return qtResponse;
         }
     }
+
+    public void changeSellerAccount(String userId, String mobile, String newPass) {
+        String sql = "update user set mobile=:mobile,password=:newPass where userId=:userId";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("mobile", mobile)
+                    .addParameter("newPass", newPass)
+                    .addParameter("userId", userId).executeUpdate();
+        }
+    }
+
     public static class QtItem {
         public String qtId;
         public int salesmanId;

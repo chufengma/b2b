@@ -14,14 +14,9 @@ import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.Admin;
 import onefengma.demo.server.model.SalesMan;
-import onefengma.demo.server.model.admin.AdminDetailRequest;
-import onefengma.demo.server.model.admin.AdminIronBuyDetailResponse;
-import onefengma.demo.server.model.admin.AdminOperationRequest;
-import onefengma.demo.server.model.admin.AdminQtRequest;
-import onefengma.demo.server.model.admin.AdminSellersRequest;
-import onefengma.demo.server.model.admin.AdminSellersResponse;
-import onefengma.demo.server.model.admin.AdminUsersRequest;
-import onefengma.demo.server.model.admin.AdminUsersResponse;
+import onefengma.demo.server.model.User;
+import onefengma.demo.server.model.UserProfile;
+import onefengma.demo.server.model.admin.*;
 import onefengma.demo.server.model.apibeans.admin.AdminBuysRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminChangeSalesmanRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminDeleteBuyRequest;
@@ -536,6 +531,31 @@ public class AdminManager extends BaseManager {
             }
             data.missSupplies = IronDataHelper.getIronDataHelper().getIronBuySuppliesMissed(requestBean.id);
             return success(data);
+        }));
+
+        post("changeSellerAccount", ChangeAccountRequest.class, ((request, response, requestBean) -> {
+            UserProfile userProfile = UserDataHelper.instance().getUserProfile(requestBean.userId);
+            if (userProfile == null) {
+                return error("用户不存在");
+            }
+            if (userProfile.sellerData == null) {
+                return error("用户不是商户");
+            }
+            if (!VerifyUtils.isMobile(requestBean.newTel) || !VerifyUtils.isMobile(requestBean.oldTel)) {
+                return error("手机号格式不正确");
+            }
+            if (StringUtils.equals(requestBean.oldTel, requestBean.newTel)) {
+                return error("新老手机号一样!");
+            }
+            if (!StringUtils.equals(requestBean.newPass, requestBean.newPassConfirm)) {
+                return error("密码输入不一致!");
+            }
+            User user = UserDataHelper.instance().findUserByMobile(requestBean.newTel);
+            if (user != null) {
+                return error("此手机号已经被用作商家账号，无法重新绑定");
+            }
+            AdminDataManager.instance().changeSellerAccount(requestBean.userId, requestBean.newTel, IdUtils.md5(requestBean.newPass));
+            return success("修改成功");
         }));
     }
 
