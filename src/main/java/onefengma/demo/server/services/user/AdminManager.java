@@ -33,6 +33,7 @@ import onefengma.demo.server.model.apibeans.others.AddRecruitRequest;
 import onefengma.demo.server.model.apibeans.others.AddSalesRequest;
 import onefengma.demo.server.model.apibeans.others.EditNewsRequest;
 import onefengma.demo.server.model.apibeans.others.EditRecruitRequest;
+import onefengma.demo.server.model.apibeans.others.ImageUploadRequest;
 import onefengma.demo.server.model.apibeans.others.InnerMessageRequest;
 import onefengma.demo.server.model.apibeans.others.NewsDetailRequest;
 import onefengma.demo.server.model.product.HandingDetail;
@@ -556,6 +557,10 @@ public class AdminManager extends BaseManager {
             }
             AdminDataManager.instance().changeSellerAccount(requestBean.userId, requestBean.newTel, IdUtils.md5(requestBean.newPass));
             return success("修改成功");
+        }));
+
+        multiPost("imageUpload", ImageUploadRequest.class, ((request, response, requestBean) -> {
+            return success(requestBean.image.getPath().replace('\\', '/').replace("./res/", "/"));
         }));
     }
 

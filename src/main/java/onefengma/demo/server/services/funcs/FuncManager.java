@@ -181,7 +181,6 @@ public class FuncManager extends BaseManager {
             }
             return success(recruitDetail);
         }));
-
     }
 
     @Override
