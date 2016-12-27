@@ -16,7 +16,15 @@ import onefengma.demo.server.model.Admin;
 import onefengma.demo.server.model.SalesMan;
 import onefengma.demo.server.model.User;
 import onefengma.demo.server.model.UserProfile;
-import onefengma.demo.server.model.admin.*;
+import onefengma.demo.server.model.admin.AdminDetailRequest;
+import onefengma.demo.server.model.admin.AdminIronBuyDetailResponse;
+import onefengma.demo.server.model.admin.AdminOperationRequest;
+import onefengma.demo.server.model.admin.AdminQtRequest;
+import onefengma.demo.server.model.admin.AdminSellersRequest;
+import onefengma.demo.server.model.admin.AdminSellersResponse;
+import onefengma.demo.server.model.admin.AdminUsersRequest;
+import onefengma.demo.server.model.admin.AdminUsersResponse;
+import onefengma.demo.server.model.admin.ChangeAccountRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminBuysRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminChangeSalesmanRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminDeleteBuyRequest;
@@ -33,7 +41,6 @@ import onefengma.demo.server.model.apibeans.others.AddRecruitRequest;
 import onefengma.demo.server.model.apibeans.others.AddSalesRequest;
 import onefengma.demo.server.model.apibeans.others.EditNewsRequest;
 import onefengma.demo.server.model.apibeans.others.EditRecruitRequest;
-import onefengma.demo.server.model.apibeans.others.ImageUploadRequest;
 import onefengma.demo.server.model.apibeans.others.InnerMessageRequest;
 import onefengma.demo.server.model.apibeans.others.NewsDetailRequest;
 import onefengma.demo.server.model.product.HandingDetail;
@@ -557,10 +564,6 @@ public class AdminManager extends BaseManager {
             }
             AdminDataManager.instance().changeSellerAccount(requestBean.userId, requestBean.newTel, IdUtils.md5(requestBean.newPass));
             return success("修改成功");
-        }));
-
-        multiPost("imageUpload", ImageUploadRequest.class, ((request, response, requestBean) -> {
-            return success(requestBean.image.getPath().replace('\\', '/').replace("./res/", "/"));
         }));
     }
 
