@@ -560,7 +560,7 @@ public class AdminManager extends BaseManager {
             }
             User user = UserDataHelper.instance().findUserByMobile(requestBean.newTel);
             if (user != null) {
-                return error("此手机号已经被用作商家账号，无法重新绑定");
+                return error("此手机号已经被用作用户账号，无法重新绑定");
             }
             AdminDataManager.instance().changeSellerAccount(requestBean.userId, requestBean.newTel, IdUtils.md5(requestBean.newPass));
             return success("修改成功");
