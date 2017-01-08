@@ -16,6 +16,7 @@ import onefengma.demo.server.model.apibeans.BasePageBean;
 import onefengma.demo.server.model.apibeans.codes.MsgCode;
 import onefengma.demo.server.model.apibeans.codes.ValidateCodeBean;
 import onefengma.demo.server.model.apibeans.meta.CityDescRequest;
+import onefengma.demo.server.model.apibeans.others.ImageUploadRequest;
 import onefengma.demo.server.model.apibeans.others.NewsDetailRequest;
 import onefengma.demo.server.model.news.InnerNewsDetail;
 import onefengma.demo.server.model.news.InnerNewsResponse;
@@ -182,6 +183,9 @@ public class FuncManager extends BaseManager {
             return success(recruitDetail);
         }));
 
+        multiPost("imageUpload", ImageUploadRequest.class, ((request, response, requestBean) -> {
+            return success(requestBean.image.getPath().replace('\\', '/').replace("./res/", "/"));
+        }));
     }
 
     @Override

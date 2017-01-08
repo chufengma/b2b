@@ -16,7 +16,15 @@ import onefengma.demo.server.model.Admin;
 import onefengma.demo.server.model.SalesMan;
 import onefengma.demo.server.model.User;
 import onefengma.demo.server.model.UserProfile;
-import onefengma.demo.server.model.admin.*;
+import onefengma.demo.server.model.admin.AdminDetailRequest;
+import onefengma.demo.server.model.admin.AdminIronBuyDetailResponse;
+import onefengma.demo.server.model.admin.AdminOperationRequest;
+import onefengma.demo.server.model.admin.AdminQtRequest;
+import onefengma.demo.server.model.admin.AdminSellersRequest;
+import onefengma.demo.server.model.admin.AdminSellersResponse;
+import onefengma.demo.server.model.admin.AdminUsersRequest;
+import onefengma.demo.server.model.admin.AdminUsersResponse;
+import onefengma.demo.server.model.admin.ChangeAccountRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminBuysRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminChangeSalesmanRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminDeleteBuyRequest;
@@ -552,7 +560,7 @@ public class AdminManager extends BaseManager {
             }
             User user = UserDataHelper.instance().findUserByMobile(requestBean.newTel);
             if (user != null) {
-                return error("此手机号已经被用作商家账号，无法重新绑定");
+                return error("此手机号已经被用作用户账号，无法重新绑定");
             }
             AdminDataManager.instance().changeSellerAccount(requestBean.userId, requestBean.newTel, IdUtils.md5(requestBean.newPass));
             return success("修改成功");

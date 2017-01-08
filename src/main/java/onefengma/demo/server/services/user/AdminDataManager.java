@@ -6,7 +6,6 @@ import org.sql2o.data.Row;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import onefengma.demo.common.NumberUtils;
 import onefengma.demo.common.StringUtils;
@@ -64,10 +63,10 @@ public class AdminDataManager extends BaseDataHelper {
     public void deleteUser(String userId) throws Exception {
         String sql = "delete from user where userId=:userId";
         String sellerSql = "delete from seller where userId=:userId";
-        String bakSql = "insert into user_bak select * from user where userId=:userId";
+        // String bakSql = "insert into user_bak select * from user where userId=:userId";
 
         try (Connection conn = getConn()) {
-            conn.createQuery(bakSql).addParameter("userId", userId).executeUpdate();
+            // conn.createQuery(bakSql).addParameter("userId", userId).executeUpdate();
             conn.createQuery(sql).addParameter("userId", userId).executeUpdate();
             if (SellerDataHelper.instance().isSeller(userId)) {
                 conn.createQuery(sellerSql).addParameter("userId", userId).executeUpdate();
