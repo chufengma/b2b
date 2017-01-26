@@ -59,7 +59,7 @@ public class MetaDataFetcher {
                     element.attr("src", "/data/geett.js");
                 }
             }
-            doc.select("#container").attr("style", "width:100%;height:120px;");
+            doc.select("#container").attr("style", "width:100%;height:200px;");
 
             File graphFile = new File("./res/B2BPlatformFront/data/graph.html");
             if (!graphFile.exists()) {
