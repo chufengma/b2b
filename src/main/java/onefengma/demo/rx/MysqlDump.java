@@ -10,7 +10,7 @@ public class MysqlDump {
 
     public static void main(String[] args) {
 //        ConfigBean.configDev();
-        // DataManager.instance().justCopyIt();
+        DataManager.instance().justCopyIt();
     }
 
 }
