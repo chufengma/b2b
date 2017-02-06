@@ -329,6 +329,10 @@ public class AdminManager extends BaseManager {
             return success(AdminDataManager.instance().getAdminSeller(requestBean.id));
         }));
 
+        get("sellerInfoDetail", AdminDetailRequest.class, ((request, response, requestBean) -> {
+            return success(AdminDataManager.instance().getAdminSeller(requestBean.id));
+        }));
+
         post("sellerVerifyOp", AdminOperationRequest.class, ((request, response, requestBean) -> {
             if (AdminDataManager.instance().isSellerApplyHandled(requestBean.id)) {
                 return error("用户不再审核范围之内");
