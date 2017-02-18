@@ -1,7 +1,18 @@
 package onefengma.demo.rx;
 
-import onefengma.demo.server.config.ConfigBean;
-import onefengma.demo.server.services.products.IronDataHelper;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.jackson.JacksonConverterFactory;
+import retrofit2.http.*;
+import rx.Observable;
+import rx.functions.Action1;
+
+import java.io.File;
+
 
 /**
  * @author yfchu
@@ -11,34 +22,43 @@ import onefengma.demo.server.services.products.IronDataHelper;
 public class RxDemo {
 
     public static void main(String[] args) {
-//        Tinify.setKey("wMGvp7X-Sk02pI1vkouapzIKt3_6m84j");
-//        try {
-//            Source source = Tinify.fromBuffer(Files.readAllBytes(Paths.get("/Users/chufengma/projects/web/b2b/res/files/2016/7/24/Wkmvdz6NUJtm.png")));
-//            Options options = new Options()
-//                    .with("method", "scale")
-//                    .with("width", 450);
-//            Source resized = source.resize(options);
-//            resized.toFile("/Users/chufengma/projects/web/b2b/res/files/2016/7/24/Wkmvdz6NUJtm.png");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-//        DecimalFormat df = new DecimalFormat("0.0");
-//        System.out.println("---" + df.format(new BigDecimal(112313.39323)));
-
-//        try(Connection connection = OrderDataHelper.instance().getConn()) {
-//            OrderDataHelper.instance().addIntegralByBuy(connection, "527cec6a380046b5b813537e10d065e9", "5afa98c48214438dad364113e3a82ce9", 1323);
-////        }
-//        BigDecimal bd = new BigDecimal(1233.1129134 + "");
-//        System.out.println("---" + NumberUtils.round(bd, 3));
-
-        try {
-            ConfigBean.configDev();
-            IronDataHelper.getIronDataHelper().offerIronBuy("k9Z7L1F3xd3A", "Z27e2ceuayIe", 183, "test" + System.currentTimeMillis(), "kg");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl("http://localhost:9090")
+//                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .build();
+//
+//        retrofit.create(DemoService.class).test("Test").subscribe(new Action1<Data>() {
+//            @Override
+//            public void call(Data s) {
+//                System.out.println("-----" + s.data);
+//            }
+//        });
+//
+//        // 创建 RequestBody，用于封装 请求RequestBody
+//        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), "test.png");
+//        MultipartBody.Part body = MultipartBody.Part.createFormData("image", "test.png", requestFile);
+//        retrofit.create(DemoService.class).update(body).subscribe(new Action1<Data>() {
+//            @Override
+//            public void call(Data data) {
+//                System.out.println("-----" + data.data);
+//            }
+//        });
     }
 
+//    public interface DemoService {
+//        @GET("/test")
+//        Observable<Data> test(@Query("id") String id);
+//
+//        @Multipart
+//        @POST("imageUpload")
+//        Observable<Data> update(@Part MultipartBody.Part image);
+//    }
+//
+//    public static class Data {
+//        public String errorMsg;
+//        public int status;
+//        public String data;
+//    }
 
 }

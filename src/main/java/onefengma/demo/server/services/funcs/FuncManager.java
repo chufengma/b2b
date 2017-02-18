@@ -186,6 +186,10 @@ public class FuncManager extends BaseManager {
         multiPost("imageUpload", ImageUploadRequest.class, ((request, response, requestBean) -> {
             return success(requestBean.image.getPath().replace('\\', '/').replace("./res/", "/"));
         }));
+
+        get("test", NewsDetailRequest.class,((request, response, requestBean) -> {
+            return success("You Are Right");
+        }));
     }
 
     @Override
