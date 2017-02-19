@@ -10,6 +10,7 @@ import onefengma.demo.rx.UserMessageServer;
 import onefengma.demo.server.config.Config;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.services.funcs.FuncManager;
+import onefengma.demo.server.services.logistics.LogisticsManager;
 import onefengma.demo.server.services.order.OrderManager;
 import onefengma.demo.server.services.order.SellerManager;
 import onefengma.demo.server.services.products.HandingManager;
@@ -35,7 +36,8 @@ public class Enter {
             new OrderManager(),
             new AdminManager(),
             new SellerManager(),
-            new SalesManager()
+            new SalesManager(),
+            new LogisticsManager()
     );
 
     public static void main(String[] args) {
