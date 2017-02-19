@@ -100,7 +100,7 @@ public class MetaDataFetcher {
                 quotationsTmp.add(quotation);
 
                 System.out.println(element);
-                if (quotationsTmp.size() == 3) {
+                if (quotationsTmp.size() == 4) {
                     break;
                 }
 
