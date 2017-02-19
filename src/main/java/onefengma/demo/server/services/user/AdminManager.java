@@ -35,6 +35,9 @@ import onefengma.demo.server.model.apibeans.admin.AdminOrdersRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminSalesRequest;
 import onefengma.demo.server.model.apibeans.admin.DeleteUserRequest;
 import onefengma.demo.server.model.apibeans.admin.UpdateUserRequest;
+import onefengma.demo.server.model.apibeans.logistics.LogisticsActionRequst;
+import onefengma.demo.server.model.apibeans.logistics.LogisticsDeleteRequst;
+import onefengma.demo.server.model.apibeans.logistics.LogisticsPageRequst;
 import onefengma.demo.server.model.apibeans.order.SiteInfoRequest;
 import onefengma.demo.server.model.apibeans.others.AddNewsRequest;
 import onefengma.demo.server.model.apibeans.others.AddRecruitRequest;
@@ -43,6 +46,7 @@ import onefengma.demo.server.model.apibeans.others.EditNewsRequest;
 import onefengma.demo.server.model.apibeans.others.EditRecruitRequest;
 import onefengma.demo.server.model.apibeans.others.InnerMessageRequest;
 import onefengma.demo.server.model.apibeans.others.NewsDetailRequest;
+import onefengma.demo.server.model.logistics.LogisticsNormalBean;
 import onefengma.demo.server.model.product.HandingDetail;
 import onefengma.demo.server.model.product.IronBuyBrief;
 import onefengma.demo.server.model.product.IronDetail;
@@ -52,6 +56,7 @@ import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import onefengma.demo.server.services.funcs.NewsDataHelper;
 import onefengma.demo.server.services.funcs.RecruitDataManager;
 import onefengma.demo.server.services.funcs.RecruitDataManager.RecruitDetail;
+import onefengma.demo.server.services.logistics.LogisticsDataManager;
 import onefengma.demo.server.services.order.OrderDataHelper;
 import onefengma.demo.server.services.products.HandingDataHelper;
 import onefengma.demo.server.services.products.IronDataHelper;
@@ -74,8 +79,10 @@ public class AdminManager extends BaseManager {
             if (StringUtils.equalsIngcase(IdUtils.md5(requestBean.password), admin.password)) {
                 Session session = request.session();
                 session.attribute("admin", admin.id + "");
+                session.attribute("role", admin.role + "");
                 session.maxInactiveInterval(30 * 60);
                 response.cookie("admin", admin.id + "", 30 * 60);
+                response.cookie("role", admin.role + "");
                 return success("登陆成功");
             } else {
                 return error("密码不正确");
@@ -568,6 +575,34 @@ public class AdminManager extends BaseManager {
             }
             AdminDataManager.instance().changeSellerAccount(requestBean.userId, requestBean.newTel, IdUtils.md5(requestBean.newPass));
             return success("修改成功");
+        }));
+
+        get("logisticsRequests", LogisticsPageRequst.class, ((request1, response1, requestBean1) -> {
+            PageBuilder pageBuilder = new PageBuilder(requestBean1.currentPage, requestBean1.pageCount);
+            if (requestBean1.status != -1) {
+                pageBuilder.addEqualWhere("status", requestBean1.status);
+            }
+            return success(LogisticsDataManager.instance().getLogisticsRequests(pageBuilder));
+        }));
+
+        post("logisticsAction", LogisticsActionRequst.class, ((request, response, requestBean) -> {
+            if (requestBean.status != 1 && requestBean.status != 2) {
+                return error("操作不合法");
+            }
+            LogisticsNormalBean bean = LogisticsDataManager.instance().getLogisticsById(requestBean.id);
+            if (bean.status == 0 && requestBean.status == 2) {
+                return error("该请求还没有处理");
+            }
+            if (bean.status == 2) {
+                return error("该请求已经处理完成");
+            }
+            LogisticsDataManager.instance().upodateLogisticsStatusById(requestBean.id, requestBean.status);
+            return success("处理成功");
+        }));
+
+        post("logisticsDelete", LogisticsDeleteRequst.class, ((request, response, requestBean) -> {
+            LogisticsDataManager.instance().deleteLogisticsById(requestBean.id);
+            return success("删除成功");
         }));
     }
 

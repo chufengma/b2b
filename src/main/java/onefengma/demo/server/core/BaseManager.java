@@ -380,6 +380,10 @@ public abstract class BaseManager {
                         // other pages
                         if (request.pathInfo().startsWith("/auth")) {
                             pageFile = FileHelper.getFileFromPath("notLogin.html");
+                        } else if (request.pathInfo().startsWith("/admin/normalAuth")) {
+                            if (!AuthHelper.isNormalAdminLogin(request)) {
+                                response.redirect("/admin/normal_login.html");
+                            }
                         } else if (request.pathInfo().startsWith("/admin/auth")) {
                             if (!AuthHelper.isAdminLogin(request)) {
                                 response.redirect("/admin/login.html");

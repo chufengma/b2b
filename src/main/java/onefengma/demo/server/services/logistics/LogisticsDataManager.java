@@ -11,6 +11,7 @@ import java.util.List;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.logistics.LogisticsPageResponse;
 import onefengma.demo.server.model.logistics.LogisticsNormalBean;
+import onefengma.demo.server.services.funcs.CityDataHelper;
 import org.sql2o.Connection;
 import org.sql2o.logging.SysOutLogger;
 
@@ -35,7 +36,7 @@ public class LogisticsDataManager extends BaseDataHelper {
         }
     }
 
-    public LogisticsPageResponse getLogisticsRequests(PageBuilder pageBuilder) {
+    public LogisticsPageResponse getLogisticsRequests(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(LogisticsNormalBean.class) + " from logistics_request " + pageBuilder.generateWherePlus(true) + " order by pushTime desc " + pageBuilder.generateLimit();
         String countSql = "select count(*) from logistics_request " + pageBuilder.generateWherePlus(true);
         try(Connection conn = getConn()) {
@@ -43,8 +44,32 @@ public class LogisticsDataManager extends BaseDataHelper {
             Integer integer = conn.createQuery(countSql).executeScalar(Integer.class);
             response.maxCount = integer == null ? 0 : integer;
             response.logisticsRequest = conn.createQuery(sql).executeAndFetch(LogisticsNormalBean.class);
+            for(LogisticsNormalBean bean : response.logisticsRequest) {
+                bean.setStartCity(CityDataHelper.instance().getCityDescById(bean.startPoint));
+                bean.setEndCity(CityDataHelper.instance().getCityDescById(bean.endPoint));
+            }
             return response;
         }
     }
 
+    public LogisticsNormalBean getLogisticsById(String id) {
+        String sql = "select " + generateFiledString(LogisticsNormalBean.class) + " from logistics_request where id=:id";
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql).addParameter("id", id).executeAndFetchFirst(LogisticsNormalBean.class);
+        }
+    }
+
+    public void upodateLogisticsStatusById(String id, int status) {
+        String sql = "update logistics_request set status=:status where id=:id";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("id", id).addParameter("status", status).executeUpdate();
+        }
+    }
+
+    public void deleteLogisticsById(String id) {
+        String sql = "delete from logistics_request where id=:id";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("id", id).executeUpdate();
+        }
+    }
 }

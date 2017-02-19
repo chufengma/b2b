@@ -19,7 +19,15 @@ public class AuthHelper {
     public static final String USER_ID = "userId";
 
     public static boolean isAdminLogin(Request request) {
-        return StringUtils.equals(request.cookie("admin"), request.session().attribute("admin"));
+         return (StringUtils.equals(request.cookie("admin"), request.session().attribute("admin"))
+                 && StringUtils.equals(request.cookie("role"), request.session().attribute("role"))
+                 && StringUtils.equals(request.session().attribute("role"), "0"));
+    }
+
+    public static boolean isNormalAdminLogin(Request request) {
+        return (StringUtils.equals(request.cookie("admin"), request.session().attribute("admin"))
+                && StringUtils.equals(request.cookie("role"), request.session().attribute("role"))
+                && Integer.parseInt(request.session().attribute("role")) <= 1);
     }
 
     public static boolean isSalesLogin(Request request) {
