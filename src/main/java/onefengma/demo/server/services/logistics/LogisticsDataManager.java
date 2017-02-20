@@ -36,6 +36,18 @@ public class LogisticsDataManager extends BaseDataHelper {
         }
     }
 
+    public List<LogisticsNormalBean> getNewestLogisticsRequests(int maxCount) throws NoSuchFieldException, IllegalAccessException {
+        String sql = "select " + generateFiledString(LogisticsNormalBean.class) + " from logistics_request order by pushTime desc limit " + maxCount;
+        try(Connection conn = getConn()) {
+            List<LogisticsNormalBean> beans = conn.createQuery(sql).executeAndFetch(LogisticsNormalBean.class);
+            for(LogisticsNormalBean bean : beans) {
+                bean.setStartCity(CityDataHelper.instance().getCityDescById(bean.startPoint));
+                bean.setEndCity(CityDataHelper.instance().getCityDescById(bean.endPoint));
+            }
+            return beans;
+        }
+    }
+
     public LogisticsPageResponse getLogisticsRequests(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(LogisticsNormalBean.class) + " from logistics_request " + pageBuilder.generateWherePlus(true) + " order by pushTime desc " + pageBuilder.generateLimit();
         String countSql = "select count(*) from logistics_request " + pageBuilder.generateWherePlus(true);
@@ -71,5 +83,10 @@ public class LogisticsDataManager extends BaseDataHelper {
         try(Connection conn = getConn()) {
             conn.createQuery(sql).addParameter("id", id).executeUpdate();
         }
+    }
+
+    public static class Good {
+        public String name;
+        public double count;
     }
 }
