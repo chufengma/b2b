@@ -283,10 +283,11 @@ public class AdminDataManager extends BaseDataHelper {
                         buyForAdmin.supplyPrice = detail.supplyPrice;
                         buyForAdmin.totalMoney = buyForAdmin.supplyPrice * buyForAdmin.count;
                     }
-                    buyForAdmin.desc = row.getString("ironType") + " " + row.getString("surface")  + " " + row.getString("material")
-                            + " " + row.getString("height") + "*" + row.getString("width") + "*" + row.getString("length") + " 公差：" + row.getString("tolerance") + " "
+                    buyForAdmin.desc = row.getString("ironType") + "/" + row.getString("surface")  + "/" + row.getString("material") + "/" + row.getString("proPlace")
+                            + " (" + "收货城市：" + CityDataHelper.instance().getCityDescById(row.getString("locationCityId")) + ")"
+                            + " " + row.getString("height") + "*" + row.getString("width") + "*" + row.getString("length") + ", 公差：" + row.getString("tolerance") + " "
                             + row.getString("numbers") + "" + row.getString("unit") + " "
-                            + "收货城市：" + CityDataHelper.instance().getCityDescById(row.getString("locationCityId")) + " " + row.getString("message");
+                            + ", 备注: " + row.getString("message");
                     buyForAdmin.appFlag = row.getInteger("appFlag");
                 } else {
                     HandingBuyOfferDetail detail = HandingDataHelper.getHandingDataHelper().getWinSellerOffer(buyForAdmin.buyId, supplyUserId);

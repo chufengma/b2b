@@ -1,17 +1,5 @@
 package onefengma.demo.rx;
 
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
-import retrofit2.http.*;
-import rx.Observable;
-import rx.functions.Action1;
-
-import java.io.File;
-
-
 /**
  * @author yfchu
  * @date 2016/5/19
