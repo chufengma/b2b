@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import onefengma.demo.common.FileHelper;
+import onefengma.demo.rx.AdminMessageServer;
 import onefengma.demo.rx.MetaDataFetcher;
 import onefengma.demo.rx.UserMessageServer;
 import onefengma.demo.server.config.Config;
@@ -59,6 +60,7 @@ public class Enter {
         });
 
         UserMessageServer.getInstance().start();
+        AdminMessageServer.getInstance().start();
         MetaDataFetcher.startFetch();
     }
 

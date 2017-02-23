@@ -596,6 +596,34 @@ public class AdminManager extends BaseManager {
             AdminDataManager.instance().updateSmallAdmin(requestBean.id, requestBean.userName, requestBean.password, requestBean.desc);
             return success("更新成功");
         }));
+
+        get("logisticsRequests", LogisticsPageRequst.class, ((request1, response1, requestBean1) -> {
+            PageBuilder pageBuilder = new PageBuilder(requestBean1.currentPage, requestBean1.pageCount);
+            if (requestBean1.status != -1) {
+                pageBuilder.addEqualWhere("status", requestBean1.status);
+            }
+            return success(LogisticsDataManager.instance().getLogisticsRequests(pageBuilder));
+        }));
+
+        post("logisticsAction", LogisticsActionRequst.class, ((request, response, requestBean) -> {
+            if (requestBean.status != 1 && requestBean.status != 2) {
+                return error("操作不合法");
+            }
+            LogisticsNormalBean bean = LogisticsDataManager.instance().getLogisticsById(requestBean.id);
+            if (bean.status == 0 && requestBean.status == 2) {
+                return error("该请求还没有处理");
+            }
+            if (bean.status == 2) {
+                return error("该请求已经处理完成");
+            }
+            LogisticsDataManager.instance().upodateLogisticsStatusById(requestBean.id, requestBean.status);
+            return success("处理成功");
+        }));
+
+        post("logisticsDelete", LogisticsDeleteRequst.class, ((request, response, requestBean) -> {
+            LogisticsDataManager.instance().deleteLogisticsById(requestBean.id);
+            return success("删除成功");
+        }));
     }
 
 

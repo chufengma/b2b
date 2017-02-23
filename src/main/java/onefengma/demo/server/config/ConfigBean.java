@@ -12,6 +12,7 @@ public class ConfigBean {
     public static String LOG_FILE_PREFIX = "/root/data/logs-dev/";
     public static int PORT = 80;
     public static int USER_MESSAGE_PORT = 9091;
+    public static int ADMIN_MESSAGE_PORT = 9100;
     public static String MOBILE_PUSH_PREFIX = "PRO_";
 
     public static void configDev() {
@@ -21,6 +22,7 @@ public class ConfigBean {
         LOG_FILE_PREFIX = "/root/data/logs-dev/";
         PORT = 5389;
         USER_MESSAGE_PORT = 9092;
+        ADMIN_MESSAGE_PORT = 9200;
         MOBILE_PUSH_PREFIX = "DEV_";
     }
 
@@ -31,6 +33,7 @@ public class ConfigBean {
         LOG_FILE_PREFIX = "/root/data/logs/";
         PORT = 80;
         USER_MESSAGE_PORT = 9091;
+        ADMIN_MESSAGE_PORT = 9100;
         MOBILE_PUSH_PREFIX = "PRO_";
     }
 

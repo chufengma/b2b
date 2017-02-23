@@ -2,6 +2,7 @@ package onefengma.demo.server.services.logistics;
 
 import com.alibaba.fastjson.JSON;
 import onefengma.demo.common.StringUtils;
+import onefengma.demo.rx.AdminMessageServer;
 import onefengma.demo.server.core.BaseDataHelper;
 
 import java.io.UnsupportedEncodingException;

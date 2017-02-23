@@ -3,6 +3,7 @@ package onefengma.demo.server.services.logistics;
 import com.alibaba.fastjson.JSON;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.VerifyUtils;
+import onefengma.demo.rx.AdminMessageServer;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.model.apibeans.BaseBean;
@@ -44,28 +45,33 @@ public class LogisticsManager extends BaseManager {
             logisticsNormalBean.specCommand = requestBean.sepcCommand;
 
             List<LogisticsDataManager.Good> goods = new ArrayList<LogisticsDataManager.Good>();
+            StringBuilder pushContent = new StringBuilder();
             try {
                 LogisticsDataManager.Good good = new LogisticsDataManager.Good();
                 good.name = requestBean.goods1;
                 good.count = Double.parseDouble(requestBean.goods1Count);
                 goods.add(good);
+                pushContent.append(good.name + " " + good.count + "吨 / ");
                 if (!StringUtils.isEmpty(requestBean.goods2) && !StringUtils.isEmpty(requestBean.goods2Count)) {
                     LogisticsDataManager.Good good2 = new LogisticsDataManager.Good();
                     good2.name = requestBean.goods2;
                     good2.count = Double.parseDouble(requestBean.goods2Count);
                     goods.add(good2);
+                    pushContent.append(good2.name + " " + good2.count + "吨 / ");
                 }
                 if (!StringUtils.isEmpty(requestBean.goods3) && !StringUtils.isEmpty(requestBean.goods3Count)) {
                     LogisticsDataManager.Good good3 = new LogisticsDataManager.Good();
                     good3.name = requestBean.goods3;
                     good3.count = Double.parseDouble(requestBean.goods3Count);
                     goods.add(good3);
+                    pushContent.append(good3.name + " " + good3.count + "吨 / ");
                 }
                 if (!StringUtils.isEmpty(requestBean.goods4) && !StringUtils.isEmpty(requestBean.goods4Count)) {
                     LogisticsDataManager.Good good4 = new LogisticsDataManager.Good();
                     good4.name = requestBean.goods4;
                     good4.count = Double.parseDouble(requestBean.goods4Count);
                     goods.add(good4);
+                    pushContent.append(good4.name + " " + good4.count + "吨 / ");
                 }
             } catch (NumberFormatException e) {
                 return error("请输入合法的数量");
@@ -73,6 +79,8 @@ public class LogisticsManager extends BaseManager {
             logisticsNormalBean.goods = JSON.toJSONString(goods);
             logisticsNormalBean.pushTime = System.currentTimeMillis();
             LogisticsDataManager.instance().insertLogisticsRequest(logisticsNormalBean);
+            String content = "货物：" + pushContent.toString() + "  联系方式：" + logisticsNormalBean.tel + "  " + logisticsNormalBean.specCommand + " " + logisticsNormalBean.comment;
+            AdminMessageServer.getInstance().sendMessageToAll("有新的物流询价", content);
             return success();
         }));
     }
