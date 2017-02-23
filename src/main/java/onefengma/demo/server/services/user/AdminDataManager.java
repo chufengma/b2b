@@ -830,7 +830,7 @@ public class AdminDataManager extends BaseDataHelper {
 
     public AdminSmallAdminResponse getSmallAdminListResponse(PageBuilder pageBuilder) {
         String sql = "select " + generateFiledString(SmallAdmin.class) + " from admin_user where role = 1 " + pageBuilder.generateLimit();
-        String countSql = "select count(*) from admin_user";
+        String countSql = "select count(*) from admin_user where role = 1";
         try(Connection conn = getConn()) {
             AdminSmallAdminResponse response = new AdminSmallAdminResponse();
             response.smallAdmins = conn.createQuery(sql).executeAndFetch(SmallAdmin.class);
@@ -870,7 +870,7 @@ public class AdminDataManager extends BaseDataHelper {
     public SmallAdmin findSmallAdminByName(String name) {
         String sql = "select " + generateFiledString(SmallAdmin.class) + " from admin_user where userName=:name";
         try(Connection conn = getConn()) {
-            return conn.createQuery(sql).addParameter("name", name).executeAndFetch(SmallAdmin.class);
+            return conn.createQuery(sql).addParameter("name", name).executeAndFetchFirst(SmallAdmin.class);
         }
     }
 

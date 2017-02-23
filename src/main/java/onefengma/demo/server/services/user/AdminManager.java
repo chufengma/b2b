@@ -576,6 +576,9 @@ public class AdminManager extends BaseManager {
         }));
 
         post("insertSmallAdmins", AdminInsertSmallAdminRequest.class, ((request, response, requestBean) -> {
+            if (AdminDataManager.instance().findSmallAdminByName(requestBean.userName) != null) {
+                return error("当前用户已存在");
+            }
             if (!StringUtils.isEmpty(requestBean.password)) {
                 requestBean.password = IdUtils.md5(requestBean.password);
             }
@@ -584,6 +587,9 @@ public class AdminManager extends BaseManager {
         }));
 
         post("updateSamllAdmins", AdminUpdateSmallAdminRequest.class, ((request, response, requestBean) -> {
+            if (AdminDataManager.instance().findSmallAdminByName(requestBean.userName) == null) {
+                return error("当前用户不存在");
+            }
             if (!StringUtils.isEmpty(requestBean.password)) {
                 requestBean.password = IdUtils.md5(requestBean.password);
             }
