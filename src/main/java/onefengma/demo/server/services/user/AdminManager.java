@@ -2,6 +2,7 @@ package onefengma.demo.server.services.user;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import onefengma.demo.common.DateHelper;
 import onefengma.demo.common.DateHelper.TimeRange;
@@ -12,19 +13,12 @@ import onefengma.demo.server.core.BaseAdminPageBean;
 import onefengma.demo.server.core.BaseManager;
 import onefengma.demo.server.core.LogUtils;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.core.request.TypedRoute;
 import onefengma.demo.server.model.Admin;
 import onefengma.demo.server.model.SalesMan;
 import onefengma.demo.server.model.User;
 import onefengma.demo.server.model.UserProfile;
-import onefengma.demo.server.model.admin.AdminDetailRequest;
-import onefengma.demo.server.model.admin.AdminIronBuyDetailResponse;
-import onefengma.demo.server.model.admin.AdminOperationRequest;
-import onefengma.demo.server.model.admin.AdminQtRequest;
-import onefengma.demo.server.model.admin.AdminSellersRequest;
-import onefengma.demo.server.model.admin.AdminSellersResponse;
-import onefengma.demo.server.model.admin.AdminUsersRequest;
-import onefengma.demo.server.model.admin.AdminUsersResponse;
-import onefengma.demo.server.model.admin.ChangeAccountRequest;
+import onefengma.demo.server.model.admin.*;
 import onefengma.demo.server.model.apibeans.admin.AdminBuysRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminChangeSalesmanRequest;
 import onefengma.demo.server.model.apibeans.admin.AdminDeleteBuyRequest;
@@ -577,32 +571,24 @@ public class AdminManager extends BaseManager {
             return success("修改成功");
         }));
 
-        get("logisticsRequests", LogisticsPageRequst.class, ((request1, response1, requestBean1) -> {
-            PageBuilder pageBuilder = new PageBuilder(requestBean1.currentPage, requestBean1.pageCount);
-            if (requestBean1.status != -1) {
-                pageBuilder.addEqualWhere("status", requestBean1.status);
-            }
-            return success(LogisticsDataManager.instance().getLogisticsRequests(pageBuilder));
+        get("smallAdmins", BaseAdminPageBean.class, ((request, response, requestBean) -> {
+            return success(AdminDataManager.instance().getSmallAdminListResponse(new PageBuilder(requestBean.currentPage, requestBean.pageCount)));
         }));
 
-        post("logisticsAction", LogisticsActionRequst.class, ((request, response, requestBean) -> {
-            if (requestBean.status != 1 && requestBean.status != 2) {
-                return error("操作不合法");
+        post("insertSmallAdmins", AdminInsertSmallAdminRequest.class, ((request, response, requestBean) -> {
+            if (!StringUtils.isEmpty(requestBean.password)) {
+                requestBean.password = IdUtils.md5(requestBean.password);
             }
-            LogisticsNormalBean bean = LogisticsDataManager.instance().getLogisticsById(requestBean.id);
-            if (bean.status == 0 && requestBean.status == 2) {
-                return error("该请求还没有处理");
-            }
-            if (bean.status == 2) {
-                return error("该请求已经处理完成");
-            }
-            LogisticsDataManager.instance().upodateLogisticsStatusById(requestBean.id, requestBean.status);
-            return success("处理成功");
+            AdminDataManager.instance().addNewSmallAdmin(requestBean.userName, requestBean.password, requestBean.desc);
+            return success("添加成功");
         }));
 
-        post("logisticsDelete", LogisticsDeleteRequst.class, ((request, response, requestBean) -> {
-            LogisticsDataManager.instance().deleteLogisticsById(requestBean.id);
-            return success("删除成功");
+        post("updateSamllAdmins", AdminUpdateSmallAdminRequest.class, ((request, response, requestBean) -> {
+            if (!StringUtils.isEmpty(requestBean.password)) {
+                requestBean.password = IdUtils.md5(requestBean.password);
+            }
+            AdminDataManager.instance().updateSmallAdmin(requestBean.id, requestBean.userName, requestBean.password, requestBean.desc);
+            return success("更新成功");
         }));
     }
 

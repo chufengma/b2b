@@ -8,4 +8,5 @@ public class Admin {
     public String userName;
     public String password;
     public int role = 0;// 0 super, 1 normal
+    public String des;
 }

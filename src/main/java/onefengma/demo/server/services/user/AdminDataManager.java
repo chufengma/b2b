@@ -1,5 +1,6 @@
 package onefengma.demo.server.services.user;
 
+import onefengma.demo.server.model.admin.AdminSmallAdminResponse;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
 
@@ -827,6 +828,52 @@ public class AdminDataManager extends BaseDataHelper {
         }
     }
 
+    public AdminSmallAdminResponse getSmallAdminListResponse(PageBuilder pageBuilder) {
+        String sql = "select " + generateFiledString(SmallAdmin.class) + " from admin_user where role = 1 " + pageBuilder.generateLimit();
+        String countSql = "select count(*) from admin_user";
+        try(Connection conn = getConn()) {
+            AdminSmallAdminResponse response = new AdminSmallAdminResponse();
+            response.smallAdmins = conn.createQuery(sql).executeAndFetch(SmallAdmin.class);
+            Integer count = conn.createQuery(countSql).executeScalar(Integer.class);
+            response.currentPage = pageBuilder.currentPage;
+            response.pageCount = pageBuilder.pageCount;
+            response.maxCount = count == null ? 0 : count;
+            return response;
+        }
+    }
+
+
+    public void updateSmallAdmin(int id, String name, String password, String desc) {
+        UpdateBuilder updateBuilder = new UpdateBuilder();
+        updateBuilder.addStringMap("userName", name);
+        updateBuilder.addStringMap("des", desc);
+        if (!StringUtils.isEmpty(password)) {
+            updateBuilder.addStringMap("password", password);
+        };
+        String sql = "update admin_user set " + updateBuilder.generateSql() + " where id=:id and role!=0";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("id", id).executeUpdate();
+        }
+    }
+
+    public void addNewSmallAdmin(String name, String password, String desc) {
+        String sql = "insert into admin_user set userName=:name, password=:password, des=:des, role=1";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql)
+                    .addParameter("name", name)
+                    .addParameter("password", password)
+                    .addParameter("des", desc)
+                    .executeUpdate();
+        }
+    }
+
+    public SmallAdmin findSmallAdminByName(String name) {
+        String sql = "select " + generateFiledString(SmallAdmin.class) + " from admin_user where userName=:name";
+        try(Connection conn = getConn()) {
+            return conn.createQuery(sql).addParameter("name", name).executeAndFetch(SmallAdmin.class);
+        }
+    }
+
     public static class QtItem {
         public String qtId;
         public int salesmanId;
@@ -877,6 +924,12 @@ public class AdminDataManager extends BaseDataHelper {
         public int userCount;
         public float totalMoney;
         public String password;
+    }
+
+    public static class SmallAdmin {
+        public int id;
+        public String userName;
+        public String des;
     }
 
     public static class BuyForAdmin {
