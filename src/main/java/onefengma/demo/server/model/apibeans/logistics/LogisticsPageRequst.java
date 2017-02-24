@@ -10,5 +10,5 @@ import onefengma.demo.server.model.apibeans.product.BasePageResponse;
  */
 public class LogisticsPageRequst extends BaseNormalAdminPageBean {
     @NotRequired
-    public int status = -1; // 0表示未处理 1表示已处理
+    public int status = -1; //  0 表示未处理 1表示处理中 2表示已处理
 }
