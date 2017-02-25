@@ -35,7 +35,7 @@ public class LogisticsManager extends BaseManager {
                 return error("终点城市选择错误");
             }
             if (!VerifyUtils.isMobile(requestBean.tel)) {
-                return error("请输入合法的电话号码");
+                return error("请输入合法的手机号码");
             }
             LogisticsNormalBean logisticsNormalBean = new LogisticsNormalBean();
             logisticsNormalBean.startPoint = requestBean.startPoint;
@@ -50,12 +50,18 @@ public class LogisticsManager extends BaseManager {
                 LogisticsDataManager.Good good = new LogisticsDataManager.Good();
                 good.name = requestBean.goods1;
                 good.count = Double.parseDouble(requestBean.goods1Count);
+                if (good.count <= 0) {
+                    return error("数量必须大于0");
+                }
                 goods.add(good);
                 pushContent.append(good.name + " " + good.count + "吨");
                 if (!StringUtils.isEmpty(requestBean.goods2) && !StringUtils.isEmpty(requestBean.goods2Count)) {
                     LogisticsDataManager.Good good2 = new LogisticsDataManager.Good();
                     good2.name = requestBean.goods2;
                     good2.count = Double.parseDouble(requestBean.goods2Count);
+                    if (good2.count <= 0) {
+                        return error("数量必须大于0");
+                    }
                     goods.add(good2);
                     pushContent.append(" | " + good2.name + " " + good2.count + "吨");
                 }
@@ -63,6 +69,9 @@ public class LogisticsManager extends BaseManager {
                     LogisticsDataManager.Good good3 = new LogisticsDataManager.Good();
                     good3.name = requestBean.goods3;
                     good3.count = Double.parseDouble(requestBean.goods3Count);
+                    if (good3.count <= 0) {
+                        return error("数量必须大于0");
+                    }
                     goods.add(good3);
                     pushContent.append(" | " + good3.name + " " + good3.count + "吨");
                 }
@@ -70,6 +79,9 @@ public class LogisticsManager extends BaseManager {
                     LogisticsDataManager.Good good4 = new LogisticsDataManager.Good();
                     good4.name = requestBean.goods4;
                     good4.count = Double.parseDouble(requestBean.goods4Count);
+                    if (good4.count <= 0) {
+                        return error("数量必须大于0");
+                    }
                     goods.add(good4);
                     pushContent.append(" | " + good4.name + " " + good4.count + "吨");
                 }
