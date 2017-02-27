@@ -1,14 +1,16 @@
 package onefengma.demo.server.services.logistics;
 
 import com.alibaba.fastjson.JSON;
+import onefengma.demo.common.IdUtils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.VerifyUtils;
 import onefengma.demo.rx.AdminMessageServer;
 import onefengma.demo.server.core.BaseManager;
+import onefengma.demo.server.core.MsgCodeHelper;
 import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.core.ValidateHelper;
 import onefengma.demo.server.model.apibeans.BaseBean;
-import onefengma.demo.server.model.apibeans.logistics.LogisticsPageRequst;
-import onefengma.demo.server.model.apibeans.logistics.LogisticsRequest;
+import onefengma.demo.server.model.apibeans.logistics.*;
 import onefengma.demo.server.model.logistics.LogisticsNormalBean;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 
@@ -103,6 +105,35 @@ public class LogisticsManager extends BaseManager {
             AdminMessageServer.getInstance().sendMessageToAll("有新的物流询价", content);
             return success();
         }));
+
+        post("driverRegister", LogisticsDriverRegisterRequest.class, ((request, response, requestBean) -> {
+            if (!ValidateHelper.isPasswordRight(requestBean.password)) {
+                return error("密码长度为 6~16");
+            }
+            if (!VerifyUtils.isMobile(requestBean.mobile)) {
+                return error("手机号码输入不正确");
+            }
+            if (!MsgCodeHelper.isMsgCodeRight(request, requestBean.code, requestBean.mobile)) {
+                return error("短信验证码不正确");
+            }
+            if (DriverDataManager.instance().getDriverDescByMobile(requestBean.mobile) != null) {
+                return error("用户已存在");
+            }
+            DriverDataManager.instance().insertDriver(requestBean.mobile, IdUtils.md5(requestBean.password));
+            return success();
+        }));
+
+        post("driverLogin", LogisticsDriverLoginRequest.class, ((request, response, requestBean) -> {
+            DriverDataManager.LogisticsDriver driver = DriverDataManager.instance().getDriverDescByMobile(requestBean.mobile);
+            if(driver == null) {
+                return error("用户不存在");
+            }
+            if (!StringUtils.equals(IdUtils.md5(requestBean.password), driver.password)) {
+                return error("密码不正确");
+            }
+            return success(driver);
+        }));
+
     }
 
     @Override
