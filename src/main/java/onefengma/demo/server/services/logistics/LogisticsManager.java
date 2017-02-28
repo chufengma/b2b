@@ -120,7 +120,25 @@ public class LogisticsManager extends BaseManager {
                 return error("用户已存在");
             }
             DriverDataManager.instance().insertDriver(requestBean.mobile, IdUtils.md5(requestBean.password));
-            return success();
+            DriverDataManager.LogisticsDriver driver = DriverDataManager.instance().getDriverDescByMobile(requestBean.mobile);
+            driver.password = "";
+            return success(driver);
+        }));
+
+        post("driverChangePassword", LogisticsDriverRegisterRequest.class, ((request, response, requestBean) -> {
+            DriverDataManager.LogisticsDriver driver = DriverDataManager.instance().getDriverDescByMobile(requestBean.mobile);
+            if(driver == null) {
+                return error("用户不存在");
+            }
+            if (!ValidateHelper.isPasswordRight(requestBean.password)) {
+                return error("密码长度为 6~16");
+            }
+            if (!MsgCodeHelper.isMsgCodeRight(request, requestBean.code, requestBean.mobile)) {
+                return error("短信验证码不正确");
+            }
+            DriverDataManager.instance().changePasswordDriver(requestBean.mobile, IdUtils.md5(requestBean.password));
+            driver.password = "";
+            return success(driver);
         }));
 
         post("driverLogin", LogisticsDriverLoginRequest.class, ((request, response, requestBean) -> {
@@ -131,9 +149,9 @@ public class LogisticsManager extends BaseManager {
             if (!StringUtils.equals(IdUtils.md5(requestBean.password), driver.password)) {
                 return error("密码不正确");
             }
+            driver.password = "";
             return success(driver);
         }));
-
     }
 
     @Override

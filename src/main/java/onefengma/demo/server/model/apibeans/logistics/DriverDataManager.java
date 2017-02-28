@@ -28,6 +28,15 @@ public class DriverDataManager extends DataManager {
         }
     }
 
+    public void changePasswordDriver(String mobile, String password) {
+        String sql = "update logistics_driver set password=:password where mobile=:mobile";
+        try (Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("mobile", mobile)
+                    .addParameter("password", password)
+                    .executeUpdate();
+        }
+    }
+
     public LogisticsDriver getDriverDesc(String id) {
         String sql = "select " + generateFiledString(LogisticsDriver.class) + " from logistics_driver where id=:id";
         try(Connection conn = getConn()) {

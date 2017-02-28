@@ -110,44 +110,44 @@ public class DataManager extends BaseDataHelper {
     }
 
     public void changeProductOrdersMockData() {
-        String deleteAllData = "delete from product_orders_mock";
+//        String deleteAllData = "delete from product_orders_mock";
         String fetchAllSellerNameSql = "select userId,companyName,cantactTel from seller where isMock=0 and companyName <> '' and cantactTel <> ''";
         String fetchIronProductSql = "select proId,price from iron_product limit 0,1000";
 
         String fetchOrdersSql = "select id from product_orders";
-        String productOrdersSql = "insert into " +
-                "product_orders_mock(`id`,  `buyerId`,  `sellerId`,  `productId`,  `productType`, `count`,  `salesmanId`,  `sellTime`,  `timeLimit`,  `status`,  `ironCount`,  `ironPrice`,  `singleScore`, `totalMoney`,  `deleteBy`,  `cancelBy`,  `finishTime`, `message`, `productPrice`)" +
-                "select `id`,  :buyerId,  :sellerId,  :productId,  0,  :count,  :salesmanId,  `sellTime`,  `timeLimit`,  `status`,  `ironCount`,  `ironPrice`,  `singleScore`, :totalMoney,  `deleteBy`,  `cancelBy`,  `finishTime`, `message`, `productPrice`" +
-                "from product_orders where id=:id";
+//        String productOrdersSql = "insert into " +
+//                "product_orders_mock(`id`,  `buyerId`,  `sellerId`,  `productId`,  `productType`, `count`,  `salesmanId`,  `sellTime`,  `timeLimit`,  `status`,  `ironCount`,  `ironPrice`,  `singleScore`, `totalMoney`,  `deleteBy`,  `cancelBy`,  `finishTime`, `message`, `productPrice`)" +
+//                "select `id`,  :buyerId,  :sellerId,  :productId,  0,  :count,  :salesmanId,  `sellTime`,  `timeLimit`,  `status`,  `ironCount`,  `ironPrice`,  `singleScore`, :totalMoney,  `deleteBy`,  `cancelBy`,  `finishTime`, `message`, `productPrice`" +
+//                "from product_orders where id=:id";
 
         List<CompanyBriefInfo> companyBriefInfos = getCompanyInfos();
         List<IronProductInfo> ironProductInfos;
         List<String> ordersIdList;
         try (Connection conn = getConn()) {
-            conn.createQuery(deleteAllData).executeUpdate();
+//            conn.createQuery(deleteAllData).executeUpdate();
 
             ordersIdList = conn.createQuery(fetchOrdersSql).executeAndFetch(String.class);
             ironProductInfos = conn.createQuery(fetchIronProductSql).executeAndFetch(IronProductInfo.class);
-            Random random = new Random(10086);
+//            Random random = new Random(10086);
 
-            for (String id : ordersIdList) {
-                int index = 0;
-                int indexAnother = 0;
-                while (index == indexAnother) {
-                    index = random.nextInt(companyBriefInfos.size());
-                    indexAnother = random.nextInt(companyBriefInfos.size());
-                }
-                IronProductInfo ironProductInfo = ironProductInfos.get(new Random().nextInt(ironProductInfos.size()));
-                float count = (float) (new Random().nextInt(187)) + (new Random().nextBoolean() ? 0.5f : 0f);
-                conn.createQuery(productOrdersSql)
-                        .addParameter("buyerId", companyBriefInfos.get(index).userId)
-                        .addParameter("productId", ironProductInfo.proId)
-                        .addParameter("salesmanId", new Random().nextInt(12) + 4)
-                        .addParameter("count", count)
-                        .addParameter("totalMoney", NumberUtils.round(count * ironProductInfo.price, 2))
-                        .addParameter("id", id)
-                        .addParameter("sellerId", companyBriefInfos.get(indexAnother).userId).executeUpdate();
-            }
+//            for (String id : ordersIdList) {
+//                int index = 0;
+//                int indexAnother = 0;
+//                while (index == indexAnother) {
+//                    index = random.nextInt(companyBriefInfos.size());
+//                    indexAnother = random.nextInt(companyBriefInfos.size());
+//                }
+//                IronProductInfo ironProductInfo = ironProductInfos.get(new Random().nextInt(ironProductInfos.size()));
+//                float count = (float) (new Random().nextInt(187)) + (new Random().nextBoolean() ? 0.5f : 0f);
+//                conn.createQuery(productOrdersSql)
+//                        .addParameter("buyerId", companyBriefInfos.get(index).userId)
+//                        .addParameter("productId", ironProductInfo.proId)
+//                        .addParameter("salesmanId", new Random().nextInt(12) + 4)
+//                        .addParameter("count", count)
+//                        .addParameter("totalMoney", NumberUtils.round(count * ironProductInfo.price, 2))
+//                        .addParameter("id", id)
+//                        .addParameter("sellerId", companyBriefInfos.get(indexAnother).userId).executeUpdate();
+//            }
         }
 
 
@@ -195,8 +195,6 @@ public class DataManager extends BaseDataHelper {
                                     .addParameter("finishTime", thisCalendar.getTimeInMillis() + new Random().nextInt(1000 * 60 * 55) + 1000 * 60 * 5)
                                     .addParameter("sellTime", thisCalendar.getTimeInMillis())
                                     .addParameter("sellerId", companyBriefInfos.get(indexAnother).userId).executeUpdate();
-
-                            System.out.println("------------" + proId + "," + thisCalendar.getTimeInMillis());
                         }
                     }
                 }
