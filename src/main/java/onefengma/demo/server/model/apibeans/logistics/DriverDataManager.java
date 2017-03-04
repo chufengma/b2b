@@ -51,6 +51,13 @@ public class DriverDataManager extends DataManager {
         }
     }
 
+    public void fillCompanyName(String id, String companyName) {
+        String sql = "update logistics_driver set companyName=:companyName where id=:id";
+        try(Connection conn = getConn()) {
+            conn.createQuery(sql).addParameter("companyName", companyName).addParameter("id", "id").executeUpdate();
+        }
+    }
+
     public static class LogisticsDriver {
         public String id;
         public String mobile;

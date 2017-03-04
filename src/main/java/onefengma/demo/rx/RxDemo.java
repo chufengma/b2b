@@ -1,5 +1,14 @@
 package onefengma.demo.rx;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author yfchu
  * @date 2016/5/19
@@ -8,6 +17,20 @@ package onefengma.demo.rx;
 public class RxDemo {
 
     public static void main(String[] args) {
+
+        Map<String, List<String>> data = new HashMap<>();
+
+        data.put("test", Arrays.asList("sss", "sdfsdf", "asdfasdf"));
+        data.put("test2", Arrays.asList("sss1", "sdfsdf1", "asdfasdf1"));
+        data.put("test3", Arrays.asList("sss3", "sdfsdf2", "asdfasdf2"));
+        data.put("test4", Arrays.asList("sss4", "sdfsdf3", "asdfasdf3"));
+
+        String jsonData = JSON.toJSONString(data);
+        JSONObject jsonObject = JSONObject.parseObject(jsonData);
+        Map<String, Object> map = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<Map<String, Object>>() {});
+
+        System.out.println(map.size());
+
 //        Retrofit retrofit = new Retrofit.Builder()
 //                .baseUrl("http://localhost:9090")
 //                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())

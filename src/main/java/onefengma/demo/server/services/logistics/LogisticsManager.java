@@ -152,6 +152,30 @@ public class LogisticsManager extends BaseManager {
             driver.password = "";
             return success(driver);
         }));
+
+        post("driverChangePassword", LogisticsDriverCompanyNameRequest.class, ((request, response, requestBean) -> {
+            DriverDataManager.LogisticsDriver driver = DriverDataManager.instance().getDriverDesc(requestBean.id);
+            if (driver == null) {
+                return error("用户不存在");
+            }
+            if (!StringUtils.isEmpty(driver.companyName)) {
+                return error("公司名已存在");
+            }
+            DriverDataManager.instance().fillCompanyName(requestBean.id, requestBean.companyName);
+            return success();
+        }));
+
+        post("driverChangePassword", LogisticsDriverCompanyNameRequest.class, ((request, response, requestBean) -> {
+            DriverDataManager.LogisticsDriver driver = DriverDataManager.instance().getDriverDesc(requestBean.id);
+            if (driver == null) {
+                return error("用户不存在");
+            }
+            if (!StringUtils.isEmpty(driver.companyName)) {
+                return error("公司名已存在");
+            }
+            DriverDataManager.instance().fillCompanyName(requestBean.id, requestBean.companyName);
+            return success();
+        }));
     }
 
     @Override
