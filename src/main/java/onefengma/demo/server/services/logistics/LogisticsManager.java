@@ -153,7 +153,7 @@ public class LogisticsManager extends BaseManager {
             return success(driver);
         }));
 
-        post("driverChangePassword", LogisticsDriverCompanyNameRequest.class, ((request, response, requestBean) -> {
+        post("driverFillCompany", LogisticsDriverCompanyNameRequest.class, ((request, response, requestBean) -> {
             DriverDataManager.LogisticsDriver driver = DriverDataManager.instance().getDriverDesc(requestBean.id);
             if (driver == null) {
                 return error("用户不存在");
@@ -162,18 +162,11 @@ public class LogisticsManager extends BaseManager {
                 return error("公司名已存在");
             }
             DriverDataManager.instance().fillCompanyName(requestBean.id, requestBean.companyName);
-            return success();
+            driver.companyName = requestBean.companyName;
+            return success(driver);
         }));
 
-        post("driverChangePassword", LogisticsDriverCompanyNameRequest.class, ((request, response, requestBean) -> {
-            DriverDataManager.LogisticsDriver driver = DriverDataManager.instance().getDriverDesc(requestBean.id);
-            if (driver == null) {
-                return error("用户不存在");
-            }
-            if (!StringUtils.isEmpty(driver.companyName)) {
-                return error("公司名已存在");
-            }
-            DriverDataManager.instance().fillCompanyName(requestBean.id, requestBean.companyName);
+        post("driverFillCertificates", LogisticsDriverCertificatesRequest.class, ((request, response, requestBean) -> {
             return success();
         }));
     }
