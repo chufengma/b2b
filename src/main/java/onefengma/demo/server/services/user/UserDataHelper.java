@@ -132,6 +132,15 @@ public class UserDataHelper extends BaseDataHelper {
         }
     }
 
+    public long getRegisterTime(String userId) {
+        String sql = "select registerTime from user where userId=:userId";
+        try(Connection conn = getConn()) {
+            Long registerTime = conn.createQuery(sql).addParameter("userId", userId).executeScalar(Long.class);
+            return registerTime == null ? 0l : registerTime;
+        }
+    }
+
+
     public int getSalesManId(String userId) {
         String sql = "select salesManId from user where userId=:userId";
         try(Connection conn = getConn()) {

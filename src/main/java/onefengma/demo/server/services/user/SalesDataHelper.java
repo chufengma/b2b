@@ -42,6 +42,13 @@ public class SalesDataHelper extends BaseDataHelper {
         }
     }
 
+    public SalesManDetail getSalesManById(String id) {
+        String sql = "select * from salesman where id=:id";
+        try (Connection conn = getConn()) {
+            return conn.createQuery(sql).addParameter("id", id).executeAndFetchFirst(SalesManDetail.class);
+        }
+    }
+
     public UserInfo getUserInfo(String userId) {
         String sql = "select " + generateFiledString(UserInfo.class) + " from user where userId=:userId";
         try (Connection conn = getConn()) {

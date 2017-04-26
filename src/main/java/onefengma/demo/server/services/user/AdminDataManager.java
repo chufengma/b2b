@@ -1,6 +1,6 @@
 package onefengma.demo.server.services.user;
 
-import onefengma.demo.server.model.User;
+import onefengma.demo.server.model.*;
 import onefengma.demo.server.model.admin.AdminSmallAdminResponse;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
@@ -14,9 +14,6 @@ import onefengma.demo.common.StringUtils;
 import onefengma.demo.server.core.BaseDataHelper;
 import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.core.UpdateBuilder;
-import onefengma.demo.server.model.Admin;
-import onefengma.demo.server.model.SalesMan;
-import onefengma.demo.server.model.Seller;
 import onefengma.demo.server.model.admin.AdminQtResponse;
 import onefengma.demo.server.model.admin.AdminSellersResponse;
 import onefengma.demo.server.model.admin.AdminUsersResponse;
@@ -147,7 +144,7 @@ public class AdminDataManager extends BaseDataHelper {
                 "contact as contactName,productCount,score, 1 as mobile, 1 as registerTime, " +
                 "0 as sellerTotalMoney ,1 as salesMobile,1 as salesId  " +
                 "from seller " +
-                " and applyTime<:registerEndTime and applyTime>=:registerStartTime " + companySql +
+                " where applyTime<:registerEndTime and applyTime>=:registerStartTime " + companySql +
                 (StringUtils.isEmpty(pageBuilder.generateWhere()) ? "" : " and " + whereSql) +
                 " order by applyTime desc " + pageBuilder.generateLimit();
 
@@ -169,10 +166,14 @@ public class AdminDataManager extends BaseDataHelper {
 //                    Float buyerMoney = conn.createQuery(buyerSql).addParameter("buyerId", sellerBrief.userId)
 //                            .addParameter("dataStartTime", dataStartTime)
 //                            .addParameter("dataEndTime", dateEndTime).executeScalar(Float.class);
-                    SalesMan salesMan = SalesDataHelper.instance().get
-                    SalesDataHelper.UserInfo userInfo = SalesDataHelper.instance().getUserInfo(sellerBrief.userId);
-                    SalesMan salesMan = SalesDataHelper.instance().getSalesMan();
+                    SalesMan salesMan = UserDataHelper.instance().getSalesMan(sellerBrief.userId);
+                    if (salesMan != null) {
+                        sellerBrief.salesId = salesMan.id;
+                        sellerBrief.salesMobile = salesMan.tel;
+                    }
+                    sellerBrief.registerTime = UserDataHelper.instance().getRegisterTime(sellerBrief.userId);
                     sellerBrief.buyerTotalMoney = 0;
+                    sellerBrief.mobile = UserDataHelper.instance().getUserMobile(sellerBrief.userId);
                 }
             }
 
