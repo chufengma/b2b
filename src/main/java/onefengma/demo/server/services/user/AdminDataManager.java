@@ -1,5 +1,6 @@
 package onefengma.demo.server.services.user;
 
+import onefengma.demo.server.model.User;
 import onefengma.demo.server.model.admin.AdminSmallAdminResponse;
 import org.sql2o.Connection;
 import org.sql2o.data.Row;
@@ -109,16 +110,16 @@ public class AdminDataManager extends BaseDataHelper {
     public AdminUsersResponse getBuyer(PageBuilder pageBuilder) {
         String whereSql = pageBuilder.generateWhere();
         String maxCountSql = "select count(*) from user left join salesman on salesman.id=salesManId " + ((StringUtils.isEmpty(whereSql)) ? "" : " where " + whereSql);
-        String userSalesMoneySql = "select userId,integral, mobile,registerTime, sum(money)  as buyMoney , tel as salesTel, salesmanId as salesId " +
-                "from (select userId,integral, mobile,registerTime,salesmanId,tel from user left join salesman on salesmanId=salesman.id) as userComplete " +
-                " left join seller_transactions on (userId=buyerId and finishTime <=:endTime and finishTime>:startTime ) "
+
+        String userSalesMoneySql = "select userId,integral, mobile,registerTime, 0 as buyMoney, tel as salesTel, salesmanId as salesId from user left join salesman on user.salesmanId=salesman.id "
                 + (StringUtils.isEmpty(pageBuilder.generateWhere()) ? "" : " where " + whereSql)
-                + " group by userId  order by buyMoney desc,registerTime desc" + pageBuilder.generateLimit();
+                + " order by buyMoney desc,registerTime desc" + pageBuilder.generateLimit();
+
         try (Connection conn = getConn()) {
             AdminUsersResponse usersResponse = new AdminUsersResponse();
             usersResponse.buyers = conn.createQuery(userSalesMoneySql)
-                    .addParameter("startTime", pageBuilder.startTime)
-                    .addParameter("endTime", pageBuilder.endTime)
+//                    .addParameter("startTime", pageBuilder.startTime)
+//                    .addParameter("endTime", pageBuilder.endTime)
                     .executeAndFetch(BuyerBrief.class);
             if (usersResponse.buyers != null) {
                 for(BuyerBrief buyerBrief : usersResponse.buyers) {
@@ -142,42 +143,36 @@ public class AdminDataManager extends BaseDataHelper {
                 + " and applyTime<:registerEndTime and applyTime>=:registerStartTime " + companySql
                 + ((StringUtils.isEmpty(whereSql)) ? "" : " and " + whereSql);
 
-        String sellerSql = "select userId,integral,companyName, " +
-                " applyTime as becomeSellerTime, " +
-                " contact as contactName,productCount,score, mobile,registerTime,  " +
-                " sum(money)  as  sellerTotalMoney , " +
-                " tel as salesMobile,salesId  " +
-                " from (select * from (select  companyName, " +
-                "        seller.integral as integral, user.userId, passTime,contact, productCount,score,mobile,registerTime,applyTime, " +
-                "        user.salesManId as salesId " +
-                "        from seller,user where user.userId=seller.userId) as userTmp left join salesman on salesman.id = userTmp.salesId) " +
-                " as userComplete " +
-                " left join seller_transactions " +
-                " on (userId=sellerId and finishTime>=:dataStartTime and finishTime<:dataEndTime) " +
-                " where applyTime<:registerEndTime and applyTime>=:registerStartTime " + companySql +
+        String sellerSql = "select seller.userId,seller.integral,companyName, applyTime as becomeSellerTime, " +
+                "contact as contactName,productCount,score, 1 as mobile, 1 as registerTime, " +
+                "0 as sellerTotalMoney ,1 as salesMobile,1 as salesId  " +
+                "from seller " +
+                " and applyTime<:registerEndTime and applyTime>=:registerStartTime " + companySql +
                 (StringUtils.isEmpty(pageBuilder.generateWhere()) ? "" : " and " + whereSql) +
-                " group by userId " +
-                " order by sellerTotalMoney desc, applyTime desc " + pageBuilder.generateLimit();
+                " order by applyTime desc " + pageBuilder.generateLimit();
 
-        String buyerSql = "select sum(money) from seller_transactions where buyerId=:buyerId and finishTime>=:dataStartTime and finishTime<:dataEndTime ";
+//        String buyerSql = "select sum(money) from seller_transactions where buyerId=:buyerId and finishTime>=:dataStartTime and finishTime<:dataEndTime ";
 
         AdminSellersResponse adminSellersResponse = new AdminSellersResponse();
         adminSellersResponse.pageCount = pageBuilder.pageCount;
         adminSellersResponse.currentPage = pageBuilder.currentPage;
         try(Connection conn = getConn()) {
             adminSellersResponse.sellers = conn.createQuery(sellerSql)
-                    .addParameter("dataStartTime", dataStartTime)
-                    .addParameter("dataEndTime", dateEndTime)
+//                    .addParameter("dataStartTime", dataStartTime)
+//                    .addParameter("dataEndTime", dateEndTime)
                     .addParameter("registerStartTime", pageBuilder.startTime)
                     .addParameter("registerEndTime", pageBuilder.endTime)
                     .executeAndFetch(SellerBrief.class);
 
             if (adminSellersResponse.sellers != null) {
                 for(SellerBrief sellerBrief : adminSellersResponse.sellers) {
-                    Float buyerMoney = conn.createQuery(buyerSql).addParameter("buyerId", sellerBrief.userId)
-                            .addParameter("dataStartTime", dataStartTime)
-                            .addParameter("dataEndTime", dateEndTime).executeScalar(Float.class);
-                    sellerBrief.buyerTotalMoney = buyerMoney == null ? 0 : buyerMoney;
+//                    Float buyerMoney = conn.createQuery(buyerSql).addParameter("buyerId", sellerBrief.userId)
+//                            .addParameter("dataStartTime", dataStartTime)
+//                            .addParameter("dataEndTime", dateEndTime).executeScalar(Float.class);
+                    SalesMan salesMan = SalesDataHelper.instance().get
+                    SalesDataHelper.UserInfo userInfo = SalesDataHelper.instance().getUserInfo(sellerBrief.userId);
+                    SalesMan salesMan = SalesDataHelper.instance().getSalesMan();
+                    sellerBrief.buyerTotalMoney = 0;
                 }
             }
 
