@@ -160,7 +160,7 @@ public class AdminManager extends BaseManager {
                             .addEqualWhere("mobile", requestBean.userMobile)
                             .addEqualWhere("tel", requestBean.salesMobile)
                             .setTime(requestBean.becomeSellerTimeStart, requestBean.becomeSellerTimeEnd)
-                            , dateStartTime, dateEndTime, isBuyerStart, requestBean.companyName);
+                            , dateStartTime, dateEndTime, isBuyerStart, requestBean.companyName, !StringUtils.isEmpty(requestBean.userMobile) || !StringUtils.isEmpty(requestBean.salesMobile));
 
             return success(adminSellersResponse);
         }));

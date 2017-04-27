@@ -131,7 +131,7 @@ public class AdminDataManager extends BaseDataHelper {
         }
     }
 
-    public AdminSellersResponse getSellers(PageBuilder pageBuilder, long dataStartTime, long dateEndTime, boolean timeByBuy, String companyName) {
+    public AdminSellersResponse getSellers(PageBuilder pageBuilder, long dataStartTime, long dateEndTime, boolean timeByBuy, String companyName, boolean hasMobile) {
         String whereSql = pageBuilder.generateWhere();
 
         String companySql = StringUtils.isEmpty(companyName) ? "" :  "and companyName like '%" + companyName +"%' ";
@@ -140,13 +140,24 @@ public class AdminDataManager extends BaseDataHelper {
                 + " and applyTime<:registerEndTime and applyTime>=:registerStartTime " + companySql
                 + ((StringUtils.isEmpty(whereSql)) ? "" : " and " + whereSql);
 
-        String sellerSql = "select seller.userId,seller.integral,companyName, applyTime as becomeSellerTime, " +
-                "contact as contactName,productCount,score, 1 as mobile, 1 as registerTime, " +
-                "0 as sellerTotalMoney ,1 as salesMobile,1 as salesId  " +
-                "from seller " +
-                " where applyTime<:registerEndTime and applyTime>=:registerStartTime " + companySql +
-                (StringUtils.isEmpty(pageBuilder.generateWhere()) ? "" : " and " + whereSql) +
-                " order by applyTime desc " + pageBuilder.generateLimit();
+        String sellerSql = "";
+        if (hasMobile) {
+            sellerSql = "select seller.userId,seller.integral,companyName, applyTime as becomeSellerTime,contact as contactName,productCount,score, mobile, registerTime, " +
+                    "0 as sellerTotalMoney ,tel as salesMobile,salesId " +
+                    "from seller left join (select mobile,userId,tel,registerTime,salesman.id as salesId  from user left join salesman on user.salesManId=salesman.id) as u on " +
+                    "u.userId=seller.userId " +
+                    " where applyTime<:registerEndTime and applyTime>=:registerStartTime " + companySql +
+                    (StringUtils.isEmpty(pageBuilder.generateWhere()) ? "" : " and " + whereSql) +
+                    " order by applyTime desc " + pageBuilder.generateLimit();
+        } else {
+            sellerSql = "select seller.userId,seller.integral,companyName, applyTime as becomeSellerTime, " +
+                    "contact as contactName,productCount,score, 1 as mobile, 1 as registerTime, " +
+                    "0 as sellerTotalMoney ,1 as salesMobile,1 as salesId  " +
+                    "from seller " +
+                    " where applyTime<:registerEndTime and applyTime>=:registerStartTime " + companySql +
+                    (StringUtils.isEmpty(pageBuilder.generateWhere()) ? "" : " and " + whereSql) +
+                    " order by applyTime desc " + pageBuilder.generateLimit();
+        }
 
 //        String buyerSql = "select sum(money) from seller_transactions where buyerId=:buyerId and finishTime>=:dataStartTime and finishTime<:dataEndTime ";
 
@@ -166,14 +177,16 @@ public class AdminDataManager extends BaseDataHelper {
 //                    Float buyerMoney = conn.createQuery(buyerSql).addParameter("buyerId", sellerBrief.userId)
 //                            .addParameter("dataStartTime", dataStartTime)
 //                            .addParameter("dataEndTime", dateEndTime).executeScalar(Float.class);
-                    SalesMan salesMan = UserDataHelper.instance().getSalesMan(sellerBrief.userId);
-                    if (salesMan != null) {
-                        sellerBrief.salesId = salesMan.id;
-                        sellerBrief.salesMobile = salesMan.tel;
+                    if (!hasMobile) {
+                        SalesMan salesMan = UserDataHelper.instance().getSalesMan(sellerBrief.userId);
+                        if (salesMan != null) {
+                            sellerBrief.salesId = salesMan.id;
+                            sellerBrief.salesMobile = salesMan.tel;
+                        }
+                        sellerBrief.registerTime = UserDataHelper.instance().getRegisterTime(sellerBrief.userId);
+                        sellerBrief.buyerTotalMoney = 0;
+                        sellerBrief.mobile = UserDataHelper.instance().getUserMobile(sellerBrief.userId);
                     }
-                    sellerBrief.registerTime = UserDataHelper.instance().getRegisterTime(sellerBrief.userId);
-                    sellerBrief.buyerTotalMoney = 0;
-                    sellerBrief.mobile = UserDataHelper.instance().getUserMobile(sellerBrief.userId);
                 }
             }
 
