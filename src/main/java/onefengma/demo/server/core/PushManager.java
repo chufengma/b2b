@@ -63,7 +63,7 @@ public class PushManager {
 //        ThreadUtils.instance().post(() -> {
 //            String messagePayload = content;
 //            Message.IOSBuilder build = new Message.IOSBuilder()
-//                    .description(basePushData.desc)
+//                    .description(basePushData.des)
 //                    .soundURL("default")    // 消息铃声
 //                    .badge(basePushData.bageCount)
 //                    .extra("type", basePushData.type)

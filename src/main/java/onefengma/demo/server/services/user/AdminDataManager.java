@@ -110,7 +110,7 @@ public class AdminDataManager extends BaseDataHelper {
 
         String userSalesMoneySql = "select userId,integral, mobile,registerTime, 0 as buyMoney, tel as salesTel, salesmanId as salesId from user left join salesman on user.salesmanId=salesman.id "
                 + (StringUtils.isEmpty(pageBuilder.generateWhere()) ? "" : " where " + whereSql)
-                + " order by buyMoney desc,registerTime desc" + pageBuilder.generateLimit();
+                + " order by buyMoney des,registerTime des" + pageBuilder.generateLimit();
 
         try (Connection conn = getConn()) {
             AdminUsersResponse usersResponse = new AdminUsersResponse();
@@ -148,7 +148,7 @@ public class AdminDataManager extends BaseDataHelper {
                     "u.userId=seller.userId " +
                     " where applyTime<:registerEndTime and applyTime>=:registerStartTime " + companySql +
                     (StringUtils.isEmpty(pageBuilder.generateWhere()) ? "" : " and " + whereSql) +
-                    " order by applyTime desc " + pageBuilder.generateLimit();
+                    " order by applyTime des " + pageBuilder.generateLimit();
         } else {
             sellerSql = "select seller.userId,seller.integral,companyName, applyTime as becomeSellerTime, " +
                     "contact as contactName,productCount,score, 1 as mobile, 1 as registerTime, " +
@@ -156,7 +156,7 @@ public class AdminDataManager extends BaseDataHelper {
                     "from seller " +
                     " where applyTime<:registerEndTime and applyTime>=:registerStartTime " + companySql +
                     (StringUtils.isEmpty(pageBuilder.generateWhere()) ? "" : " and " + whereSql) +
-                    " order by applyTime desc " + pageBuilder.generateLimit();
+                    " order by applyTime des " + pageBuilder.generateLimit();
         }
 
 //        String buyerSql = "select sum(money) from seller_transactions where buyerId=:buyerId and finishTime>=:dataStartTime and finishTime<:dataEndTime ";
@@ -202,7 +202,7 @@ public class AdminDataManager extends BaseDataHelper {
 
 
     public AdminOrdersResponse getOrdersForAdmin(PageBuilder pageBuilder) {
-        String sql = "select * from product_orders_mock where status<>4  " + (pageBuilder.hasWhere() ? " and " : " ") + pageBuilder.generateWhere() + " order by sellTime desc " + pageBuilder.generateLimit();
+        String sql = "select * from product_orders_mock where status<>4  " + (pageBuilder.hasWhere() ? " and " : " ") + pageBuilder.generateWhere() + " order by sellTime des " + pageBuilder.generateLimit();
         String countSql = "select count(*) from product_orders_mock where status<>4   " + (pageBuilder.hasWhere() ? " and " : " ") + pageBuilder.generateWhere();
 
         AdminOrdersResponse adminOrdersResponse = new AdminOrdersResponse();
@@ -269,7 +269,7 @@ public class AdminDataManager extends BaseDataHelper {
         } else {
             tableName = "handing_buy";
         }
-        String sql = "select * from " + tableName + " " + (pageBuilder.hasWhere() ? " where " : " ") + pageBuilder.generateWhere() + "  order by pushTime desc " + pageBuilder.generateLimit();
+        String sql = "select * from " + tableName + " " + (pageBuilder.hasWhere() ? " where " : " ") + pageBuilder.generateWhere() + "  order by pushTime des " + pageBuilder.generateLimit();
         String countSql = "select count(*) from  " + tableName + " " + (pageBuilder.hasWhere() ? " where " : " ") + pageBuilder.generateWhere();
 
         AdminBuysResponse adminBuysResponse = new AdminBuysResponse();
@@ -392,7 +392,7 @@ public class AdminDataManager extends BaseDataHelper {
     }
 
     public AdminSellerVerifyResponse getSellerVerify(PageBuilder pageBuilder) {
-        String sql = "select * from seller where passed=false and isMock=0 order by applyTime desc " + pageBuilder.generateLimit();
+        String sql = "select * from seller where passed=false and isMock=0 order by applyTime des " + pageBuilder.generateLimit();
         String countSql = "select count(*) from seller where passed=false  and isMock=0 ";
         AdminSellerVerifyResponse adminSellerVerifyResponse = new AdminSellerVerifyResponse();
         adminSellerVerifyResponse.currentPage = pageBuilder.currentPage;
@@ -463,7 +463,7 @@ public class AdminDataManager extends BaseDataHelper {
     }
 
     public AdminIronVerifyResponse getIronVerify(PageBuilder pageBuilder) {
-        String sql = "select * from iron_product where reviewed=false order by pushTime desc " + pageBuilder.generateLimit();
+        String sql = "select * from iron_product where reviewed=false order by pushTime des " + pageBuilder.generateLimit();
         String countSql = "select count(*) from iron_product where reviewed=false ";
         AdminIronVerifyResponse adminIronVerifyResponse = new AdminIronVerifyResponse();
         adminIronVerifyResponse.currentPage = pageBuilder.currentPage;
@@ -523,7 +523,7 @@ public class AdminDataManager extends BaseDataHelper {
     }
 
     public AdminHandingVerifyResponse getHandingVerify(PageBuilder pageBuilder) {
-        String sql = "select * from handing_product where reviewed=false order by pushTime desc " + pageBuilder.generateLimit();
+        String sql = "select * from handing_product where reviewed=false order by pushTime des " + pageBuilder.generateLimit();
         String countSql = "select count(*) from handing_product where reviewed=false ";
         AdminHandingVerifyResponse adminHandingVerifyResponse = new AdminHandingVerifyResponse();
         adminHandingVerifyResponse.currentPage = pageBuilder.currentPage;
@@ -786,8 +786,8 @@ public class AdminDataManager extends BaseDataHelper {
     public AdminQtResponse getQtListResponse(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         String where = StringUtils.isEmpty(pageBuilder.generateWherePlus(true)) ? " where " : pageBuilder.generateWherePlus(true) + " and ";
 
-        String sql = "select " + generateFiledStringExclude(QtItem.class, "userMobile", "sellerMobile", "sellerCompany", "desc", "buyFinishTime", "buyTotalMoney") + " from iron_buy_qt_mock " + where
-                + " pushTime<:endTime and pushTime>=:startTime order by pushTime desc " + pageBuilder.generateLimit() ;
+        String sql = "select " + generateFiledStringExclude(QtItem.class, "userMobile", "sellerMobile", "sellerCompany", "des", "buyFinishTime", "buyTotalMoney") + " from iron_buy_qt_mock " + where
+                + " pushTime<:endTime and pushTime>=:startTime order by pushTime des " + pageBuilder.generateLimit() ;
 
         String countSql = "select count(*) from iron_buy_qt_mock " + where
                 + " pushTime<:endTime and pushTime>=:startTime ";

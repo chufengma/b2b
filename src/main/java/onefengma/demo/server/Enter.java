@@ -17,6 +17,7 @@ import onefengma.demo.server.services.order.SellerManager;
 import onefengma.demo.server.services.products.HandingManager;
 import onefengma.demo.server.services.products.IronManager;
 import onefengma.demo.server.services.products.ProductManager;
+import onefengma.demo.server.services.specoffers.SpecOfferManager;
 import onefengma.demo.server.services.user.AdminManager;
 import onefengma.demo.server.services.user.SalesManager;
 import onefengma.demo.server.services.user.UserManager;
@@ -38,7 +39,8 @@ public class Enter {
             new AdminManager(),
             new SellerManager(),
             new SalesManager(),
-            new LogisticsManager()
+            new LogisticsManager(),
+            new SpecOfferManager()
     );
 
     public static void main(String[] args) {

@@ -57,6 +57,7 @@ public abstract class BaseDataHelper {
         valueBuilder.deleteCharAt(valueBuilder.length() - 1);
         valueBuilder.append(")");
         sqlBuilder.append(valueBuilder);
+        System.out.println("----" + sqlBuilder.toString());
         return sqlBuilder.toString();
     }
 

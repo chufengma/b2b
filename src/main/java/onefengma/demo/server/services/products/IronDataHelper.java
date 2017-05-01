@@ -319,7 +319,7 @@ public class IronDataHelper extends BaseDataHelper {
     }
 
     public List<IronProductBrief> getIronProductRecommend() throws NoSuchFieldException, IllegalAccessException {
-        String sql = "select " + generateFiledString(IronProductBrief.class) + " from iron_product order by monthSellCount desc limit 0, 6";
+        String sql = "select " + generateFiledString(IronProductBrief.class) + " from iron_product order by monthSellCount des limit 0, 6";
         try (Connection conn = getConn()) {
             List<IronProductBrief> ironProductBriefs = conn.createQuery(sql).executeAndFetch(IronProductBrief.class);
             for (IronProductBrief ironProductBrief : ironProductBriefs) {
@@ -330,7 +330,7 @@ public class IronDataHelper extends BaseDataHelper {
     }
 
     public List<IronRecommend> getIronBuyRecommend() throws NoSuchFieldException, IllegalAccessException {
-        String sql = "select * from iron_buy order by pushTime desc limit 0,10";
+        String sql = "select * from iron_buy order by pushTime des limit 0,10";
         try (Connection conn = getConn()) {
             List<IronRecommend> ironRecommends = new ArrayList<>();
             List<Row> rows = conn.createQuery(sql).executeAndFetchTable().rows();
@@ -597,10 +597,10 @@ public class IronDataHelper extends BaseDataHelper {
         String sql = "";
         if (status == 6 || status == 3 || status == 4) {
             sql = "select " + fileds + " from iron_buy,iron_buy_supply " +
-                    "where iron_buy_supply.ironId = iron_buy.id and sellerId=:sellerId " + statusStr + "  order by pushTime desc  " + pageBuilder.generateLimit();
+                    "where iron_buy_supply.ironId = iron_buy.id and sellerId=:sellerId " + statusStr + "  order by pushTime des  " + pageBuilder.generateLimit();
         } else {
             sql = "select " + fileds + " from iron_buy,iron_buy_seller " +
-                    "where iron_buy_seller.ironId = iron_buy.id and sellerId=:sellerId " + statusStr + "  order by pushTime desc  " + pageBuilder.generateLimit();
+                    "where iron_buy_seller.ironId = iron_buy.id and sellerId=:sellerId " + statusStr + "  order by pushTime des  " + pageBuilder.generateLimit();
         }
 
         String supplyCountSql = "select count(*) from iron_buy_supply where ironId=:ironId";
@@ -798,7 +798,7 @@ public class IronDataHelper extends BaseDataHelper {
 
     public List<IronProduct> getMyIronProduct(PageBuilder pageBuilder, String userId) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select " + generateFiledString(IronProduct.class) + " " +
-                "from iron_product where userId=:userId and reviewed=true and deleteStatus=0 order by pushTime desc " + pageBuilder.generateLimit();
+                "from iron_product where userId=:userId and reviewed=true and deleteStatus=0 order by pushTime des " + pageBuilder.generateLimit();
         try (Connection conn = getConn()) {
             List<IronProduct> ironProducts = conn.createQuery(sql)
                     .addParameter("userId", userId).executeAndFetch(IronProduct.class);

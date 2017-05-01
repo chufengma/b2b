@@ -126,7 +126,7 @@ public class OrderDataHelper extends BaseDataHelper {
 
     public MyOrdersResponse getMyOrders(PageBuilder pageBuilder, String userId) throws NoSuchFieldException, IllegalAccessException {
         MyOrdersResponse myOrdersResponse = new MyOrdersResponse(pageBuilder.currentPage, pageBuilder.pageCount);
-        String dataSql = "select * from product_orders where buyerId=:userId and status <> 4 order by sellTime desc " + pageBuilder.generateLimit();
+        String dataSql = "select * from product_orders where buyerId=:userId and status <> 4 order by sellTime des " + pageBuilder.generateLimit();
         String waitForConfirmSql = "select count(*) from product_orders where buyerId=:userId and status = 0";
         String waitForVoteSql = "select count(*) from product_orders where buyerId=:userId and status = 1";
         String countSql = "select count(*) from product_orders where buyerId=:userId and status <> 4 order by status asc ";
@@ -267,7 +267,7 @@ public class OrderDataHelper extends BaseDataHelper {
     public List<OrderDynamic> getOrdersDynamic() {
         String sql = "select product_orders_mock.id,iron_product.proId,iron_product.proId as ironId,ironType,material,mobile,finishTime,count,price  " +
                 "from product_orders_mock, iron_product, user where productType=0 and iron_product.proId = productId and status in (1,2) and buyerId=user.userId " +
-                "order by finishTime desc limit 0,10";
+                "order by finishTime des limit 0,10";
         try(Connection conn = getConn()) {
             return conn.createQuery(sql).executeAndFetch(OrderDynamic.class);
         }
@@ -413,7 +413,7 @@ public class OrderDataHelper extends BaseDataHelper {
 
     public MyCommingOrdersResponse getCommingOrders(PageBuilder pageBuilder, String userId) throws NoSuchFieldException, IllegalAccessException {
         MyCommingOrdersResponse myOrdersResponse = new MyCommingOrdersResponse(pageBuilder.currentPage, pageBuilder.pageCount);
-        String dataSql = "select * from product_orders where sellerId=:userId and status <> 4 order by sellTime desc " + pageBuilder.generateLimit();
+        String dataSql = "select * from product_orders where sellerId=:userId and status <> 4 order by sellTime des " + pageBuilder.generateLimit();
         String waitForConfirmSql = "select count(*) from product_orders where sellerId=:userId and status = 0";
         String countSql = "select count(*) from product_orders where sellerId=:userId and status <> 4 order by status asc ";
         try(Connection conn = getConn()) {

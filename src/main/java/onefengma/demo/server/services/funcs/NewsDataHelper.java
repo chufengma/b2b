@@ -29,14 +29,14 @@ public class NewsDataHelper extends BaseDataHelper {
     }
 
     public List<InnerNewsBrief> getIndexInnerNews() {
-        String sql = "select " + generateFiledString(InnerNewsBrief.class) + " from inner_news order by pushTime desc limit 0,10 ";
+        String sql = "select " + generateFiledString(InnerNewsBrief.class) + " from inner_news order by pushTime des limit 0,10 ";
         try (Connection connection = getConn()) {
             return connection.createQuery(sql).executeAndFetch(InnerNewsBrief.class);
         }
     }
 
     public InnerNewsResponse getInnerNews(PageBuilder pageBuilder) {
-        String sql = "select " + generateFiledString(InnerNewsBrief.class) + " from inner_news order by pushTime desc " + pageBuilder.generateLimit();
+        String sql = "select " + generateFiledString(InnerNewsBrief.class) + " from inner_news order by pushTime des " + pageBuilder.generateLimit();
         String countSql = "select count(*) from inner_news";
         InnerNewsResponse newsResponse = new InnerNewsResponse(pageBuilder.currentPage, pageBuilder.pageCount);
         try (Connection connection = getConn()) {
@@ -82,14 +82,14 @@ public class NewsDataHelper extends BaseDataHelper {
     }
 
     public List<NewsBrief> getIndexNews() {
-        String sql = "select " + generateFiledString(NewsBrief.class) + " from news order by pushTime desc limit 0,10 ";
+        String sql = "select " + generateFiledString(NewsBrief.class) + " from news order by pushTime des limit 0,10 ";
         try (Connection connection = getConn()) {
             return connection.createQuery(sql).executeAndFetch(NewsBrief.class);
         }
     }
 
     public NewsResponse getNews(PageBuilder pageBuilder) {
-        String sql = "select " + generateFiledString(NewsBrief.class) + " from news order by pushTime desc " + pageBuilder.generateLimit();
+        String sql = "select " + generateFiledString(NewsBrief.class) + " from news order by pushTime des " + pageBuilder.generateLimit();
         String countSql = "select count(*) from news";
         NewsResponse newsResponse = new NewsResponse(pageBuilder.currentPage, pageBuilder.pageCount);
         try (Connection connection = getConn()) {
@@ -136,7 +136,7 @@ public class NewsDataHelper extends BaseDataHelper {
 
 
     public List<TheySay> getTheySay() {
-        String sql = "select " + generateFiledString(TheySay.class) + " from they_say order by pushTime desc limit 0,10 ";
+        String sql = "select " + generateFiledString(TheySay.class) + " from they_say order by pushTime des limit 0,10 ";
         try (Connection connection = getConn()) {
             return connection.createQuery(sql).executeAndFetch(TheySay.class);
         }

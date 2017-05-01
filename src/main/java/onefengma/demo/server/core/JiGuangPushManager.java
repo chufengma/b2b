@@ -22,7 +22,7 @@ public class JiGuangPushManager {
 
     public static void pushIosMessage(BasePushData basePushData) {
         if (StringUtils.isEmpty(basePushData.title) || StringUtils.isEmpty(basePushData.desc)) {
-            LogUtils.saveToFiles("title or desc null: " + basePushData.title + ", " + basePushData.desc , true);
+            LogUtils.saveToFiles("title or des null: " + basePushData.title + ", " + basePushData.desc , true);
             return;
         }
         PushPayload payload = PushPayload.newBuilder()

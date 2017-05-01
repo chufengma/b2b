@@ -251,7 +251,7 @@ public class HandingDataHelper extends BaseDataHelper {
         String sql = "select " + generateFiledString(HandingDetail.class) +
                 " from handing_product " +
                 "left join (select productId, sum(count) as monthSellCount from product_orders where productType=1 and  finishTime<:endTime and finishTime>=:startTime) as orders " +
-                " on orders.productId = handing_product.id and handing_product.id=:id order by monthSellCount desc limit 0, 6";
+                " on orders.productId = handing_product.id and handing_product.id=:id order by monthSellCount des limit 0, 6";
         try(Connection conn = getConn()) {
             List<HandingProductBrief> briefs =  conn.createQuery(sql).executeAndFetch(HandingProductBrief.class);
             for(HandingProductBrief brief : briefs) {
@@ -367,7 +367,7 @@ public class HandingDataHelper extends BaseDataHelper {
 
     public SellerHandingBuysResponse getSellerHandingBuys(PageBuilder pageBuilder, String sellerId) throws NoSuchFieldException, IllegalAccessException {
         String sql = "select handing_buy.id as id, handingType, souCityId, message, userId, pushTime, timeLimit, status, supplyUserId, supplyWinTime" +
-                " from handing_buy,handing_buy_seller where handing_buy_seller.handingId = handing_buy.id and sellerId=:sellerId and status<>2 order by pushTime desc " + pageBuilder.generateLimit();
+                " from handing_buy,handing_buy_seller where handing_buy_seller.handingId = handing_buy.id and sellerId=:sellerId and status<>2 order by pushTime des " + pageBuilder.generateLimit();
 
         String supplyCountSql = "select count(*) from handing_buy_supply where handingId=:ironId";
 
@@ -490,7 +490,7 @@ public class HandingDataHelper extends BaseDataHelper {
     }
 
     public List<HandingProduct> getMyHandingProduct(PageBuilder pageBuilder, String userId) throws NoSuchFieldException, IllegalAccessException {
-        String sql = "select " + generateFiledString(HandingProduct.class) + " from handing_product where userId=:userId and reviewed=true order by pushTime desc " + pageBuilder.generateLimit();
+        String sql = "select " + generateFiledString(HandingProduct.class) + " from handing_product where userId=:userId and reviewed=true order by pushTime des " + pageBuilder.generateLimit();
         try (Connection conn = getConn()) {
             List<HandingProduct> handingProducts = conn.createQuery(sql)
                     .addParameter("userId", userId).executeAndFetch(HandingProduct.class);
