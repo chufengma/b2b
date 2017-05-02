@@ -35,7 +35,7 @@ public class SpecOfferDataHelper extends BaseDataHelper {
         try (Connection conn = getConn()) {
             SpecOfferFetchResponse specOfferFetchResponse = new SpecOfferFetchResponse(pageBuilder.currentPage, pageBuilder.pageCount);
             String where = pageBuilder.generateWhere();
-            specOfferFetchResponse.specOffers = conn.createQuery("select * from special_offers" + (StringUtils.isEmpty(where) ? " " : " where " + where) + " " + pageBuilder.generateLimit()).executeAndFetch(SpecOffer.class);
+            specOfferFetchResponse.specOffers = conn.createQuery("select * from special_offers" + (StringUtils.isEmpty(where) ? " " : " where " + where) + " order by pushTime desc " + pageBuilder.generateLimit()).executeAndFetch(SpecOffer.class);
             Integer integer = conn.createQuery("select count(*) from special_offers " + (StringUtils.isEmpty(where) ? " " : " where " + where)).executeScalar(Integer.class);
             specOfferFetchResponse.maxCount = integer == null ? 0 : integer;
             return specOfferFetchResponse;
@@ -54,12 +54,32 @@ public class SpecOfferDataHelper extends BaseDataHelper {
         }
     }
 
-//    public void updateSpecOffer(SpecOffer specOffer) {
-//        try(Connection conn = getConn()) {
-//            String sql = "insert into special_offers " +
-//                    "( offerId,type,material,surface,proPlace,spec,tolerance,price,unit,title,des,cover,pic1,pic2,pic3,pic4,pic5,tel,hostName,hostTel,province,city,cityDesc,priceDesc1,priceDesc2,count,pushTime,updateTime,status) " +
-//                    "values (  :offerId, :type, :material, :surface, :proPlace, :spec, :tolerance, :price, :unit, :title, :des, :cover, :pic1, :pic2, :pic3, :pic4, :pic5, :tel, :hostName, :hostTel, :province, :city, :cityDesc, :priceDesc1, :priceDesc2, :count, :pushTime, :updateTime, :status)"
-//            conn.createQuery("update special_offers set status=1 where offerId=:offerId").addParameter("offerId", specOffer.offerId).executeUpdate();
-//        }
-//    }
+    public void updateSpecOffer(SpecOffer specOffer) {
+        try(Connection conn = getConn()) {
+            String sql = "update special_offers " +
+                    "set spec=:spec, tolerance=:tolerance,price=:price,unit=:unit," +
+                    "title=:title,des=:des,tel=:tel,hostName=:hostName,hostTel=:hostTel," +
+                    "province=:province,city=:city,cityDesc=:cityDesc,priceDesc1=:priceDesc1,priceDesc2=:priceDesc2," +
+                    "count=:count,updateTime=:updateTime where offerId=:offerId ";
+            conn.createQuery(sql).addParameter("offerId", specOffer.offerId)
+                    .addParameter("spec", specOffer.spec)
+                    .addParameter("tolerance", specOffer.tolerance)
+                    .addParameter("price", specOffer.price)
+                    .addParameter("unit", specOffer.unit)
+                    .addParameter("title", specOffer.title)
+                    .addParameter("des", specOffer.des)
+                    .addParameter("tel", specOffer.tel)
+                    .addParameter("hostName", specOffer.hostName)
+                    .addParameter("hostTel", specOffer.hostTel)
+                    .addParameter("province", specOffer.province)
+                    .addParameter("city", specOffer.city)
+                    .addParameter("cityDesc", specOffer.cityDesc)
+                    .addParameter("priceDesc1", specOffer.priceDesc1)
+                    .addParameter("priceDesc2", specOffer.priceDesc2)
+                    .addParameter("count", specOffer.count)
+                    .addParameter("updateTime", specOffer.updateTime)
+                    .addParameter("offerId", specOffer.offerId)
+                    .executeUpdate();
+        }
+    }
 }
