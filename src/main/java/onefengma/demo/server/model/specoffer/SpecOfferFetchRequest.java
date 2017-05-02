@@ -20,4 +20,6 @@ public class SpecOfferFetchRequest extends BasePageBean {
     public String surface;
     @NotRequired
     public String proPlace;
+    @NotRequired
+    public int status = 0;
 }

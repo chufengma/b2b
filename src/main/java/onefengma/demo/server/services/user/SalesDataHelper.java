@@ -59,7 +59,7 @@ public class SalesDataHelper extends BaseDataHelper {
     public SalesManUserResponse getBindUserResponse(String salesId, PageBuilder pageBuilder) {
         String userSql = "select " + generateFiledString(UserInfo.class) + " from user where userId not in (select userId from seller) and salesManId=:salesId and user.isMock = 0 "
                 + pageBuilder.generateWherePlus(false)
-                + " order by salesBindTime des " + pageBuilder.generateLimit();
+                + " order by salesBindTime desc " + pageBuilder.generateLimit();
 
         String countSql = "select count(*) from user where  userId not in (select userId from seller) and salesManId=:salesId  and isMock = 0 "
                 + pageBuilder.generateWherePlus(false);
@@ -78,7 +78,7 @@ public class SalesDataHelper extends BaseDataHelper {
         String userSql = "select " + generateFiledString(SellerInfo.class) + " from seller,user where user.userId=seller.userId " +
                 " and user.salesManId=:salesId and user.isMock = 0 "
                 + pageBuilder.generateWherePlus(false)
-                + " order by salesBindTime des " + pageBuilder.generateLimit();
+                + " order by salesBindTime desc " + pageBuilder.generateLimit();
 
         String countSql = "select count(*) from seller,user where user.userId=seller.userId and user.salesManId=:salesId  and user.isMock = 0 "
                 + pageBuilder.generateWherePlus(false);
@@ -162,8 +162,8 @@ public class SalesDataHelper extends BaseDataHelper {
     // need_merge
     public SalesIronBuysResponse getSalesIronBuy(String salesId, PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
         long startTime = System.currentTimeMillis();
-        String sql = "select " + generateFiledStringExclude(IronBuyBrief.class) + " from iron_buy,(select userId as userIdTmp from user where salesManId=:salesId and isMock=0) as userIds where (userIds.userIdTmp=iron_buy.userId) " + pageBuilder.generateWherePlus(false) + " order by pushTime des " + pageBuilder.generateLimit();
-        String countSql = "select count(*) from iron_buy,(select userId as userIdTmp from user where salesManId=:salesId and isMock=0) as userIds where (userIds.userIdTmp=iron_buy.userId) " + pageBuilder.generateWherePlus(false) + " order by pushTime des ";
+        String sql = "select " + generateFiledStringExclude(IronBuyBrief.class) + " from iron_buy,(select userId as userIdTmp from user where salesManId=:salesId and isMock=0) as userIds where (userIds.userIdTmp=iron_buy.userId) " + pageBuilder.generateWherePlus(false) + " order by pushTime desc " + pageBuilder.generateLimit();
+        String countSql = "select count(*) from iron_buy,(select userId as userIdTmp from user where salesManId=:salesId and isMock=0) as userIds where (userIds.userIdTmp=iron_buy.userId) " + pageBuilder.generateWherePlus(false) + " order by pushTime desc ";
         String supplyCountSql = "select count(*) from iron_buy_supply where ironId=:ironId";
 
         try(Connection conn = getConn()) {

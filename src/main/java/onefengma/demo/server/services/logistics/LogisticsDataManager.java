@@ -38,7 +38,7 @@ public class LogisticsDataManager extends BaseDataHelper {
     }
 
     public List<LogisticsNormalBean> getNewestLogisticsRequests(int maxCount) throws NoSuchFieldException, IllegalAccessException {
-        String sql = "select " + generateFiledString(LogisticsNormalBean.class) + " from logistics_request order by pushTime des limit " + maxCount;
+        String sql = "select " + generateFiledString(LogisticsNormalBean.class) + " from logistics_request order by pushTime desc limit " + maxCount;
         try(Connection conn = getConn()) {
             List<LogisticsNormalBean> beans = conn.createQuery(sql).executeAndFetch(LogisticsNormalBean.class);
             for(LogisticsNormalBean bean : beans) {
@@ -50,7 +50,7 @@ public class LogisticsDataManager extends BaseDataHelper {
     }
 
     public LogisticsPageResponse getLogisticsRequests(PageBuilder pageBuilder) throws NoSuchFieldException, IllegalAccessException {
-        String sql = "select " + generateFiledString(LogisticsNormalBean.class) + " from logistics_request " + pageBuilder.generateWherePlus(true) + " order by pushTime des " + pageBuilder.generateLimit();
+        String sql = "select " + generateFiledString(LogisticsNormalBean.class) + " from logistics_request " + pageBuilder.generateWherePlus(true) + " order by pushTime desc " + pageBuilder.generateLimit();
         String countSql = "select count(*) from logistics_request " + pageBuilder.generateWherePlus(true);
         try(Connection conn = getConn()) {
             LogisticsPageResponse response = new LogisticsPageResponse(pageBuilder.currentPage, pageBuilder.pageCount);

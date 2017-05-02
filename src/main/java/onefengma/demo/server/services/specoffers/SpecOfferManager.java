@@ -97,6 +97,12 @@ public class SpecOfferManager extends BaseManager {
             if (!StringUtils.isEmpty(requestBean.key)) {
                 pageBuilder.addLikeWhere("title", requestBean.key);
             }
+            if (!StringUtils.isEmpty(requestBean.key)) {
+                pageBuilder.addLikeWhere("title", requestBean.key);
+            }
+            if (requestBean.status != -1) {
+                pageBuilder.addEqualWhere("status", requestBean.status);
+            }
             return success(SpecOfferDataHelper.getHelper().fetchSpecOffers(pageBuilder));
         }));
 

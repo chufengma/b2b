@@ -28,7 +28,7 @@ public class RecruitDataManager extends BaseDataHelper {
     }
 
     public List<IndexRecruit> getIndexRecruits() {
-        String sql = "select * from recruit order by pushTime des limit 0,10 ";
+        String sql = "select * from recruit order by pushTime desc limit 0,10 ";
         try(Connection connection = getConn()) {
             List<Row> rows = connection.createQuery(sql).executeAndFetchTable().rows();
             List<IndexRecruit> recruits = new ArrayList<>();
@@ -44,7 +44,7 @@ public class RecruitDataManager extends BaseDataHelper {
     }
 
     public RecruitResponse getRecruitBriefs(PageBuilder pageBuilder) {
-        String sql = "select " + generateFiledString(RecruitBrief.class) + " from recruit order by pushTime des " + pageBuilder.generateLimit();
+        String sql = "select " + generateFiledString(RecruitBrief.class) + " from recruit order by pushTime desc " + pageBuilder.generateLimit();
         String countSql = "select count(*) from recruit";
         RecruitResponse recruitResponse = new RecruitResponse(pageBuilder.currentPage, pageBuilder.pageCount);
         try(Connection connection = getConn()) {

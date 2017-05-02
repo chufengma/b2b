@@ -33,7 +33,7 @@ public class PageBuilder {
 
         public OrderBy(String name, boolean desc) {
             this.name = name;
-            this.order = ((desc) ? "des" : "asc");
+            this.order = ((desc) ? "desc" : "asc");
         }
 
         public String generate() {

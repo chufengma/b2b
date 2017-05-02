@@ -71,7 +71,7 @@ public class InnerMessageDataHelper extends BaseDataHelper {
     }
 
     public List<InnerMessageBrief> getInnerMessages(PageBuilder pageBuilder, String userId) {
-        String sql = "select " + generateFiledString(InnerMessageBrief.class) + " from inner_message where userId=:userId  order by pushTime des " + pageBuilder.generateLimit();
+        String sql = "select " + generateFiledString(InnerMessageBrief.class) + " from inner_message where userId=:userId  order by pushTime desc " + pageBuilder.generateLimit();
         try(Connection conn = getConn()) {
             return conn.createQuery(sql).addParameter("userId", userId).executeAndFetch(InnerMessageBrief.class);
         }
