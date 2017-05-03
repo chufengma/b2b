@@ -384,6 +384,10 @@ public abstract class BaseManager {
                             if (!AuthHelper.isNormalAdminLogin(request)) {
                                 response.redirect("/admin/normal_login.html");
                             }
+                        } else if (request.pathInfo().startsWith("/admin/specOfferAuth")) {
+                            if (!AuthHelper.isSpecOfferAdminLogin(request)) {
+                                response.redirect("/admin/spec_offer_login.html");
+                            }
                         } else if (request.pathInfo().startsWith("/admin/auth")) {
                             if (!AuthHelper.isAdminLogin(request)) {
                                 response.redirect("/admin/login.html");

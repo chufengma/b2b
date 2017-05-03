@@ -12,4 +12,6 @@ public class AdminUpdateSmallAdminRequest extends AdminAuthSession {
     @NotRequired
     public String password;
     public String desc;
+    @NotRequired
+    public int role = 1;
 }

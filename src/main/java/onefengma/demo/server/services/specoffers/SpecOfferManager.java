@@ -200,7 +200,7 @@ public class SpecOfferManager extends BaseManager {
                 specOffer.updateTime = System.currentTimeMillis() + "";
                 SpecOfferDataHelper.getHelper().updateSpecOffer(specOffer);
             }
-            return success();
+            return success(specOffer);
         }));
 
     }

@@ -838,8 +838,8 @@ public class AdminDataManager extends BaseDataHelper {
     }
 
     public AdminSmallAdminResponse getSmallAdminListResponse(PageBuilder pageBuilder) {
-        String sql = "select " + generateFiledString(SmallAdmin.class) + " from admin_user where role = 1 " + pageBuilder.generateLimit();
-        String countSql = "select count(*) from admin_user where role = 1";
+        String sql = "select " + generateFiledString(SmallAdmin.class) + " from admin_user where " + pageBuilder.generateWhere() + " " + pageBuilder.generateLimit();
+        String countSql = "select count(*) from admin_user where " + pageBuilder.generateWhere() + " ";
         try(Connection conn = getConn()) {
             AdminSmallAdminResponse response = new AdminSmallAdminResponse();
             response.smallAdmins = conn.createQuery(sql).executeAndFetch(SmallAdmin.class);
@@ -852,26 +852,27 @@ public class AdminDataManager extends BaseDataHelper {
     }
 
 
-    public void updateSmallAdmin(int id, String name, String password, String desc) {
+    public void updateSmallAdmin(int id, String name, String password, String desc, String role) {
         UpdateBuilder updateBuilder = new UpdateBuilder();
         updateBuilder.addStringMap("userName", name);
         updateBuilder.addStringMap("des", desc);
         if (!StringUtils.isEmpty(password)) {
             updateBuilder.addStringMap("password", password);
         };
-        String sql = "update admin_user set " + updateBuilder.generateSql() + " where id=:id and role!=0";
+        String sql = "update admin_user set " + updateBuilder.generateSql() + " where id=:id and role=:role";
         try(Connection conn = getConn()) {
-            conn.createQuery(sql).addParameter("id", id).executeUpdate();
+            conn.createQuery(sql).addParameter("id", id).addParameter("role", role).executeUpdate();
         }
     }
 
-    public void addNewSmallAdmin(String name, String password, String desc) {
-        String sql = "insert into admin_user set userName=:name, password=:password, des=:des, role=1";
+    public void addNewSmallAdmin(String name, String password, String desc, String role) {
+        String sql = "insert into admin_user set userName=:name, password=:password, des=:des, role=:role";
         try(Connection conn = getConn()) {
             conn.createQuery(sql)
                     .addParameter("name", name)
                     .addParameter("password", password)
                     .addParameter("des", desc)
+                    .addParameter("role", role)
                     .executeUpdate();
         }
     }

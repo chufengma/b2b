@@ -10,4 +10,6 @@ public class AdminInsertSmallAdminRequest extends AdminAuthSession {
     public String userName;
     public String password;
     public String desc;
+    @NotRequired
+    public int role = 1;
 }

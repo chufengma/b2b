@@ -9,10 +9,7 @@ import onefengma.demo.common.DateHelper.TimeRange;
 import onefengma.demo.common.IdUtils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.VerifyUtils;
-import onefengma.demo.server.core.BaseAdminPageBean;
-import onefengma.demo.server.core.BaseManager;
-import onefengma.demo.server.core.LogUtils;
-import onefengma.demo.server.core.PageBuilder;
+import onefengma.demo.server.core.*;
 import onefengma.demo.server.core.request.TypedRoute;
 import onefengma.demo.server.model.Admin;
 import onefengma.demo.server.model.SalesMan;
@@ -571,18 +568,24 @@ public class AdminManager extends BaseManager {
             return success("修改成功");
         }));
 
-        get("smallAdmins", BaseAdminPageBean.class, ((request, response, requestBean) -> {
-            return success(AdminDataManager.instance().getSmallAdminListResponse(new PageBuilder(requestBean.currentPage, requestBean.pageCount)));
+        get("smallAdmins", SmallAdminPageBean.class, ((request, response, requestBean) -> {
+            if (requestBean.role == 0) {
+                return error("权限错误");
+            }
+            return success(AdminDataManager.instance().getSmallAdminListResponse(new PageBuilder(requestBean.currentPage, requestBean.pageCount).addEqualWhere("role", requestBean.role + "")));
         }));
 
         post("insertSmallAdmins", AdminInsertSmallAdminRequest.class, ((request, response, requestBean) -> {
+            if (requestBean.role == 0) {
+                return error("权限错误");
+            }
             if (AdminDataManager.instance().findSmallAdminByName(requestBean.userName) != null) {
                 return error("当前用户已存在");
             }
             if (!StringUtils.isEmpty(requestBean.password)) {
                 requestBean.password = IdUtils.md5(requestBean.password);
             }
-            AdminDataManager.instance().addNewSmallAdmin(requestBean.userName, requestBean.password, requestBean.desc);
+            AdminDataManager.instance().addNewSmallAdmin(requestBean.userName, requestBean.password, requestBean.desc, requestBean.role + "");
             return success("添加成功");
         }));
 
@@ -593,7 +596,7 @@ public class AdminManager extends BaseManager {
             if (!StringUtils.isEmpty(requestBean.password)) {
                 requestBean.password = IdUtils.md5(requestBean.password);
             }
-            AdminDataManager.instance().updateSmallAdmin(requestBean.id, requestBean.userName, requestBean.password, requestBean.desc);
+            AdminDataManager.instance().updateSmallAdmin(requestBean.id, requestBean.userName, requestBean.password, requestBean.desc, requestBean.role + "");
             return success("更新成功");
         }));
 
