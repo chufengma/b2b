@@ -14,7 +14,6 @@ public class SpecOfferRequest extends BaseBean {
     public String surface;
     public String proPlace;
     public String spec;
-    public String tolerance;
     public String price;
     public String unit;
     public String title;
@@ -28,6 +27,8 @@ public class SpecOfferRequest extends BaseBean {
     public String priceDesc2;
     public String count;
 
+    @NotRequired
+    public String tolerance;
     @NotRequired
     public String cityDesc;
     @NotRequired

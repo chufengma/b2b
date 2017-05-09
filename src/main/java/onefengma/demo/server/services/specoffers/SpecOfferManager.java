@@ -35,10 +35,10 @@ public class SpecOfferManager extends BaseManager {
             if (!IconDataCategory.get().surfaces.contains(requestBean.surface)) {
                 return errorAndClear(requestBean, "表面填写有误");
             }
-            if (!VerifyUtils.isPhone(requestBean.tel) && !VerifyUtils.isMobile(requestBean.tel)) {
+            if (!VerifyUtils.isPhone(requestBean.tel) && !VerifyUtils.isLoMobile(requestBean.tel)) {
                 return errorAndClear(requestBean, "请填写正确的电话号码");
             }
-            if (!VerifyUtils.isPhone(requestBean.hostTel) && !VerifyUtils.isMobile(requestBean.hostTel)) {
+            if (!VerifyUtils.isPhone(requestBean.hostTel) && !VerifyUtils.isLoMobile(requestBean.hostTel)) {
                 return errorAndClear(requestBean, "请填写正确的电话号码");
             }
             if (requestBean.pic1 != null) {

@@ -53,4 +53,14 @@ public class VerifyUtils {
         b = m.matches();
         return b;
     }
+
+    public static boolean isLoMobile(String str) {
+        Pattern p = null;
+        Matcher m = null;
+        boolean b = false;
+        p = Pattern.compile("/^0\\d{2,3}-?\\d{7,8}$/");
+        m = p.matcher(str);
+        b = m.matches();
+        return b;
+    }
 }
