@@ -155,7 +155,7 @@ public class SpecOfferManager extends BaseManager {
                 specOffer.title = requestBean.title;
             }
             if (!StringUtils.isEmpty(requestBean.tel) && !StringUtils.equals(requestBean.tel, specOffer.tel)) {
-                if (!VerifyUtils.isPhone(requestBean.tel) && !VerifyUtils.isMobile(requestBean.tel)) {
+                if (!VerifyUtils.isPhone(requestBean.tel) && !VerifyUtils.isLoMobile(requestBean.tel)) {
                     return errorAndClear(requestBean, "请填写正确的电话号码");
                 }
                 changed = true;
@@ -166,7 +166,7 @@ public class SpecOfferManager extends BaseManager {
                 specOffer.hostName = requestBean.hostName;
             }
             if (!StringUtils.isEmpty(requestBean.hostTel) && !StringUtils.equals(requestBean.hostTel, specOffer.hostTel)) {
-                if (!VerifyUtils.isPhone(requestBean.hostTel) && !VerifyUtils.isMobile(requestBean.hostTel)) {
+                if (!VerifyUtils.isPhone(requestBean.hostTel) && !VerifyUtils.isLoMobile(requestBean.hostTel)) {
                     return errorAndClear(requestBean, "请填写正确的电话号码");
                 }
                 changed = true;
