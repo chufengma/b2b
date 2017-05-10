@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import onefengma.demo.common.VerifyUtils;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +19,10 @@ import java.util.Map;
 public class RxDemo {
 
     public static void main(String[] args) {
-        System.out.println("========" + VerifyUtils.isMobile("17611112222"));
+//        String data = "9999.98";
+//        BigDecimal bg = new BigDecimal(data);
+//        System.out.println("========" + bg.setScale(1, BigDecimal.ROUND_DOWN).toString());
+                System.out.println("========" + VerifyUtils.isPhone("051081812186"));
     }
 
 }

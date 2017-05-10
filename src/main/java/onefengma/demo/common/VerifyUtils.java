@@ -33,8 +33,8 @@ public class VerifyUtils {
         Matcher m = null;
         boolean b = false;
         p1 = Pattern.compile("^[0][1-9]{2,3}-[0-9]{5,10}$");  // 验证带区号的
-        p2 = Pattern.compile("^[1-9]{1}[0-9]{5,8}$");         // 验证没有区号的
-        if(str.length() >9)
+        p2 = Pattern.compile("^[0-9]{5,20}$");         // 验证没有区号的
+        if(str.contains("-"))
         {   m = p1.matcher(str);
             b = m.matches();
         }else{
@@ -58,7 +58,7 @@ public class VerifyUtils {
         Pattern p = null;
         Matcher m = null;
         boolean b = false;
-        p = Pattern.compile("/^0\\d{2,3}-?\\d{7,8}$/");
+        p = Pattern.compile("/^0\\d{2,3}-?\\d+$/");
         m = p.matcher(str);
         b = m.matches();
         return b;
