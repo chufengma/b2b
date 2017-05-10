@@ -12,7 +12,7 @@ public class SpecOfferUpdateRequest extends BaseBean {
     @NotRequired
     public String spec;
     @NotRequired
-    public String tolerance;
+    public String tolerance = "";
     @NotRequired
     public String price;
     @NotRequired
@@ -36,7 +36,7 @@ public class SpecOfferUpdateRequest extends BaseBean {
     @NotRequired
     public String count;
     @NotRequired
-    public String cityDesc;
+    public String cityDesc = "";
     @NotRequired
     public String des;
 
