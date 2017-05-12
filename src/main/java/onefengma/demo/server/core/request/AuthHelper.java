@@ -36,6 +36,12 @@ public class AuthHelper {
                 && (Integer.parseInt(request.session().attribute("role")) == 2 || Integer.parseInt(request.session().attribute("role")) == 0));
     }
 
+    public static boolean isBuysAdminLogin(Request request) {
+        return (StringUtils.equals(request.cookie("admin"), request.session().attribute("admin"))
+                && StringUtils.equals(request.cookie("role"), request.session().attribute("role"))
+                && (Integer.parseInt(request.session().attribute("role")) == 3 || Integer.parseInt(request.session().attribute("role")) == 0));
+    }
+
 
     public static boolean isSalesLogin(Request request) {
         return StringUtils.equals(request.cookie("sales"), request.session().attribute("sales"));

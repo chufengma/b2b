@@ -1,5 +1,6 @@
 package onefengma.demo.server.model.admin;
 
+import onefengma.demo.server.core.request.AuthHelper;
 import onefengma.demo.server.model.apibeans.AdminAuthSession;
 
 /**
@@ -7,4 +8,8 @@ import onefengma.demo.server.model.apibeans.AdminAuthSession;
  */
 public class AdminDetailRequest extends AdminAuthSession {
     public String id;
+
+    public boolean isNotValid() {
+        return !AuthHelper.isAdminLogin(request) && !AuthHelper.isBuysAdminLogin(request);
+    }
 }
