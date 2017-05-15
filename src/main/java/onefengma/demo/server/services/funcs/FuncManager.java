@@ -9,6 +9,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import onefengma.demo.common.FileHelper;
+import onefengma.demo.common.IdUtils;
 import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.VerifyUtils;
 import onefengma.demo.rx.MetaDataFetcher;
@@ -19,6 +20,7 @@ import onefengma.demo.server.core.PageBuilder;
 import onefengma.demo.server.core.ValidateHelper;
 import onefengma.demo.server.model.apibeans.BaseBean;
 import onefengma.demo.server.model.apibeans.BasePageBean;
+import onefengma.demo.server.model.apibeans.WeixinShareBean;
 import onefengma.demo.server.model.apibeans.codes.MsgCode;
 import onefengma.demo.server.model.apibeans.codes.ValidateCodeBean;
 import onefengma.demo.server.model.apibeans.meta.CityDescRequest;
@@ -35,24 +37,48 @@ import spark.utils.IOUtils;
  */
 public class FuncManager extends BaseManager {
 
-    private static String lastAccessToken = "";
+    private static String lastTicket = "";
     private static long lastGetAccessTokenTime = 0l;
 
     @Override
     public void init() {
-        get("weixin_access_token", BaseBean.class, ((request, response, requestBean1) -> {
-            if (System.currentTimeMillis() - lastGetAccessTokenTime <= 1000 * 60 * 60 * 1.5 && !StringUtils.isEmpty(lastAccessToken)) {
-                return success(JSON.parse(lastAccessToken));
-            }
-            lastGetAccessTokenTime = System.currentTimeMillis();
+        get("weixin_access_token", WeixinShareBean.class, ((request, response, requestBean1) -> {
+            String ticket;
+            if (System.currentTimeMillis() - lastGetAccessTokenTime <= 1000 * 5 && !StringUtils.isEmpty(lastTicket)) {
+                ticket = lastTicket;
+            } else {
+                lastGetAccessTokenTime = System.currentTimeMillis();
 
-            OkHttpClient client = new OkHttpClient();
-            Request weiRequest = new Request.Builder()
-                    .url("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx6ed459563788605b&secret=7c139bcd819c30a8cd65269dfffebd02")
-                    .build();
-            Response weiResponse = client.newCall(weiRequest).execute();
-            lastAccessToken = weiResponse.body().string();
-            return success(JSON.parse(lastAccessToken));
+                OkHttpClient client = new OkHttpClient();
+                Request weiRequest = new Request.Builder()
+                        .url("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx6ed459563788605b&secret=7c139bcd819c30a8cd65269dfffebd02")
+                        .build();
+                Response weiResponse = client.newCall(weiRequest).execute();
+                String lastAccessToken = weiResponse.body().string();
+                JSONObject tokenJsonObject = JSON.parseObject(lastAccessToken);
+                String token = tokenJsonObject.getString("access_token");
+
+
+                Request tokenRequest = new Request.Builder()
+                        .url("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=" + token + "&type=jsapi")
+                        .build();
+                Response tokenResponse = client.newCall(tokenRequest).execute();
+                JSONObject ticketJsonObject = JSON.parseObject(tokenResponse.body().string());
+                ticket = ticketJsonObject.getString("ticket");
+                lastTicket = ticket;
+            }
+
+            String noncestr = "D33WZgTPz0wzccna";
+            String timestamp = System.currentTimeMillis() + "";
+            String signatureBig = "jsapi_ticket=" + ticket + "&noncestr=" + noncestr + "&timestamp=" + timestamp + "&url=" + requestBean1.url;
+            String signature = IdUtils.getSha1(signatureBig);
+
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("timestamp", timestamp);
+            jsonObject.put("nonceStr", noncestr);
+            jsonObject.put("signature", signature);
+
+            return success(jsonObject);
         }));
 
         //  获取验证码
@@ -211,7 +237,7 @@ public class FuncManager extends BaseManager {
             return success(requestBean.image.getPath().replace('\\', '/').replace("./res/", "/"));
         }));
 
-        get("test", NewsDetailRequest.class,((request, response, requestBean) -> {
+        get("test", NewsDetailRequest.class, ((request, response, requestBean) -> {
             return success("You Are Right");
         }));
     }
