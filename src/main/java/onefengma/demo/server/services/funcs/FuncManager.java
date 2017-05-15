@@ -44,6 +44,8 @@ public class FuncManager extends BaseManager {
     public void init() {
         get("weixin_access_token", WeixinShareBean.class, ((request, response, requestBean1) -> {
             String ticket;
+            String appid = "wx6ed459563788605b";
+            String secret = "7c139bcd819c30a8cd65269dfffebd02";
             if (System.currentTimeMillis() - lastGetAccessTokenTime <= 1000 * 5 && !StringUtils.isEmpty(lastTicket)) {
                 ticket = lastTicket;
             } else {
@@ -51,7 +53,7 @@ public class FuncManager extends BaseManager {
 
                 OkHttpClient client = new OkHttpClient();
                 Request weiRequest = new Request.Builder()
-                        .url("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx6ed459563788605b&secret=7c139bcd819c30a8cd65269dfffebd02")
+                        .url("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + appid + "&secret=" + secret)
                         .build();
                 Response weiResponse = client.newCall(weiRequest).execute();
                 String lastAccessToken = weiResponse.body().string();
@@ -77,6 +79,7 @@ public class FuncManager extends BaseManager {
             jsonObject.put("timestamp", timestamp);
             jsonObject.put("nonceStr", noncestr);
             jsonObject.put("signature", signature);
+            jsonObject.put("appid", appid);
 
             return success(jsonObject);
         }));
