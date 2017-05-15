@@ -3,7 +3,13 @@ package onefengma.demo.server.services.funcs;
 import java.io.File;
 import java.io.FileInputStream;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import onefengma.demo.common.FileHelper;
+import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.VerifyUtils;
 import onefengma.demo.rx.MetaDataFetcher;
 import onefengma.demo.server.config.Config;
@@ -29,8 +35,26 @@ import spark.utils.IOUtils;
  */
 public class FuncManager extends BaseManager {
 
+    private static String lastAccessToken = "";
+    private static long lastGetAccessTokenTime = 0l;
+
     @Override
     public void init() {
+        get("weixin_access_token", BaseBean.class, ((request, response, requestBean1) -> {
+            if (System.currentTimeMillis() - lastGetAccessTokenTime <= 1000 * 60 * 60 * 1.5 && !StringUtils.isEmpty(lastAccessToken)) {
+                return success(JSON.parse(lastAccessToken));
+            }
+            lastGetAccessTokenTime = System.currentTimeMillis();
+
+            OkHttpClient client = new OkHttpClient();
+            Request weiRequest = new Request.Builder()
+                    .url("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx6ed459563788605b&secret=7c139bcd819c30a8cd65269dfffebd02")
+                    .build();
+            Response weiResponse = client.newCall(weiRequest).execute();
+            lastAccessToken = weiResponse.body().string();
+            return success(JSON.parse(lastAccessToken));
+        }));
+
         //  获取验证码
         get("validateCode.png", BaseBean.class, ((request, response, requestBean1) -> {
             ValidateHelper.generateValidateCode(request, response);
