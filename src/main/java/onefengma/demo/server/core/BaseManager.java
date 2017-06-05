@@ -392,6 +392,10 @@ public abstract class BaseManager {
                             if (!AuthHelper.isSpecOfferAdminLogin(request)) {
                                 response.redirect("/admin/spec_offer_login.html");
                             }
+                        } else if (request.pathInfo().startsWith("/admin/pushBuyAuth")) {
+                            if (!AuthHelper.isPushBuyAdminLogin(request)) {
+                                response.redirect("/admin/push_buy_admin_login.html");
+                            }
                         } else if (request.pathInfo().startsWith("/admin/auth")) {
                             if (!AuthHelper.isAdminLogin(request)) {
                                 response.redirect("/admin/login.html");
