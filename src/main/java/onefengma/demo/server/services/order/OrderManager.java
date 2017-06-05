@@ -144,7 +144,6 @@ public class OrderManager extends BaseManager{
                             DateHelper.getDataStr(System.currentTimeMillis() + requestBean.timeLimit)
                             + "前确认");
                 }
-                return success();
             }
             return success();
         }));

@@ -16,16 +16,7 @@ import onefengma.demo.server.model.SalesMan;
 import onefengma.demo.server.model.User;
 import onefengma.demo.server.model.UserProfile;
 import onefengma.demo.server.model.admin.*;
-import onefengma.demo.server.model.apibeans.admin.AdminBuysRequest;
-import onefengma.demo.server.model.apibeans.admin.AdminChangeSalesmanRequest;
-import onefengma.demo.server.model.apibeans.admin.AdminDeleteBuyRequest;
-import onefengma.demo.server.model.apibeans.admin.AdminDeleteOrderRequest;
-import onefengma.demo.server.model.apibeans.admin.AdminFindHelpRequest;
-import onefengma.demo.server.model.apibeans.admin.AdminLoginRequest;
-import onefengma.demo.server.model.apibeans.admin.AdminOrdersRequest;
-import onefengma.demo.server.model.apibeans.admin.AdminSalesRequest;
-import onefengma.demo.server.model.apibeans.admin.DeleteUserRequest;
-import onefengma.demo.server.model.apibeans.admin.UpdateUserRequest;
+import onefengma.demo.server.model.apibeans.admin.*;
 import onefengma.demo.server.model.apibeans.logistics.LogisticsActionRequst;
 import onefengma.demo.server.model.apibeans.logistics.LogisticsDeleteRequst;
 import onefengma.demo.server.model.apibeans.logistics.LogisticsPageRequst;
@@ -37,11 +28,10 @@ import onefengma.demo.server.model.apibeans.others.EditNewsRequest;
 import onefengma.demo.server.model.apibeans.others.EditRecruitRequest;
 import onefengma.demo.server.model.apibeans.others.InnerMessageRequest;
 import onefengma.demo.server.model.apibeans.others.NewsDetailRequest;
+import onefengma.demo.server.model.apibeans.product.IronBuyRequest;
 import onefengma.demo.server.model.logistics.LogisticsNormalBean;
-import onefengma.demo.server.model.product.HandingDetail;
-import onefengma.demo.server.model.product.IronBuyBrief;
-import onefengma.demo.server.model.product.IronDetail;
-import onefengma.demo.server.model.product.SupplyBrief;
+import onefengma.demo.server.model.metaData.IconDataCategory;
+import onefengma.demo.server.model.product.*;
 import onefengma.demo.server.services.funcs.CityDataHelper;
 import onefengma.demo.server.services.funcs.InnerMessageDataHelper;
 import onefengma.demo.server.services.funcs.NewsDataHelper;
@@ -219,6 +209,38 @@ public class AdminManager extends BaseManager {
             return success("删除成功");
         }));
 
+
+        post("buyByAdmin", IronBuyRequestByAdmin.class, ((request, response, requestBean) -> {
+            if (!SellerDataHelper.instance().isSeller(requestBean.userId)) {
+                return error("该用户不是企业用户，不能发布求购, 请前往后台点击成为商家上传公司三证等相关资料");
+            }
+
+            // 材料种类
+            if (!IconDataCategory.get().materials.contains(requestBean.material)) {
+                return errorAndClear(requestBean, "材料种类填写不正确");
+            }
+            // 表面种类
+            if (!IconDataCategory.get().surfaces.contains(requestBean.surface)) {
+                return errorAndClear(requestBean, "表面种类填写不正确");
+            }
+            // 不锈钢品类
+            if (!IconDataCategory.get().types.contains(requestBean.ironType)) {
+                return errorAndClear(requestBean, "不锈钢品类填写不正确");
+            }
+            // 不锈钢产地
+            if (!IconDataCategory.get().productPlaces.contains(requestBean.proPlace)) {
+                return errorAndClear(requestBean, "不锈钢产地填写不正确");
+            }
+
+            if (!CityDataHelper.instance().isCityExist(requestBean.locationCityId)) {
+                return errorAndClear(requestBean, "交货地点不存在");
+            }
+            IronBuy ironBuy = requestBean.generateIronBuy();
+            ironBuy.salesmanId = UserDataHelper.instance().getSalesManId(requestBean.userId);
+            IronDataHelper.getIronDataHelper().pushIronBuy(ironBuy);
+
+            return success();
+        }));
 
         get("buys", AdminBuysRequest.class, ((request, response, requestBean) -> {
             getIronDataHelper().updateBuyStatus();
