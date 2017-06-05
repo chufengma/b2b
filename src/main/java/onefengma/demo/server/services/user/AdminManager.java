@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import com.alibaba.fastjson.JSONObject;
 import onefengma.demo.common.DateHelper;
 import onefengma.demo.common.DateHelper.TimeRange;
 import onefengma.demo.common.IdUtils;
@@ -11,10 +12,7 @@ import onefengma.demo.common.StringUtils;
 import onefengma.demo.common.VerifyUtils;
 import onefengma.demo.server.core.*;
 import onefengma.demo.server.core.request.TypedRoute;
-import onefengma.demo.server.model.Admin;
-import onefengma.demo.server.model.SalesMan;
-import onefengma.demo.server.model.User;
-import onefengma.demo.server.model.UserProfile;
+import onefengma.demo.server.model.*;
 import onefengma.demo.server.model.admin.*;
 import onefengma.demo.server.model.apibeans.admin.*;
 import onefengma.demo.server.model.apibeans.logistics.LogisticsActionRequst;
@@ -209,9 +207,26 @@ public class AdminManager extends BaseManager {
             return success("删除成功");
         }));
 
+        get("querySellerByMobile", QuerySellerRequestByAdmin.class, ((request, response, requestBean) -> {
+
+            String userId = UserDataHelper.instance().getUserIdByMobile(requestBean.userMobile);
+            if (StringUtils.isEmpty(userId)) {
+                return error("用户不存在");
+            }
+            Seller seller = SellerDataHelper.instance().getSellerByUserId(userId);
+            if (seller == null) {
+                return error("商家不存在");
+            }
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("companyName", seller.companyName);
+            return success(jsonObject);
+        }));
 
         post("buyByAdmin", IronBuyRequestByAdmin.class, ((request, response, requestBean) -> {
-            if (!SellerDataHelper.instance().isSeller(requestBean.userId)) {
+
+            String userId = UserDataHelper.instance().getUserIdByMobile(requestBean.userMobile);
+
+            if (StringUtils.isEmpty(userId) || !SellerDataHelper.instance().isSeller(userId)) {
                 return error("该用户不是企业用户，不能发布求购, 请前往后台点击成为商家上传公司三证等相关资料");
             }
 
@@ -236,7 +251,8 @@ public class AdminManager extends BaseManager {
                 return errorAndClear(requestBean, "交货地点不存在");
             }
             IronBuy ironBuy = requestBean.generateIronBuy();
-            ironBuy.salesmanId = UserDataHelper.instance().getSalesManId(requestBean.userId);
+            ironBuy.userId = userId;
+            ironBuy.salesmanId = UserDataHelper.instance().getSalesManId(userId);
             IronDataHelper.getIronDataHelper().pushIronBuy(ironBuy);
 
             return success();

@@ -30,7 +30,7 @@ public class IronBuyRequestByAdmin extends AdminAuthSession {
     public String unit;
     @NotRequired
     public String ironId;
-    public String userId;
+    public String userMobile;
 
     public IronBuy generateIronBuy() {
         IronBuy ironBuy = new IronBuy();
@@ -41,7 +41,6 @@ public class IronBuyRequestByAdmin extends AdminAuthSession {
         ironBuy.surface = surface;
         ironBuy.locationCityId = locationCityId;
         ironBuy.message = message;
-        ironBuy.userId = userId;
         ironBuy.pushTime = System.currentTimeMillis();
 
         ironBuy.length = length;
