@@ -3,6 +3,7 @@ package onefengma.demo.server.model.apibeans.admin;
 import onefengma.demo.annotation.NotRequired;
 import onefengma.demo.common.IdUtils;
 import onefengma.demo.common.StringUtils;
+import onefengma.demo.server.core.request.AuthHelper;
 import onefengma.demo.server.model.apibeans.AdminAuthSession;
 import onefengma.demo.server.model.apibeans.AuthSession;
 import onefengma.demo.server.model.product.IronBuy;
@@ -52,5 +53,10 @@ public class IronBuyRequestByAdmin extends AdminAuthSession {
         ironBuy.unit = unit;
         ironBuy.appFlag = getMobileFlag();
         return ironBuy;
+    }
+
+
+    public boolean isNotValid() {
+        return !AuthHelper.isAdminLogin(request) && !AuthHelper.isPushBuyAdminLogin(request);
     }
 }
