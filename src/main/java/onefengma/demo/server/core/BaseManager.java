@@ -415,7 +415,9 @@ public abstract class BaseManager {
                             return;
                         }
                     } else if (pathInfo.startsWith("/nadmin")) {
-                        pageFile = FileHelper.getFileFromPath("/nadmin/index.html");
+                        if (!pathInfo.startsWith("/nadmin/static")) {
+                            pageFile = FileHelper.getFileFromPath("/nadmin/index.html");
+                        }
                     }
                     // other request
                     if (pageFile == null) {
