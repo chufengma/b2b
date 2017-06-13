@@ -229,7 +229,7 @@ public class UserDataHelper extends BaseDataHelper {
         String handingBuyCountsql = "select count(*) from handing_buy where status = 0 and userId=:userId ";
         String orderCountSql = "select count(*) from product_orders where status = 0 and buyerId=:userId";
 
-        String ironProducts = "selct count(*) from select count(*) from iron_product where userId=:userId and reviewed=true and deleteStatus=0";
+        String ironProducts = "select count(*) from iron_product where userId=:userId and reviewed=true and deleteStatus=0";
 
         String waitSupplySql = "select count(*) from iron_buy,iron_buy_seller where iron_buy.id=iron_buy_seller.ironId and iron_buy.status=0 and iron_buy_seller.sellerId=:userId";
         String supplyBiddingSql = "select count(*) from iron_buy,iron_buy_supply where iron_buy.id=iron_buy_supply.ironId and iron_buy.status=0 and iron_buy_supply.sellerId=:userId";
