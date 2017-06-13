@@ -810,7 +810,7 @@ public class IronDataHelper extends BaseDataHelper {
     }
 
     public int getMyIronProductCount(String userId) {
-        String sql = "select count(*) from iron_product where userId=:userId and reviewed=true ";
+        String sql = "select count(*) from iron_product where userId=:userId and reviewed=true and deleteStatus=0 ";
         try (Connection conn = getConn()) {
             Integer count = conn.createQuery(sql)
                     .addParameter("userId", userId).executeScalar(Integer.class);

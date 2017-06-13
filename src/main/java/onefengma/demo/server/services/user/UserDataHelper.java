@@ -228,6 +228,14 @@ public class UserDataHelper extends BaseDataHelper {
         String ironBuyCountsql = "select count(*) from iron_buy where status = 0 and userId=:userId ";
         String handingBuyCountsql = "select count(*) from handing_buy where status = 0 and userId=:userId ";
         String orderCountSql = "select count(*) from product_orders where status = 0 and buyerId=:userId";
+
+        String ironProducts = "selct count(*) from select count(*) from iron_product where userId=:userId and reviewed=true and deleteStatus=0";
+
+        String waitSupplySql = "select count(*) from iron_buy,iron_buy_seller where iron_buy.id=iron_buy_seller.ironId and iron_buy.status=0 and iron_buy_seller.sellerId=:userId";
+        String supplyBiddingSql = "select count(*) from iron_buy,iron_buy_supply where iron_buy.id=iron_buy_supply.ironId and iron_buy.status=0 and iron_buy_supply.sellerId=:userId";
+
+        String supplySuccessSql = "select count(*) from iron_buy,iron_buy_supply where iron_buy.id=iron_buy_supply.ironId and iron_buy.status=1 and iron_buy_supply.sellerId=:userId1 and supplyUserId=:userId2";
+
         try(Connection conn = getConn()) {
             BigDecimal integral = conn.createQuery(sql).addParameter("userId", userId).executeScalar(BigDecimal.class);
             integral = (integral == null) ? new BigDecimal(0) : integral;
@@ -241,10 +249,27 @@ public class UserDataHelper extends BaseDataHelper {
             Integer orderCount = conn.createQuery(orderCountSql).addParameter("userId", userId).executeScalar(Integer.class);
             orderCount = (orderCount == null) ? 0 : orderCount;
 
+            Integer ironProductsCount = conn.createQuery(ironProducts).addParameter("userId", userId).executeScalar(Integer.class);
+            ironProductsCount = (ironProductsCount == null) ? 0 : ironProductsCount;
+
+            Integer waitSupplyCount = conn.createQuery(waitSupplySql).addParameter("userId", userId).executeScalar(Integer.class);
+            waitSupplyCount = (waitSupplyCount == null) ? 0 : waitSupplyCount;
+
+            Integer biddingSupplyCount = conn.createQuery(supplyBiddingSql).addParameter("userId", userId).executeScalar(Integer.class);
+            biddingSupplyCount = (biddingSupplyCount == null) ? 0 : biddingSupplyCount;
+
+            Integer supplySuccessCount = conn.createQuery(supplySuccessSql).addParameter("userId1", userId).addParameter("userId2", userId).executeScalar(Integer.class);
+            supplySuccessCount = (supplySuccessCount == null) ? 0 : supplySuccessCount;
+
             UserInfo userInfo = new UserInfo();
             userInfo.integral = integral;
             userInfo.buys = ironCount + handingCount;
             userInfo.orders = orderCount;
+            userInfo.irons = ironProductsCount;
+            userInfo.supplyPendingCount = waitSupplyCount;
+            userInfo.biddingSupplyCount = biddingSupplyCount;
+            userInfo.supplySuccessCount = supplySuccessCount;
+
 
             return userInfo;
         }
@@ -281,6 +306,10 @@ public class UserDataHelper extends BaseDataHelper {
         public BigDecimal integral;
         public int buys;
         public int orders;
+        public int irons;
+        public int biddingSupplyCount;
+        public int supplySuccessCount;
+        public int supplyPendingCount;
     }
 
     public void updateSalesmanBindTime(int salesmanId, String userId) {
