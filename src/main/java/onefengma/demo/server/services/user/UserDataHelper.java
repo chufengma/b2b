@@ -229,9 +229,42 @@ public class UserDataHelper extends BaseDataHelper {
         String handingBuyCountsql = "select count(*) from handing_buy where status = 0 and userId=:userId ";
         String orderCountSql = "select count(*) from product_orders where status = 0 and buyerId=:userId";
 
+        try(Connection conn = getConn()) {
+            BigDecimal integral = conn.createQuery(sql).addParameter("userId", userId).executeScalar(BigDecimal.class);
+            integral = (integral == null) ? new BigDecimal(0) : integral;
+
+            Integer ironCount = conn.createQuery(ironBuyCountsql).addParameter("userId", userId).executeScalar(Integer.class);
+            ironCount = (ironCount == null) ? 0 : ironCount;
+
+            Integer handingCount = conn.createQuery(handingBuyCountsql).addParameter("userId", userId).executeScalar(Integer.class);
+            handingCount = (handingCount == null) ? 0 : handingCount;
+
+            Integer orderCount = conn.createQuery(orderCountSql).addParameter("userId", userId).executeScalar(Integer.class);
+            orderCount = (orderCount == null) ? 0 : orderCount;
+
+
+            UserInfo userInfo = new UserInfo();
+            userInfo.integral = integral;
+            userInfo.buys = ironCount + handingCount;
+            userInfo.orders = orderCount;
+
+
+            return userInfo;
+        }
+    }
+
+    public UserInfo getSellerInfo(String userId) {
+        String sql = "select integral from seller where userId=:userId";
+        String ironBuyCountsql = "select count(*) from iron_buy where status = 0 and userId=:userId ";
+        String handingBuyCountsql = "select count(*) from handing_buy where status = 0 and userId=:userId ";
+        String orderCountSql = "select count(*) from product_orders where status = 0 and sellerId=:userId";
+
+
         String ironProducts = "select count(*) from iron_product where userId=:userId and reviewed=true and deleteStatus=0";
 
         String waitSupplySql = "select count(*) from iron_buy,iron_buy_seller where iron_buy.id=iron_buy_seller.ironId and iron_buy.status=0 and iron_buy_seller.sellerId=:userId";
+        String waitSupplySql2 = "select count(*) from iron_buy,iron_buy_supply where iron_buy.id=iron_buy_supply.ironId  and iron_buy.status=0 and iron_buy_supply.sellerId=:userId";
+
         String supplyBiddingSql = "select count(*) from iron_buy,iron_buy_supply where iron_buy.id=iron_buy_supply.ironId and iron_buy.status=0 and iron_buy_supply.sellerId=:userId";
 
         String supplySuccessSql = "select count(*) from iron_buy,iron_buy_supply where iron_buy.id=iron_buy_supply.ironId and iron_buy.status=1 and iron_buy_supply.sellerId=:userId1 and supplyUserId=:userId2";
@@ -254,6 +287,9 @@ public class UserDataHelper extends BaseDataHelper {
 
             Integer waitSupplyCount = conn.createQuery(waitSupplySql).addParameter("userId", userId).executeScalar(Integer.class);
             waitSupplyCount = (waitSupplyCount == null) ? 0 : waitSupplyCount;
+            Integer waitSupplyCoun2 = conn.createQuery(waitSupplySql2).addParameter("userId", userId).executeScalar(Integer.class);
+            waitSupplyCoun2 = (waitSupplyCoun2 == null) ? 0 : waitSupplyCoun2;
+            waitSupplyCount = waitSupplyCount - waitSupplyCoun2;
 
             Integer biddingSupplyCount = conn.createQuery(supplyBiddingSql).addParameter("userId", userId).executeScalar(Integer.class);
             biddingSupplyCount = (biddingSupplyCount == null) ? 0 : biddingSupplyCount;
@@ -265,38 +301,11 @@ public class UserDataHelper extends BaseDataHelper {
             userInfo.integral = integral;
             userInfo.buys = ironCount + handingCount;
             userInfo.orders = orderCount;
+
             userInfo.irons = ironProductsCount;
             userInfo.supplyPendingCount = waitSupplyCount;
             userInfo.biddingSupplyCount = biddingSupplyCount;
             userInfo.supplySuccessCount = supplySuccessCount;
-
-
-            return userInfo;
-        }
-    }
-
-    public UserInfo getSellerInfo(String userId) {
-        String sql = "select integral from seller where userId=:userId";
-        String ironBuyCountsql = "select count(*) from iron_buy where status = 0 and userId=:userId ";
-        String handingBuyCountsql = "select count(*) from handing_buy where status = 0 and userId=:userId ";
-        String orderCountSql = "select count(*) from product_orders where status = 0 and sellerId=:userId";
-        try(Connection conn = getConn()) {
-            BigDecimal integral = conn.createQuery(sql).addParameter("userId", userId).executeScalar(BigDecimal.class);
-            integral = (integral == null) ? new BigDecimal(0) : integral;
-
-            Integer ironCount = conn.createQuery(ironBuyCountsql).addParameter("userId", userId).executeScalar(Integer.class);
-            ironCount = (ironCount == null) ? 0 : ironCount;
-
-            Integer handingCount = conn.createQuery(handingBuyCountsql).addParameter("userId", userId).executeScalar(Integer.class);
-            handingCount = (handingCount == null) ? 0 : handingCount;
-
-            Integer orderCount = conn.createQuery(orderCountSql).addParameter("userId", userId).executeScalar(Integer.class);
-            orderCount = (orderCount == null) ? 0 : orderCount;
-
-            UserInfo userInfo = new UserInfo();
-            userInfo.integral = integral;
-            userInfo.buys = ironCount + handingCount;
-            userInfo.orders = orderCount;
 
             return userInfo;
         }
