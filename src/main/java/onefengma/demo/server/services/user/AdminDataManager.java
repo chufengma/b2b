@@ -327,6 +327,10 @@ public class AdminDataManager extends BaseDataHelper {
                     buyForAdmin.sellerCompany = seller.companyName;
                 }
 
+                Seller buySeller = SellerDataHelper.instance().getSeller(buyerId);
+                if (buySeller != null) {
+                    buyForAdmin.buyerCompany = buySeller.companyName;
+                }
                 buyForAdmins.add(buyForAdmin);
             }
 
@@ -957,6 +961,8 @@ public class AdminDataManager extends BaseDataHelper {
         public int status;   // ok
         public int salesManId;   // ok
         public String salesManMobile; // ok
+
+        public String buyerCompany;
 
         public int appFlag;
         public String desc;
